@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Steel Plant Info</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { -webkit-tap-highlight-color: transparent; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            overscroll-behavior-y: none;
+            background: #f1f5f9;
+        }
+        
+        /* Safe area for notched phones */
+        .safe-top { padding-top: env(safe-area-inset-top); }
+        .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+        
+        /* Hide scrollbar but keep functionality */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Bottom sheet animation */
+        .bottom-sheet {
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .bottom-sheet.open {
+            transform: translateY(0);
+        }
+        
+        /* Floating label animation */
+        .floating-input:focus ~ label,
+        .floating-input:not(:placeholder-shown) ~ label {
+            transform: translateY(-1.5rem) scale(0.85);
+            color: #3b82f6;
+        }
+        
+        /* Card press effect */
+        .press-card:active {
+            transform: scale(0.98);
+            transition: transform 0.1s;
+        }
+        
+        /* Custom checkbox for mobile */
+        .mobile-check:checked {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+        }
+        .mobile-check:checked:after {
+            content: '✓';
+            display: block;
+            text-align: center;
+            color: white;
+            font-size: 12px;
+            line-height: 20px;
+        }
+        
+        /* Image grid for mobile */
+        .masonry-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        
+        /* Toast Notification - Fixed position and auto-hide */
+        .toast-container {
+            position: fixed;
+            top: 80px; /* Below header */
+            left: 16px;
+            right: 16px;
+            z-index: 100;
+            pointer-events: none; /* Allow clicks through */
+            display: flex;
+            justify-content: center;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+        }
+        
+        .toast-container.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .toast-box {
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 100%;
+            font-size: 14px;
+            font-weight: 500;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        /* Step indicator dots */
+        .step-dot {
+            transition: all 0.3s;
+        }
+        .step-dot.active {
+            background: #3b82f6;
+            transform: scale(1.2);
+        }
+        
+        /* Swipeable cards */
+        .swipe-card {
+            touch-action: pan-y;
+            user-select: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 pb-20">
+
+    <!-- Toast Notification - Moved to top -->
+    <div id="toastContainer" class="toast-container">
+        <div class="toast-box">
+            <i id="toastIcon" class="fa-solid fa-check-circle text-green-400"></i>
+            <span id="toastMsg">Operation successful</span>
+        </div>
+    </div>
+
+    <!-- Status Bar Background -->
+    <div class="fixed top-0 left-0 right-0 h-12 bg-slate-900 z-50 safe-top flex items-center justify-between px-4">
+        <span class="text-white font-semibold text-sm">Steel Plant Info</span>
+        <div class="flex items-center space-x-2 text-white text-xs">
+            <i class="fa-solid fa-signal"></i>
+            <i class="fa-solid fa-wifi"></i>
+            <i class="fa-solid fa-battery-full"></i>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="fixed top-12 left-0 right-0 bg-white shadow-sm z-40 safe-top">
+        <div class="flex items-center justify-between px-4 py-3">
+            <button onclick="goBack()" class="w-10 h-10 flex items-center justify-center -ml-2 active:bg-slate-100 rounded-full">
+                <i class="fa-solid fa-chevron-left text-slate-600 text-lg"></i>
+            </button>
+            <h1 class="text-lg font-bold text-slate-800" id="pageTitle">Basic Info</h1>
+            <button onclick="showHelp()" class="w-10 h-10 flex items-center justify-center -mr-2 active:bg-slate-100 rounded-full">
+                <i class="fa-solid fa-circle-question text-slate-400 text-lg"></i>
+            </button>
+        </div>
+        
+        <!-- Progress Dots -->
+        <div class="flex justify-center space-x-2 pb-3 px-4">
+            <div class="step-dot active w-2 h-2 rounded-full bg-slate-300" data-step="1"></div>
+            <div class="step-dot w-2 h-2 rounded-full bg-slate-300" data-step="2"></div>
+            <div class="step-dot w-2 h-2 rounded-full bg-slate-300" data-step="3"></div>
+            <div class="step-dot w-2 h-2 rounded-full bg-slate-300" data-step="4"></div>
+            <div class="step-dot w-2 h-2 rounded-full bg-slate-300" data-step="5"></div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="pt-32 px-4 pb-24 max-w-md mx-auto" id="mainContent">
+        
+        <!-- Section 1: Basic Info -->
+        <div id="section1" class="space-y-4 animate-fade-in">
+            <div class="bg-white rounded-2xl p-4 shadow-sm space-y-4">
+                <div class="relative">
+                    <input type="text" id="plantName" placeholder=" " 
+                           class="floating-input w-full px-4 py-4 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:outline-none text-base bg-transparent peer"
+                           oninput="validateField(this)">
+                    <label class="absolute left-4 top-4 text-slate-400 transition-all pointer-events-none bg-white px-1">
+                        Plant Full Name <span class="text-red-500">*</span>
+                    </label>
+                    <i class="fa-solid fa-industry absolute right-4 top-4 text-slate-300"></i>
+                </div>
+
+                <div class="relative">
+                    <input type="text" id="shortName" placeholder=" " 
+                           class="floating-input w-full px-4 py-4 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:outline-none text-base bg-transparent peer"
+                           oninput="validateField(this)">
+                    <label class="absolute left-4 top-4 text-slate-400 transition-all pointer-events-none bg-white px-1">
+                        Short Name <span class="text-red-500">*</span>
+                    </label>
+                    <i class="fa-solid fa-tag absolute right-4 top-4 text-slate-300"></i>
+                </div>
+
+                <div class="relative">
+                    <input type="text" id="groupName" placeholder=" " 
+                           class="floating-input w-full px-4 py-4 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:outline-none text-base bg-transparent peer"
+                           oninput="validateField(this)">
+                    <label class="absolute left-4 top-4 text-slate-400 transition-all pointer-events-none bg-white px-1">
+                        Parent Group <span class="text-red-500">*</span>
+                    </label>
+                    <i class="fa-solid fa-building-columns absolute right-4 top-4 text-slate-300"></i>
+                </div>
+            </div>
+
+            <div class="bg-blue-50 rounded-xl p-4 border border-blue-100 flex items-start space-x-3">
+                <i class="fa-solid fa-circle-info text-blue-500 mt-0.5"></i>
+                <p class="text-sm text-blue-800">Enter the official registered name of the steel plant and its parent holding company.</p>
+            </div>
+        </div>
+
+        <!-- Section 2: Production Method -->
+        <div id="section2" class="space-y-4 hidden">
+            <div class="bg-white rounded-2xl p-4 shadow-sm">
+                <h3 class="font-semibold text-slate-800 mb-3">Select Production Methods</h3>
+                <div class="space-y-2" id="methodList">
+                    <!-- Generated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Equipment -->
+        <div id="section3" class="space-y-4 hidden">
+            <div class="flex justify-between items-center px-1">
+                <h3 class="font-semibold text-slate-800">Equipment List</h3>
+                <button onclick="addEquipmentMobile()" class="bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium active:bg-blue-700 shadow-md">
+                    <i class="fa-solid fa-plus mr-1"></i> Add
+                </button>
+            </div>
+            
+            <div id="equipmentCards" class="space-y-3">
+                <!-- Equipment cards generated here -->
+            </div>
+            
+            <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 text-center text-slate-500 text-sm" id="emptyEquipment">
+                <i class="fa-solid fa-box-open text-3xl mb-2 block"></i>
+                No equipment added yet
+            </div>
+        </div>
+
+        <!-- Section 4: Metrics -->
+        <div id="section4" class="space-y-4 hidden">
+            <div class="bg-white rounded-2xl p-4 shadow-sm space-y-4">
+                <h3 class="font-semibold text-slate-800 mb-2">Production Metrics</h3>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-slate-50 rounded-xl p-3 border border-slate-200">
+                        <label class="text-xs text-slate-500 block mb-1">Crude Steel</label>
+                        <div class="flex items-center">
+                            <input type="number" class="w-full bg-transparent text-lg font-semibold outline-none" placeholder="0.00">
+                            <span class="text-xs text-slate-400 ml-1">Mt</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-slate-50 rounded-xl p-3 border border-slate-200">
+                        <label class="text-xs text-slate-500 block mb-1">Pig Iron</label>
+                        <div class="flex items-center">
+                            <input type="number" class="w-full bg-transparent text-lg font-semibold outline-none" placeholder="0.00">
+                            <span class="text-xs text-slate-400 ml-1">Mt</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 rounded-xl p-3 border border-slate-200">
+                        <label class="text-xs text-slate-500 block mb-1">Utilization</label>
+                        <div class="flex items-center">
+                            <input type="number" class="w-full bg-transparent text-lg font-semibold outline-none" placeholder="0">
+                            <span class="text-xs text-slate-400 ml-1">%</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 rounded-xl p-3 border border-slate-200">
+                        <label class="text-xs text-slate-500 block mb-1">Energy</label>
+                        <div class="flex items-center">
+                            <input type="number" class="w-full bg-transparent text-lg font-semibold outline-none" placeholder="0">
+                            <span class="text-xs text-slate-400 ml-1">kgce</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-3 pt-2">
+                    <div class="bg-slate-50 rounded-xl p-3 border border-slate-200">
+                        <label class="text-xs text-slate-500 block mb-1">Coke Ratio</label>
+                        <div class="flex items-center">
+                            <input type="number" class="w-full bg-transparent text-lg font-semibold outline-none" placeholder="0">
+                            <span class="text-xs text-slate-400 ml-1">kg/t</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 rounded-xl p-3 border border-slate-200">
+                        <label class="text-xs text-slate-500 block- mb-1">Labor Productivity</label>
+                        <div class="flex items-center">
+                            <input type="number" class="w-full bg-transparent text-lg font-semibold outline-none" placeholder="0">
+                            <span class="text-xs text-slate-400 ml-1">t/person</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <label class="text-sm font-medium text-slate-700 mb-2 block">Additional Notes</label>
+                    <textarea class="w-full bg-slate-50 rounded-xl p-3 border border-slate-200 outline-none focus:border-blue-500 resize-none text-sm" 
+                              rows="3" placeholder="Enter any additional metrics..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 5: Uploads -->
+        <div id="section5" class="space-y-4 hidden">
+            <!-- Photos -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="font-semibold text-slate-800">Photos</h3>
+                    <span class="text-xs text-slate-500" id="photoCount">0/10</span>
+                </div>
+                
+                <div class="masonry-grid mb-3" id="photoGrid">
+                    <!-- Add Photo Button -->
+                    <button onclick="triggerPhotoUpload()" class="aspect-square bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center text-slate-400 active:bg-slate-100">
+                        <i class="fa-solid fa-camera text-2xl mb-1"></i>
+                        <span class="text-xs">Add</span>
+                    </button>
+                </div>
+                
+                <input type="file" id="photoInput" accept="image/*" multiple capture="environment" class="hidden" onchange="handlePhotos(this)">
+                
+                <p class="text-xs text-slate-500 text-center">Tap to take photo or upload from gallery</p>
+            </div>
+
+            <!-- Documents -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="font-semibold text-slate-800">Documents</h3>
+                    <button onclick="triggerDocUpload()" class="text-blue-600 text-sm font-medium">
+                        <i class="fa-solid fa-plus"></i> Add
+                    </button>
+                </div>
+                
+                <input type="file" id="docInput" accept=".pdf,.doc,.docx,.xls,.xlsx" multiple class="hidden" onchange="handleDocs(this)">
+                
+                <div id="docListMobile" class="space-y-2">
+                    <div class="text-center text-slate-400 py-8 text-sm">
+                        <i class="fa-solid fa-file-import text-3xl mb-2 block"></i>
+                        No documents uploaded
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 safe-bottom z-50 pb-safe">
+        <div class="flex justify-around items-center h-16 max-w-md mx-auto">
+            <button onclick="goToStep(1)" class="nav-btn flex flex-col items-center justify-center w-16 h-full space-y-1 text-blue-600" data-nav="1">
+                <i class="fa-solid fa-building text-xl"></i>
+                <span class="text-[10px] font-medium">Info</span>
+            </button>
+            
+            <button onclick="goToStep(2)" class="nav-btn flex flex-col items-center justify-center w-16 h-full space-y-1 text-slate-400" data-nav="2">
+                <i class="fa-solid fa-fire text-xl"></i>
+                <span class="text-[10px] font-medium">Method</span>
+            </button>
+            
+            <button onclick="goToStep(3)" class="nav-btn flex flex-col items-center justify-center w-16 h-full space-y-1 text-slate-400" data-nav="3">
+                <i class="fa-solid fa-gears text-xl"></i>
+                <span class="text-[10px] font-medium">Equip</span>
+            </button>
+            
+            <button onclick="goToStep(4)" class="nav-btn flex flex-col items-center justify-center w-16 h-full space-y-1 text-slate-400" data-nav="4">
+                <i class="fa-solid fa-chart-simple text-xl"></i>
+                <span class="text-[10px] font-medium">Data</span>
+            </button>
+            
+            <button onclick="goToStep(5)" class="nav-btn flex flex-col items-center justify-center w-16 h-full space-y-1 text-slate-400" data-nav="5">
+                <i class="fa-solid fa-folder text-xl"></i>
+                <span class="text-[10px] font-medium">Files</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Floating Action Button (Submit) -->
+    <button onclick="submitForm()" id="submitFab" class="fixed bottom-20 right-4 w-14 h-14 bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center text-xl z-40 active:scale-90 transition-transform hidden">
+        <i class="fa-solid fa-check"></i>
+    </button>
+
+    <!-- Bottom Sheet for Equipment -->
+    <div id="equipmentSheet" class="fixed inset-0 bg-black/50 z-[60] hidden" onclick="closeSheet(event)">
+        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl p-6 bottom-sheet safe-bottom max-w-md mx-auto" onclick="event.stopPropagation()">
+            <div class="w-12 h-1 bg-slate-300 rounded-full mx-auto mb-6"></div>
+            <h3 class="text-lg font-bold mb-4">Add Equipment</h3>
+            
+            <div class="space-y-4 max-h-[60vh] overflow-y-auto no-scrollbar pb-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Equipment Type</label>
+                    <select id="sheetEquipType" class="w-full p-4 bg-slate-50 rounded-xl border border-slate-200 outline-none focus:border-blue-500 text-base">
+                        <option value="">Select type...</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Specification</label>
+                    <input type="text" id="sheetEquipSpec" class="w-full p-4 bg-slate-50 rounded-xl border border-slate-200 outline-none focus:border-blue-500 text-base" placeholder="e.g., 5000m³">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Quantity</label>
+                        <input type="number" id="sheetEquipQty" class="w-full p-4 bg-slate-50 rounded-xl border border-slate-200 outline-none focus:border-blue-500 text-base" placeholder="1" min="1">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Status</label>
+                        <select id="sheetEquipStatus" class="w-full p-4 bg-slate-50 rounded-xl border border-slate-200 outline-none focus:border-blue-500 text-base">
+                            <option value="Operating">Operating</option>
+                            <option value="Standby">Standby</option>
+                            <option value="Maintenance">Maintenance</option>
+                            <option value="Construction">Construction</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button onclick="saveEquipment()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-semibold text-lg active:bg-blue-700 mt-4 shadow-lg">
+                    Save Equipment
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Viewer Modal -->
+    <div id="imageModal" class="fixed inset-0 bg-black z-[80] hidden flex items-center justify-center" onclick="closeImageModal()">
+        <img id="modalImage" src="" class="max-w-full max-h-full object-contain" onclick="event.stopPropagation()">
+        <button class="absolute top-4 right-4 text-white text-2xl p-2" onclick="closeImageModal()">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <button class="absolute bottom-8 right-4 bg-red-600 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg" onclick="deleteCurrentImage()">
+            <i class="fa-solid fa-trash"></i>
+        </button>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let equipmentList = [];
+        let photos = [];
+        let docs = [];
+        let currentImageIndex = 0;
+        let toastTimeout;
+
+        const equipmentTypes = [
+            'Sintering Machine', 'Pelletizing Equipment', 'Blast Furnace', 
+            'Corex/Finex', 'Converter (BOF)', 'Electric Arc Furnace (EAF)', 
+            'Ladle Furnace (LF)', 'RH Degasser', 'Continuous Caster',
+            'Hot Rolling Mill', 'Cold Rolling Mill', 'Other'
+        ];
+
+        const productionMethods = [
+            { id: 'BF-BOF', name: 'BF-BOF Route', icon: 'fa-fire', color: 'text-orange-500', bg: 'bg-orange-50', desc: 'Blast Furnace + BOF' },
+            { id: 'EAF', name: 'EAF Route', icon: 'fa-bolt', color: 'text-yellow-500', bg: 'bg-yellow-50', desc: 'Electric Arc Furnace' },
+            { id: 'DRI', name: 'DRI / HBI', icon: 'fa-wind', color: 'text-blue-500', bg: 'bg-blue-50', desc: 'Direct Reduced Iron' },
+            { id: 'Smelting', name: 'Smelting Reduction', icon: 'fa-flask', color: 'text-purple-500', bg: 'bg-purple-50', desc: 'Corex, Finex' },
+            { id: 'Secondary', name: 'Secondary Refining', icon: 'fa-filter', color: 'text-green-500', bg: 'bg-green-50', desc: 'LF, RH, VD' },
+            { id: 'Casting', name: 'Continuous Casting', icon: 'fa-layer-group', color: 'text-cyan-500', bg: 'bg-cyan-50', desc: 'Slab, Bloom, Billet' }
+        ];
+
+        // Initialize
+        window.onload = function() {
+            initProductionMethods();
+            initEquipmentSelect();
+            updateUI();
+        };
+
+        function initProductionMethods() {
+            const container = document.getElementById('methodList');
+            productionMethods.forEach(method => {
+                const div = document.createElement('div');
+                div.className = 'press-card flex items-center p-3 bg-slate-50 rounded-xl border border-slate-200';
+                div.innerHTML = `
+                    <div class="w-12 h-12 ${method.bg} ${method.color} rounded-xl flex items-center justify-center text-xl mr-3">
+                        <i class="fa-solid ${method.icon}"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-slate-800">${method.name}</h4>
+                        <p class="text-xs text-slate-500">${method.desc}</p>
+                    </div>
+                    <input type="checkbox" value="${method.id}" class="mobile-check w-6 h-6 rounded-full border-2 border-slate-300 appearance-none checked:bg-blue-500 checked:border-blue-500 transition-all">
+                `;
+                div.querySelector('input').addEventListener('change', function() {
+                    if(this.checked) {
+                        div.classList.add('border-blue-500', 'bg-blue-50');
+                    } else {
+                        div.classList.remove('border-blue-500', 'bg-blue-50');
+                    }
+                });
+                container.appendChild(div);
+            });
+        }
+
+        function initEquipmentSelect() {
+            const select = document.getElementById('sheetEquipType');
+            equipmentTypes.forEach(type => {
+                const option = document.createElement('option');
+                option.value = type;
+                option.textContent = type;
+                select.appendChild(option);
+            });
+        }
+
+        function goToStep(step) {
+            // Hide all sections
+            for(let i=1; i<=5; i++) {
+                document.getElementById(`section${i}`).classList.add('hidden');
+            }
+            
+            // Show target section
+            document.getElementById(`section${step}`).classList.remove('hidden');
+            
+            // Update nav
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-blue-600');
+                btn.classList.add('text-slate-400');
+            });
+            document.querySelector(`[data-nav="${step}"]`).classList.remove('text-slate-400');
+            document.querySelector(`[data-nav="${step}"]`).classList.add('text-blue-600');
+            
+            // Update dots
+            document.querySelectorAll('.step-dot').forEach((dot, idx) => {
+                if(idx < step) dot.classList.add('active', 'bg-blue-500');
+                else dot.classList.remove('active', 'bg-blue-500');
+            });
+            
+            // Update title
+            const titles = ['Basic Info', 'Production', 'Equipment', 'Metrics', 'Documents'];
+            document.getElementById('pageTitle').textContent = titles[step-1];
+            
+            // Show/hide FAB on last step
+            document.getElementById('submitFab').classList.toggle('hidden', step !== 5);
+            
+            currentStep = step;
+            window.scrollTo(0,0);
+        }
+
+        function addEquipmentMobile() {
+            document.getElementById('equipmentSheet').classList.remove('hidden');
+            setTimeout(() => {
+                document.querySelector('#equipmentSheet > div').classList.add('open');
+            }, 10);
+        }
+
+        function closeSheet(e) {
+            if(e.target === e.currentTarget) {
+                document.querySelector('#equipmentSheet > div').classList.remove('open');
+                setTimeout(() => {
+                    document.getElementById('equipmentSheet').classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        function saveEquipment() {
+            const type = document.getElementById('sheetEquipType').value;
+            const spec = document.getElementById('sheetEquipSpec').value;
+            const qty = document.getElementById('sheetEquipQty').value;
+            const status = document.getElementById('sheetEquipStatus').value;
+            
+            if(!type) {
+                showToast('Please select equipment type', 'error');
+                return;
+            }
+            
+            const equip = { id: Date.now(), type, spec, qty: qty||1, status };
+            equipmentList.push(equip);
+            renderEquipment();
+            
+            // Close sheet
+            document.querySelector('#equipmentSheet > div').classList.remove('open');
+            setTimeout(() => {
+                document.getElementById('equipmentSheet').classList.add('hidden');
+            }, 300);
+            
+            // Clear form
+            document.getElementById('sheetEquipType').value = '';
+            document.getElementById('sheetEquipSpec').value = '';
+            document.getElementById('sheetEquipQty').value = '';
+            
+            showToast('Equipment added');
+        }
+
+        function renderEquipment() {
+            const container = document.getElementById('equipmentCards');
+            const empty = document.getElementById('emptyEquipment');
+            
+            if(equipmentList.length === 0) {
+                container.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+            
+            empty.classList.add('hidden');
+            container.innerHTML = equipmentList.map((eq, idx) => `
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200 press-card relative overflow-hidden">
+                    <div class="absolute left-0 top-0 bottom-0 w-1 ${getStatusColor(eq.status)}"></div>
+                    <div class="flex justify-between items-start pl-3">
+                        <div>
+                            <h4 class="font-semibold text-slate-800">${eq.type}</h4>
+                            <p class="text-sm text-slate-500 mt-1">${eq.spec || 'No specification'}</p>
+                            <div class="flex items-center mt-2 space-x-3 text-xs">
+                                <span class="bg-slate-100 px-2 py-1 rounded text-slate-600">Qty: ${eq.qty}</span>
+                                <span class="bg-slate-100 px-2 py-1 rounded text-slate-600">${eq.status}</span>
+                            </div>
+                        </div>
+                        <button onclick="deleteEquipment(${eq.id})" class="text-slate-300 hover:text-red-500 p-2">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getStatusColor(status) {
+            const colors = {
+                'Operating': 'bg-green-500',
+                'Standby': 'bg-yellow-500',
+                'Maintenance': 'bg-orange-500',
+                'Construction': 'bg-blue-500'
+            };
+            return colors[status] || 'bg-slate-300';
+        }
+
+        function deleteEquipment(id) {
+            equipmentList = equipmentList.filter(e => e.id !== id);
+            renderEquipment();
+            showToast('Equipment deleted');
+        }
+
+        // Photo handling
+        function triggerPhotoUpload() {
+            document.getElementById('photoInput').click();
+        }
+
+        function handlePhotos(input) {
+            const files = Array.from(input.files);
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    photos.push({ id: Date.now(), src: e.target.result, name: file.name });
+                    renderPhotos();
+                };
+                reader.readAsDataURL(file);
+            });
+            showToast(`${files.length} photo(s) added`);
+        }
+
+        function renderPhotos() {
+            const grid = document.getElementById('photoGrid');
+            document.getElementById('photoCount').textContent = `${photos.length}/10`;
+            
+            // Keep the add button
+            const addBtn = grid.firstElementChild;
+            grid.innerHTML = '';
+            
+            photos.forEach((photo, idx) => {
+                const div = document.createElement('div');
+                div.className = 'aspect-square rounded-xl overflow-hidden relative press-card';
+                div.innerHTML = `
+                    <img src="${photo.src}" class="w-full h-full object-cover" onclick="openImageModal(${idx})">
+                `;
+                grid.appendChild(div);
+            });
+            
+            grid.appendChild(addBtn);
+        }
+
+        function openImageModal(idx) {
+            currentImageIndex = idx;
+            document.getElementById('modalImage').src = photos[idx].src;
+            document.getElementById('imageModal').classList.remove('hidden');
+        }
+
+        function closeImageModal() {
+            document.getElementById('imageModal').classList.add('hidden');
+        }
+
+        function deleteCurrentImage() {
+            photos.splice(currentImageIndex, 1);
+            renderPhotos();
+            closeImageModal();
+            showToast('Photo deleted');
+        }
+
+        // Document handling
+        function triggerDocUpload() {
+            document.getElementById('docInput').click();
+        }
+
+        function handleDocs(input) {
+            const files = Array.from(input.files);
+            files.forEach(file => {
+                docs.push({ id: Date.now(), name: file.name, size: file.size });
+            });
+            renderDocs();
+            showToast(`${files.length} document(s) added`);
+        }
+
+        function renderDocs() {
+            const container = document.getElementById('docListMobile');
+            if(docs.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-slate-400 py-8 text-sm">
+                        <i class="fa-solid fa-file-import text-3xl mb-2 block"></i>
+                        No documents uploaded
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = docs.map(doc => `
+                <div class="flex items-center p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-red-500 mr-3 border border-slate-200">
+                        <i class="fa-solid ${getDocIcon(doc.name)}"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-slate-800 truncate">${doc.name}</p>
+                        <p class="text-xs text-slate-500">${(doc.size/1024/1024).toFixed(2)} MB</p>
+                    </div>
+                    <button onclick="deleteDoc(${doc.id})" class="text-slate-400 p-2">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function getDocIcon(name) {
+            if(name.endsWith('.pdf')) return 'fa-file-pdf';
+            if(name.match(/\.(doc|docx)$/)) return 'fa-file-word';
+            if(name.match(/\.(xls|xlsx)$/)) return 'fa-file-excel';
+            return 'fa-file';
+        }
+
+        function deleteDoc(id) {
+            docs = docs.filter(d => d.id !== id);
+            renderDocs();
+            showToast('Document deleted');
+        }
+
+        function validateField(input) {
+            if(input.value.trim()) {
+                input.classList.remove('border-red-300');
+                input.classList.add('border-green-300');
+            } else {
+                input.classList.remove('border-green-300');
+            }
+        }
+
+        function submitForm() {
+            // Validate
+            const plantName = document.getElementById('plantName').value;
+            if(!plantName) {
+                showToast('Please fill in plant name', 'error');
+                goToStep(1);
+                return;
+            }
+            
+            // Show loading
+            const btn = document.getElementById('submitFab');
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
+            
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fa-solid fa-check"></i>';
+                showToast('Report submitted successfully!');
+                
+                // Success animation
+                setTimeout(() => {
+                    if(confirm('Submit another report?')) {
+                        location.reload();
+                    }
+                }, 1000);
+            }, 1500);
+        }
+
+        // Fixed Toast Function - Auto hide after 2.5 seconds
+        function showToast(msg, type='success') {
+            const container = document.getElementById('toastContainer');
+            const icon = document.getElementById('toastIcon');
+            const text = document.getElementById('toastMsg');
+            
+            // Clear any existing timeout
+            if(toastTimeout) {
+                clearTimeout(toastTimeout);
+            }
+            
+            // Update content
+            text.textContent = msg;
+            icon.className = type === 'error' 
+                ? 'fa-solid fa-circle-exclamation text-red-400' 
+                : 'fa-solid fa-check-circle text-green-400';
+            
+            // Show toast
+            container.classList.add('show');
+            
+            // Auto hide after 2.5 seconds
+            toastTimeout = setTimeout(() => {
+                hideToast();
+            }, 2500);
+        }
+
+        function hideToast() {
+            const container = document.getElementById('toastContainer');
+            container.classList.remove('show');
+        }
+
+        function goBack() {
+            if(currentStep > 1) {
+                goToStep(currentStep - 1);
+            } else {
+                if(confirm('Exit without saving?')) {
+                    showToast('Draft saved locally');
+                }
+            }
+        }
+
+        function showHelp() {
+            alert('Steel Plant Information Collection System\n\n1. Fill in basic plant information\n2. Select production methods\n3. Add main equipment\n4. Enter production metrics\n5. Upload supporting documents\n\nAll data is saved locally until submitted.');
+        }
+
+        function updateUI() {
+            // Check for saved data
+            if(localStorage.getItem('steelPlantDraft')) {
+                // Could restore draft here
+            }
+        }
+
+        // Swipe gestures
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+        
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+        
+        function handleSwipe() {
+            const threshold = 100;
+            if(touchEndX < touchStartX - threshold && currentStep < 5) {
+                goToStep(currentStep + 1);
+            }
+            if(touchEndX > touchStartX + threshold && currentStep > 1) {
+                goToStep(currentStep - 1);
+            }
+        }
+    </script>
+</body>
+</html>
