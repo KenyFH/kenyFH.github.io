@@ -1,0 +1,3089 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Steel Plant Info</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background-color: #F2F2F7;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #C7C7CC;
+            border-radius: 3px;
+        }
+        
+        /* Animations */
+        .page-transition {
+            animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .dropdown-enter {
+            animation: dropdownIn 0.2s ease-out;
+        }
+        
+        @keyframes dropdownIn {
+            from {
+                opacity: 0;
+                transform: scaleY(0.95) translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: scaleY(1) translateY(0);
+            }
+        }
+        
+        .modal-enter {
+            animation: modalIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        /* Card hover effect */
+        .plant-card {
+            transition: all 0.2s ease;
+        }
+        .plant-card:active {
+            transform: scale(0.98);
+            background-color: #F5F5F7;
+        }
+        
+        /* Custom Select Styling */
+        .custom-select {
+            position: relative;
+        }
+        
+        .select-trigger {
+            transition: all 0.2s;
+        }
+        .select-trigger.active {
+            border-color: #007AFF;
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+        
+        /* Highlight text */
+        .highlight {
+            color: #007AFF;
+            font-weight: 600;
+            background-color: rgba(0, 122, 255, 0.1);
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+        
+        /* Bottom nav active state */
+        .nav-item {
+            transition: all 0.2s;
+        }
+        .nav-item.active {
+            color: #007AFF;
+        }
+        .nav-item.active svg {
+            fill: #007AFF;
+        }
+        
+        /* Equipment section styling */
+        .equipment-header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        }
+        
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            background-color: #F2F2F7;
+            border-radius: 12px;
+            font-size: 13px;
+            color: #1e3a8a;
+            font-weight: 500;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .operating-status {
+            color: #34C759;
+            font-weight: 600;
+        }
+        
+        /* Form styling */
+        .form-input {
+            transition: all 0.2s;
+        }
+        .form-input:focus {
+            border-color: #007AFF;
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+        
+        /* Modal overlay */
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+        
+        /* Step indicator */
+        .step-active {
+            background-color: #007AFF;
+            color: white;
+        }
+        .step-completed {
+            background-color: #34C759;
+            color: white;
+        }
+        .step-pending {
+            background-color: #E5E5EA;
+            color: #8E8E93;
+        }
+        
+        /* Accordion */
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .accordion-content.open {
+            max-height: 2000px;
+        }
+        
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        /* Floating Action Buttons */
+        .fab-container {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            z-index: 40;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: flex-end;
+        }
+        
+        .fab {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            color: #007AFF;
+        }
+        
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+        
+        .fab.primary {
+            background: #007AFF;
+            color: white;
+        }
+        
+        .fab-menu {
+            position: absolute;
+            bottom: 60px;
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            padding: 8px;
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .fab-menu.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .fab-menu-item {
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            color: #333;
+            transition: background 0.2s;
+        }
+        
+        .fab-menu-item:hover {
+            background: #F2F2F7;
+        }
+        
+        .fab-menu-item.active {
+            color: #007AFF;
+            background: rgba(0,122,255,0.1);
+        }
+        
+        /* Image Gallery */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        
+        .image-thumb {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+            background: #F2F2F7;
+        }
+        
+        .image-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .image-thumb .delete-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 20px;
+            height: 20px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .image-thumb:hover .delete-btn {
+            opacity: 1;
+        }
+        
+        /* File List */
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #F9FAFB;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            gap: 12px;
+        }
+        
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        
+        .file-icon.pdf { background: #FEE2E2; color: #DC2626; }
+        .file-icon.excel { background: #D1FAE5; color: #059669; }
+        .file-icon.word { background: #DBEAFE; color: #2563EB; }
+        .file-icon.image { background: #E0E7FF; color: #4F46E5; }
+        
+        /* Upload Zone */
+        .upload-zone {
+            border: 2px dashed #D1D5DB;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .upload-zone:hover {
+            border-color: #007AFF;
+            background: rgba(0,122,255,0.02);
+        }
+        
+        .upload-zone.dragover {
+            border-color: #007AFF;
+            background: rgba(0,122,255,0.05);
+        }
+        
+        /* Satellite Map */
+        .satellite-map {
+            width: 100%;
+            height: 200px;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            background: #E5E7EB;
+        }
+        
+        .satellite-map img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .map-overlay {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            backdrop-filter: blur(4px);
+        }
+        
+        /* Section Anchor */
+        .section-anchor {
+            scroll-margin-top: 80px;
+        }
+        
+        /* Image Viewer Modal */
+        .image-viewer {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .image-viewer.open {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .image-viewer img {
+            max-width: 90%;
+            max-height: 80vh;
+            object-fit: contain;
+        }
+
+        /* Production Card Style */
+        .production-card {
+            background: #F9FAFB;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .production-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr 1fr;
+            gap: 12px;
+            align-items: center;
+        }
+
+        @media (max-width: 640px) {
+            .production-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            .production-grid .col-span-2 {
+                grid-column: span 2;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- App Container -->
+    <div id="app" class="max-w-md mx-auto bg-white min-h-screen relative shadow-2xl">
+        
+        <!-- Header -->
+        <header class="bg-white sticky top-0 z-50 border-b border-gray-100">
+            <div class="flex items-center justify-between px-4 py-3">
+                <h1 class="text-xl font-bold text-gray-900 tracking-tight">Steel Plant Info</h1>
+                <div class="flex items-center gap-3">
+                    <button class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-gray-100 transition-colors">
+                        <svg class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z"/>
+                        </svg>
+                    </button>
+                    <button class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center hover:bg-gray-100 transition-colors relative">
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" stroke-width="2"/>
+                            <circle cx="12" cy="12" r="3" fill="currentColor"/>
+                        </svg>
+                        <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main id="main-content" class="pb-20">
+            <!-- Content injected by JavaScript -->
+        </main>
+
+        <!-- Floating Action Buttons (Detail Page Only) -->
+        <div id="fab-container" class="fab-container hidden">
+            <!-- TOC Menu -->
+            <div class="fab-menu" id="toc-menu">
+                <div class="fab-menu-item active" onclick="scrollToSection('basic-info')">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Basic Info
+                </div>
+                <div class="fab-menu-item" onclick="scrollToSection('satellite-map')">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0121 18.382V7.618a1 1 0 01-.806-.984A1 1 0 0121 7.618V18.382a1 1 0 01-.447.894L15 21m0 0V7m0 0L9 7"/>
+                    </svg>
+                    Satellite Map
+                </div>
+                <div class="fab-menu-item" onclick="scrollToSection('equipments')">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    Equipments
+                </div>
+                <div class="fab-menu-item" onclick="scrollToSection('production')">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                    Production
+                </div>
+                <div class="fab-menu-item" onclick="scrollToSection('kpis')">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                    </svg>
+                    KPIs
+                </div>
+                <div class="fab-menu-item" onclick="scrollToSection('additional-notes')">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                    Additional Notes
+                </div>
+            </div>
+            
+            <!-- TOC Button -->
+            <button class="fab" onclick="toggleToc()" id="toc-btn">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+            
+            <!-- Back to Top Button -->
+            <button class="fab primary" onclick="scrollToTop()" id="back-to-top" style="opacity: 0; visibility: hidden;">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 max-w-md mx-auto z-50">
+            <div class="flex justify-around items-center h-16">
+                <button class="nav-item active flex flex-col items-center justify-center w-full h-full gap-1" onclick="router.navigate('home')">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2.1L1 12h3v8h6v-6h4v6h6v-8h3L12 2.1z"/>
+                    </svg>
+                    <span class="text-xs font-medium">Home</span>
+                </button>
+                <button class="nav-item flex flex-col items-center justify-center w-full h-full gap-1 text-gray-400" onclick="router.navigate('profile')">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                    <span class="text-xs font-medium">Me</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Modal Container -->
+        <div id="modal-container" class="fixed inset-0 z-[60] hidden">
+            <div class="modal-overlay absolute inset-0" onclick="Modal.close()"></div>
+            <div class="absolute inset-x-0 bottom-0 md:inset-0 md:flex md:items-center md:justify-center pointer-events-none">
+                <div class="bg-white w-full md:w-[600px] md:max-h-[90vh] md:rounded-2xl rounded-t-2xl max-h-[85vh] overflow-y-auto pointer-events-auto modal-enter shadow-2xl">
+                    <div id="modal-content"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Image Viewer -->
+        <div id="image-viewer" class="image-viewer" onclick="closeImageViewer()">
+            <img id="viewer-img" src="" alt="Preview">
+            <button class="absolute top-4 right-4 text-white p-2" onclick="closeImageViewer()">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // Constants
+        const COUNTRIES = [
+            { id: 'it', name: 'Italy', flag: '🇮🇹' },
+            { id: 'de', name: 'Germany', flag: '🇩🇪' },
+            { id: 'fr', name: 'France', flag: '🇫🇷' },
+            { id: 'es', name: 'Spain', flag: '🇪🇸' },
+            { id: 'nl', name: 'Netherlands', flag: '🇳🇱' },
+            { id: 'be', name: 'Belgium', flag: '🇧🇪' },
+            { id: 'at', name: 'Austria', flag: '🇦🇹' },
+            { id: 'pl', name: 'Poland', flag: '🇵🇱' },
+            { id: 'uk', name: 'United Kingdom', flag: '🇬🇧' },
+            { id: 'se', name: 'Sweden', flag: '🇸🇪' }
+        ];
+
+        const PLANT_TYPES = ['EAF', 'BF-BOF', 'Hot-rolling', 'Cold-rolling', 'Tube mills'];
+        
+        const EQUIPMENT_TYPES = [
+            { key: 'coke', label: 'Coke', defaultCapacity: 600 },
+            { key: 'sinter', label: 'Sinter', defaultCapacity: 350 },
+            { key: 'ironmaking', label: 'Iron-making', defaultCapacity: 630 },
+            { key: 'steelmaking', label: 'Steel-making', defaultCapacity: 600 },
+            { key: 'refining', label: 'Refining', defaultCapacity: 0 },
+            { key: 'casting', label: 'Continuous Casting', defaultCapacity: 600 },
+            { key: 'hotRolling', label: 'Hot-rolling', defaultCapacity: 600 },
+            { key: 'coldRolling', label: 'Cold-rolling', defaultCapacity: 600 },
+            { key: 'tube', label: 'Welded tube', defaultCapacity: 600 }
+        ];
+
+        // State Management
+        const state = {
+            selectedCountry: null,
+            selectedPlant: null,
+            searchQuery: { country: '', plant: '' },
+            filteredPlants: [],
+            plants: [],
+            mySubmissions: [], // Track user's submissions
+            currentForm: {
+                step: 1,
+                basicInfo: {},
+                equipments: {},
+                production: [],
+                kpis: {},
+                additionalNotes: {
+                    text: '',
+                    images: [],
+                    files: []
+                }
+            },
+            editingSection: null,
+            editingPlantId: null
+        };
+
+        // Initialize with expanded sample data across different countries
+        function initializeData() {
+            state.plants = [
+                {
+                    id: 1,
+                    name: 'Lesegno Works',
+                    shortName: 'Lesegno',
+                    location: 'Lesegno',
+                    country: 'it',
+                    group: 'Riva Group',
+                    type: 'EAF',
+                    fullName: 'Acciaierie d\'Italia plant',
+                    parentGroup: 'Acciaierie d\'Italia',
+                    route: 'BF-BOF',
+                    crudeSteelCapacity: 550,
+                    locationDetail: 'Italy, Taranto',
+                    submittedBy: 'system',
+                    submitTime: '2024-01-15',
+                    equipments: {
+                        coke: [
+                            { id: 'c1', name: 'Coke plant (No.1)', capacity: 350, status: 'Operating', format: '6m', ovens: 80, supplier: 'SMS Mevac', year: 1999 }
+                        ],
+                        steelmaking: [
+                            { id: 'sm1', name: 'BOF (No.1)', capacity: 200, status: 'Operating', format: '300t', year: 2003 }
+                        ]
+                    },
+                    production: [
+                        { item: 'Pig iron', year: 2025, production: 300, cost: 312 },
+                        { item: 'Crude Steel', year: 2025, production: 320, cost: 333 }
+                    ],
+                    kpis: {
+                        revenue: { value: 467.7, unit: '$', year: 2025 },
+                        profit: { value: 275, unit: '$', year: 2025 },
+                        utilization: { value: 67.5, unit: '%', year: 2025 },
+                        productivity: { value: 475, unit: 't/person', year: 2025 },
+                        energy: { value: 8.75, unit: 'GJ/t', year: 2025 }
+                    },
+                    additionalNotes: {
+                        text: 'This plant has undergone major modernization in 2023.',
+                        images: [
+                            { id: 'img1', name: 'plant_overview_2024.jpg', url: 'https://images.unsplash.com/photo-1565043666747-69f6646db940?w=400&h=400&fit=crop' }
+                        ],
+                        files: [
+                            { id: 'f1', name: 'Annual_Report_2024.pdf', type: 'pdf', size: '2.4 MB' }
+                        ]
+                    }
+                },
+                {
+                    id: 2,
+                    name: 'Duisburg Steel',
+                    shortName: 'Duisburg',
+                    location: 'Duisburg',
+                    country: 'de',
+                    group: 'ThyssenKrupp',
+                    type: 'BF-BOF',
+                    fullName: 'ThyssenKrupp Steel Europe AG',
+                    parentGroup: 'ThyssenKrupp AG',
+                    route: 'BF-BOF',
+                    crudeSteelCapacity: 420,
+                    locationDetail: 'Germany, Duisburg',
+                    submittedBy: 'system',
+                    submitTime: '2024-02-20',
+                    equipments: {
+                        ironmaking: [
+                            { id: 'i1', name: 'Blast Furnace 1', capacity: 280, status: 'Operating', format: '2800m³', year: 2005 }
+                        ],
+                        steelmaking: [
+                            { id: 'sm1', name: 'BOF Shop A', capacity: 220, status: 'Operating', format: '350t', year: 2006 }
+                        ]
+                    },
+                    production: [
+                        { item: 'Hot Rolled Coil', year: 2025, production: 180, cost: 445 },
+                        { item: 'Cold Rolled Coil', year: 2025, production: 120, cost: 520 }
+                    ],
+                    kpis: {
+                        revenue: { value: 385.2, unit: '$', year: 2025 },
+                        profit: { value: 195, unit: '$', year: 2025 },
+                        utilization: { value: 78.3, unit: '%', year: 2025 },
+                        productivity: { value: 620, unit: 't/person', year: 2025 },
+                        energy: { value: 7.95, unit: 'GJ/t', year: 2025 }
+                    },
+                    additionalNotes: {
+                        text: 'Located in the heart of the Ruhr region. Connected to river transport.',
+                        images: [],
+                        files: []
+                    }
+                },
+                {
+                    id: 3,
+                    name: 'Dunkirk Works',
+                    shortName: 'Dunkirk',
+                    location: 'Dunkirk',
+                    country: 'fr',
+                    group: 'ArcelorMittal',
+                    type: 'BF-BOF',
+                    fullName: 'ArcelorMittal Dunkirk',
+                    parentGroup: 'ArcelorMittal',
+                    route: 'BF-BOF',
+                    crudeSteelCapacity: 380,
+                    locationDetail: 'France, Dunkirk',
+                    submittedBy: 'system',
+                    submitTime: '2024-03-10',
+                    equipments: {
+                        steelmaking: [
+                            { id: 'sm1', name: 'LD Converter 1', capacity: 190, status: 'Operating', format: '300t', year: 2002 }
+                        ]
+                    },
+                    production: [
+                        { item: 'Slab', year: 2025, production: 290, cost: 385 }
+                    ],
+                    kpis: {
+                        revenue: { value: 342.8, unit: '$', year: 2025 },
+                        profit: { value: 165, unit: '$', year: 2025 },
+                        utilization: { value: 76.3, unit: '%', year: 2025 },
+                        productivity: { value: 580, unit: 't/person', year: 2025 },
+                        energy: { value: 8.15, unit: 'GJ/t', year: 2025 }
+                    },
+                    additionalNotes: { text: '', images: [], files: [] }
+                },
+                {
+                    id: 4,
+                    name: 'Ghent Mill',
+                    shortName: 'Ghent',
+                    location: 'Ghent',
+                    country: 'be',
+                    group: 'ArcelorMittal',
+                    type: 'EAF',
+                    fullName: 'ArcelorMittal Belgium',
+                    parentGroup: 'ArcelorMittal',
+                    route: 'EAF',
+                    crudeSteelCapacity: 290,
+                    locationDetail: 'Belgium, Ghent',
+                    submittedBy: 'system',
+                    submitTime: '2024-01-28',
+                    equipments: {
+                        steelmaking: [
+                            { id: 'sm1', name: 'EAF 1', capacity: 145, status: 'Operating', format: '150t', year: 2008 }
+                        ]
+                    },
+                    production: [
+                        { item: 'Wire Rod', year: 2025, production: 95, cost: 485 }
+                    ],
+                    kpis: {
+                        revenue: { value: 298.5, unit: '$', year: 2025 },
+                        profit: { value: 145, unit: '$', year: 2025 },
+                        utilization: { value: 82.1, unit: '%', year: 2025 },
+                        productivity: { value: 650, unit: 't/person', year: 2025 },
+                        energy: { value: 6.85, unit: 'GJ/t', year: 2025 }
+                    },
+                    additionalNotes: { text: '', images: [], files: [] }
+                },
+                {
+                    id: 5,
+                    name: 'Linz Steel',
+                    shortName: 'Linz',
+                    location: 'Linz',
+                    country: 'at',
+                    group: 'voestalpine',
+                    type: 'BF-BOF',
+                    fullName: 'voestalpine Stahl GmbH',
+                    parentGroup: 'voestalpine AG',
+                    route: 'BF-BOF',
+                    crudeSteelCapacity: 320,
+                    locationDetail: 'Austria, Linz',
+                    submittedBy: 'system',
+                    submitTime: '2024-04-05',
+                    equipments: {
+                        steelmaking: [
+                            { id: 'sm1', name: 'LD 1', capacity: 160, status: 'Operating', format: '280t', year: 2004 }
+                        ]
+                    },
+                    production: [
+                        { item: 'Heavy Plate', year: 2025, production: 140, cost: 465 }
+                    ],
+                    kpis: {
+                        revenue: { value: 325.6, unit: '$', year: 2025 },
+                        profit: { value: 185, unit: '$', year: 2025 },
+                        utilization: { value: 81.5, unit: '%', year: 2025 },
+                        productivity: { value: 680, unit: 't/person', year: 2025 },
+                        energy: { value: 7.45, unit: 'GJ/t', year: 2025 }
+                    },
+                    additionalNotes: { text: '', images: [], files: [] }
+                },
+                {
+                    id: 6,
+                    name: 'Port Talbot',
+                    shortName: 'Port Talbot',
+                    location: 'Port Talbot',
+                    country: 'uk',
+                    group: 'Tata Steel',
+                    type: 'BF-BOF',
+                    fullName: 'Tata Steel UK Limited',
+                    parentGroup: 'Tata Steel Europe',
+                    route: 'BF-BOF',
+                    crudeSteelCapacity: 280,
+                    locationDetail: 'UK, Wales',
+                    submittedBy: 'system',
+                    submitTime: '2024-02-14',
+                    equipments: {
+                        ironmaking: [
+                            { id: 'i1', name: 'Blast Furnace 4', capacity: 140, status: 'Operating', format: '2200m³', year: 1998 }
+                        ]
+                    },
+                    production: [
+                        { item: 'Hot Rolled Strip', year: 2025, production: 125, cost: 425 }
+                    ],
+                    kpis: {
+                        revenue: { value: 285.3, unit: '$', year: 2025 },
+                        profit: { value: 125, unit: '$', year: 2025 },
+                        utilization: { value: 73.2, unit: '%', year: 2025 },
+                        productivity: { value: 520, unit: 't/person', year: 2025 },
+                        energy: { value: 8.65, unit: 'GJ/t', year: 2025 }
+                    },
+                    additionalNotes: { text: '', images: [], files: [] }
+                },
+                {
+                    id: 7,
+                    name: 'Bilbao Steel',
+                    shortName: 'Bilbao',
+                    location: 'Bilbao',
+                    country: 'es',
+                    group: 'ArcelorMittal',
+                    type: 'EAF',
+                    fullName: 'ArcelorMittal Basque Country',
+                    parentGroup: 'ArcelorMittal',
+                    route: 'EAF',
+                    crudeSteelCapacity: 180,
+                    locationDetail: 'Spain, Basque Country',
+                    submittedBy: 'system',
+                    submitTime: '2024-03-22',
+                    equipments: {
+                        steelmaking: [
+                            { id: 'sm1', name: 'EAF Shop', capacity: 90, status: 'Operating', format: '120t', year: 2010 }
+                        ]
+                    },
+                    production: [
+                        { item: 'Rebar', year: 2025, production: 85, cost: 395 }
+                    ],
+                    kpis: {
+                        revenue: { value: 195.8, unit: '$', year: 2025 },
+                        profit: { value: 95, unit: '$', year: 2025 },
+                        utilization: { value: 85.4, unit: '%', year: 2025 },
+                        productivity: { value: 720, unit: 't/person', year: 2025 },
+                        energy: { value: 6.25, unit: 'GJ/t', year: 2025 }
+                    },
+                    additionalNotes: { text: '', images: [], files: [] }
+                },
+                {
+                    id: 8,
+                    name: 'Luleå Steel',
+                    shortName: 'Luleå',
+                    location: 'Luleå',
+                    country: 'se',
+                    group: 'SSAB',
+                    type: 'BF-BOF',
+                    fullName: 'SSAB Luleå',
+                    parentGroup: 'SSAB AB',
+                    route: 'BF-BOF',
+                    crudeSteelCapacity: 260,
+                    locationDetail: 'Sweden, Luleå',
+                    submittedBy: 'system',
+                    submitTime: '2024-01-08',
+                    equipments: {
+                        ironmaking: [
+                            { id: 'i1', name: 'Blast Furnace M3', capacity: 130, status: 'Operating', format: '2400m³', year: 2007 }
+                        ]
+                    },
+                    production: [
+                        { item: 'Advanced High Strength Steel', year: 2025, production: 115, cost: 585 }
+                    ],
+                    kpis: {
+                        revenue: { value: 265.4, unit: '$', year: 2025 },
+                        profit: { value: 155, unit: '$', year: 2025 },
+                        utilization: { value: 79.8, unit: '%', year: 2025 },
+                        productivity: { value: 750, unit: 't/person', year: 2025 },
+                        energy: { value: 7.15, unit: 'GJ/t', year: 2025 }
+                    },
+                    additionalNotes: { text: '', images: [], files: [] }
+                },
+                {
+                    id: 9,
+                    name: 'Katowice Mill',
+                    shortName: 'Katowice',
+                    location: 'Katowice',
+                    country: 'pl',
+                    group: 'ArcelorMittal',
+                    type: 'BF-BOF',
+                    fullName: 'ArcelorMittal Poland',
+                    parentGroup: 'ArcelorMittal',
+                    route: 'BF-BOF',
+                    crudeSteelCapacity: 340,
+                    locationDetail: 'Poland, Katowice',
+                    submittedBy: 'system',
+                    submitTime: '2024-05-12',
+                    equipments: {
+                        steelmaking: [
+                            { id: 'sm1', name: 'Converter 1', capacity: 170, status: 'Operating', format: '260t', year: 2001 }
+                        ]
+                    },
+                    production: [
+                        { item: 'Sections', year: 2025, production: 155, cost: 415 }
+                    ],
+                    kpis: {
+                        revenue: { value: 315.2, unit: '$', year: 2025 },
+                        profit: { value: 175, unit: '$', year: 2025 },
+                        utilization: { value: 77.6, unit: '%', year: 2025 },
+                        productivity: { value: 590, unit: 't/person', year: 2025 },
+                        energy: { value: 8.05, unit: 'GJ/t', year: 2025 }
+                    },
+                    additionalNotes: { text: '', images: [], files: [] }
+                },
+                {
+                    id: 10,
+                    name: 'IJmuiden Works',
+                    shortName: 'IJmuiden',
+                    location: 'IJmuiden',
+                    country: 'nl',
+                    group: 'Tata Steel',
+                    type: 'BF-BOF',
+                    fullName: 'Tata Steel Netherlands',
+                    parentGroup: 'Tata Steel Europe',
+                    route: 'BF-BOF',
+                    crudeSteelCapacity: 360,
+                    locationDetail: 'Netherlands, IJmuiden',
+                    submittedBy: 'system',
+                    submitTime: '2024-04-18',
+                    equipments: {
+                        steelmaking: [
+                            { id: 'sm1', name: 'BOF 1', capacity: 180, status: 'Operating', format: '300t', year: 2003 }
+                        ]
+                    },
+                    production: [
+                        { item: 'Tinplate', year: 2025, production: 165, cost: 525 }
+                    ],
+                    kpis: {
+                        revenue: { value: 355.8, unit: '$', year: 2025 },
+                        profit: { value: 195, unit: '$', year: 2025 },
+                        utilization: { value: 80.2, unit: '%', year: 2025 },
+                        productivity: { value: 640, unit: 't/person', year: 2025 },
+                        energy: { value: 7.65, unit: 'GJ/t', year: 2025 }
+                    },
+                    additionalNotes: { text: '', images: [], files: [] }
+                }
+            ];
+            filterData();
+        }
+
+        function filterData() {
+            state.filteredPlants = state.plants.filter(plant => {
+                const matchCountry = !state.selectedCountry || plant.country === state.selectedCountry.id;
+                const matchPlant = !state.selectedPlant || plant.id === state.selectedPlant.id;
+                return matchCountry && matchPlant;
+            });
+        }
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        // Utility Functions
+        const highlightText = (text, query) => {
+            if (!query) return text;
+            const regex = new RegExp(`(${query})`, 'gi');
+            return text.replace(regex, '<span class="highlight">$1</span>');
+        };
+
+        const showToast = (message, duration = 2000) => {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), duration);
+        };
+
+        const formatFileSize = (bytes) => {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        };
+
+        // Scroll Functions
+        let scrollTimeout;
+        window.addEventListener('scroll', () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                const backToTop = document.getElementById('back-to-top');
+                if (backToTop) {
+                    if (window.scrollY > 300) {
+                        backToTop.style.opacity = '1';
+                        backToTop.style.visibility = 'visible';
+                    } else {
+                        backToTop.style.opacity = '0';
+                        backToTop.style.visibility = 'hidden';
+                    }
+                }
+                updateTocActiveState();
+            }, 100);
+        }, { passive: true });
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                toggleToc(false);
+            }
+        }
+
+        function toggleToc(forceState) {
+            const menu = document.getElementById('toc-menu');
+            const btn = document.getElementById('toc-btn');
+            const isOpen = menu.classList.contains('open');
+            const shouldOpen = forceState !== undefined ? forceState : !isOpen;
+            
+            if (shouldOpen) {
+                menu.classList.add('open');
+                btn.style.transform = 'rotate(90deg)';
+                btn.classList.add('primary');
+            } else {
+                menu.classList.remove('open');
+                btn.style.transform = 'rotate(0deg)';
+                btn.classList.remove('primary');
+            }
+        }
+
+        function updateTocActiveState() {
+            const sections = ['basic-info', 'satellite-map', 'equipments', 'production', 'kpis', 'additional-notes'];
+            const scrollPos = window.scrollY + 100;
+            
+            sections.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    const top = element.offsetTop;
+                    const bottom = top + element.offsetHeight;
+                    const menuItem = document.querySelector(`[onclick="scrollToSection('${id}')"]`);
+                    
+                    if (scrollPos >= top && scrollPos < bottom) {
+                        document.querySelectorAll('.fab-menu-item').forEach(i => i.classList.remove('active'));
+                        if (menuItem) menuItem.classList.add('active');
+                    }
+                }
+            });
+        }
+
+        // Image Viewer
+        function openImageViewer(url) {
+            const viewer = document.getElementById('image-viewer');
+            const img = document.getElementById('viewer-img');
+            img.src = url;
+            viewer.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeImageViewer() {
+            const viewer = document.getElementById('image-viewer');
+            viewer.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        // Modal System
+        const Modal = {
+            open: (content) => {
+                document.getElementById('modal-content').innerHTML = content;
+                document.getElementById('modal-container').classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            },
+            close: () => {
+                document.getElementById('modal-container').classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        };
+
+        // File Upload Handler
+        const FileUpload = {
+            validateImage: (file) => {
+                const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+                const maxSize = 3 * 1024 * 1024; // 3MB
+                if (!validTypes.includes(file.type)) {
+                    return { valid: false, error: 'Only PNG and JPG images are allowed' };
+                }
+                if (file.size > maxSize) {
+                    return { valid: false, error: 'Image size must be less than 3MB' };
+                }
+                return { valid: true };
+            },
+            
+            validateDocument: (file) => {
+                const validTypes = [
+                    'application/pdf',
+                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                    'application/vnd.ms-excel',
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    'application/msword'
+                ];
+                const maxSize = 5 * 1024 * 1024; // 5MB
+                if (!validTypes.includes(file.type)) {
+                    return { valid: false, error: 'Only PDF, Excel, and Word documents are allowed' };
+                }
+                if (file.size > maxSize) {
+                    return { valid: false, error: 'File size must be less than 5MB' };
+                }
+                return { valid: true };
+            },
+            
+            getFileIcon: (filename) => {
+                const ext = filename.split('.').pop().toLowerCase();
+                if (ext === 'pdf') return 'pdf';
+                if (['xlsx', 'xls'].includes(ext)) return 'excel';
+                if (['docx', 'doc'].includes(ext)) return 'word';
+                return 'file';
+            },
+            
+            handleImageUpload: (files, callback) => {
+                Array.from(files).forEach(file => {
+                    const validation = FileUpload.validateImage(file);
+                    if (!validation.valid) {
+                        showToast(validation.error);
+                        return;
+                    }
+                    
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        callback({
+                            id: generateId(),
+                            name: file.name,
+                            url: e.target.result,
+                            size: formatFileSize(file.size)
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                });
+            },
+            
+            handleFileUpload: (files, callback) => {
+                Array.from(files).forEach(file => {
+                    const validation = FileUpload.validateDocument(file);
+                    if (!validation.valid) {
+                        showToast(validation.error);
+                        return;
+                    }
+                    
+                    callback({
+                        id: generateId(),
+                        name: file.name,
+                        type: FileUpload.getFileIcon(file.name),
+                        size: formatFileSize(file.size)
+                    });
+                });
+            }
+        };
+
+        // Form Components
+        const FormComponents = {
+            renderBasicInfoForm: (isEdit = false, plant = null) => {
+                const data = isEdit ? plant : state.currentForm.basicInfo;
+                return `
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-xl font-bold text-gray-900">${isEdit ? 'Edit Basic Info' : 'Step 1: Basic Information'}</h2>
+                            <button onclick="Modal.close()" class="p-2 hover:bg-gray-100 rounded-full">
+                                <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <form id="basic-info-form" class="space-y-4" onsubmit="event.preventDefault(); FormHandlers.saveBasicInfo(${isEdit}, ${plant ? plant.id : 'null'});">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Full Name <span class="text-red-500">*</span></label>
+                                <input type="text" name="fullName" required value="${data.fullName || ''}"
+                                    class="form-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none text-gray-900" 
+                                    placeholder="e.g., Acciaierie d'Italia plant">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Short Name <span class="text-red-500">*</span></label>
+                                <input type="text" name="shortName" required value="${data.shortName || data.name || ''}"
+                                    class="form-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none text-gray-900" 
+                                    placeholder="e.g., Lesegno Works">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Parent Group <span class="text-red-500">*</span></label>
+                                <input type="text" name="parentGroup" required value="${data.parentGroup || ''}"
+                                    class="form-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none text-gray-900" 
+                                    placeholder="e.g., Acciaierie d'Italia">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Type <span class="text-red-500">*</span></label>
+                                <select name="type" required class="form-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none text-gray-900 bg-white">
+                                    <option value="">Select Type</option>
+                                    ${PLANT_TYPES.map(t => `<option value="${t}" ${data.type === t ? 'selected' : ''}>${t}</option>`).join('')}
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Crude Steel Capacity (kt/a) <span class="text-red-500">*</span></label>
+                                <input type="number" name="crudeSteelCapacity" required value="${data.crudeSteelCapacity || ''}"
+                                    class="form-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none text-gray-900" 
+                                    placeholder="e.g., 550">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Location (Country) <span class="text-red-500">*</span></label>
+                                <select name="country" required class="form-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none text-gray-900 bg-white">
+                                    <option value="">Select Country</option>
+                                    ${COUNTRIES.map(c => `<option value="${c.id}" ${data.country === c.id ? 'selected' : ''}>${c.flag} ${c.name}</option>`).join('')}
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Detailed Location</label>
+                                <input type="text" name="locationDetail" value="${data.locationDetail || ''}"
+                                    class="form-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none text-gray-900" 
+                                    placeholder="e.g., Italy, Taranto">
+                            </div>
+                            
+                            <div class="pt-4 flex gap-3">
+                                <button type="button" onclick="Modal.close()" class="flex-1 px-4 py-3 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors">
+                                    Cancel
+                                </button>
+                                <button type="submit" class="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200">
+                                    ${isEdit ? 'Save Changes' : 'Next: Add Details'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                `;
+            },
+
+            renderEquipmentForm: (section, existingData = null, plantId = null) => {
+                const eqType = EQUIPMENT_TYPES.find(e => e.key === section);
+                const isEdit = !!existingData;
+                const data = existingData || {};
+                
+                return `
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-xl font-bold text-gray-900">${isEdit ? 'Edit' : 'Add'} ${eqType.label} Equipment</h2>
+                            <button onclick="Modal.close()" class="p-2 hover:bg-gray-100 rounded-full">
+                                <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <form id="equipment-form" class="space-y-4" onsubmit="event.preventDefault(); FormHandlers.saveEquipment('${section}', ${isEdit}, '${existingData ? existingData.id : ''}', ${plantId});">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Equipment Name <span class="text-red-500">*</span></label>
+                                <input type="text" name="name" required value="${data.name || ''}"
+                                    class="form-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none text-gray-900" 
+                                    placeholder="e.g., Coke plant (No.1)">
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Capacity</label>
+                                    <input type="text" name="capacity" value="${data.capacity || ''}"
+                                        class="form-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none text-gray-900" 
+                                        placeholder="e.g., 350">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                                    <select name="status" class="form-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none text-gray-900 bg-white">
+                                        <option value="Operating" ${data.status === 'Operating' ? 'selected' : ''}>Operating</option>
+                                        <option value="Idle" ${data.status === 'Idle' ? 'selected' : ''}>Idle</option>
+                                        <option value="Under Construction" ${data.status === 'Under Construction' ? 'selected' : ''}>Under Construction</option>
+                                        <option value="Closed" ${data.status === 'Closed' ? 'selected' : ''}>Closed</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Format/Size</label>
+                                    <input type="text" name="format" value="${data.format || ''}"
+                                        class="form-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none text-gray-900" 
+                                        placeholder="e.g., 6m or 360㎡">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Number of Units</label>
+                                    <input type="number" name="ovens" value="${data.ovens || ''}"
+                                        class="form-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none text-gray-900" 
+                                        placeholder="e.g., 80 ovens">
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Year of Commissioning</label>
+                                    <input type="text" name="year" value="${data.year || ''}"
+                                        class="form-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none text-gray-900" 
+                                        placeholder="e.g., 1999">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Supplier</label>
+                                    <input type="text" name="supplier" value="${data.supplier || ''}"
+                                        class="form-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none text-gray-900" 
+                                        placeholder="e.g., SMS Mevac">
+                                </div>
+                            </div>
+                            
+                            <div class="pt-4 flex gap-3">
+                                <button type="button" onclick="Modal.close()" class="flex-1 px-4 py-3 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors">
+                                    Cancel
+                                </button>
+                                <button type="submit" class="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200">
+                                    ${isEdit ? 'Update' : 'Add'} Equipment
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                `;
+            },
+
+            renderProductionForm: (existingData = null, plantId = null) => {
+                const isEdit = !!existingData;
+                const data = existingData || {};
+                
+                return `
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-xl font-bold text-gray-900">${isEdit ? 'Edit' : 'Add'} Production Data</h2>
+                            <button onclick="Modal.close()" class="p-2 hover:bg-gray-100 rounded-full">
+                                <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <form id="production-form" class="space-y-4" onsubmit="event.preventDefault(); FormHandlers.saveProduction(${isEdit}, '${existingData ? existingData.item : ''}', ${plantId});">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Item/Product <span class="text-red-500">*</span></label>
+                                <input type="text" name="item" required value="${data.item || ''}"
+                                    class="form-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none text-gray-900" 
+                                    placeholder="e.g., Pig iron, Crude Steel, HRC">
+                            </div>
+                            
+                            <div class="grid grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Year</label>
+                                    <select name="year" class="form-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none text-gray-900 bg-white">
+                                        ${[2025, 2024, 2023, 2022, 2021].map(y => `<option value="${y}" ${data.year === y ? 'selected' : ''}>${y}</option>`).join('')}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Production (t)</label>
+                                    <input type="number" name="production" value="${data.production || ''}"
+                                        class="form-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none text-gray-900" 
+                                        placeholder="e.g., 300">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Cost ($/t)</label>
+                                    <input type="number" name="cost" value="${data.cost || ''}"
+                                        class="form-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none text-gray-900" 
+                                        placeholder="e.g., 312">
+                                </div>
+                            </div>
+                            
+                            <div class="pt-4 flex gap-3">
+                                <button type="button" onclick="Modal.close()" class="flex-1 px-4 py-3 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors">
+                                    Cancel
+                                </button>
+                                <button type="submit" class="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200">
+                                    ${isEdit ? 'Update' : 'Add'} Data
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                `;
+            },
+
+            renderKPIForm: (plantId = null) => {
+                const plant = plantId ? state.plants.find(p => p.id === plantId) : null;
+                const kpis = plant ? plant.kpis : {};
+                
+                return `
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-xl font-bold text-gray-900">Edit Operational KPIs</h2>
+                            <button onclick="Modal.close()" class="p-2 hover:bg-gray-100 rounded-full">
+                                <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <form id="kpi-form" class="space-y-4" onsubmit="event.preventDefault(); FormHandlers.saveKPIs(${plantId});">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Revenue ($)</label>
+                                    <input type="number" step="0.1" name="revenue" value="${kpis.revenue?.value || ''}"
+                                        class="form-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none text-gray-900" 
+                                        placeholder="467.7">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Profit ($)</label>
+                                    <input type="number" name="profit" value="${kpis.profit?.value || ''}"
+                                        class="form-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none text-gray-900" 
+                                        placeholder="275">
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Utilization (%)</label>
+                                    <input type="number" step="0.1" name="utilization" value="${kpis.utilization?.value || ''}"
+                                        class="form-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none text-gray-900" 
+                                        placeholder="67.5">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Productivity (t/person)</label>
+                                    <input type="number" name="productivity" value="${kpis.productivity?.value || ''}"
+                                        class="form-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none text-gray-900" 
+                                        placeholder="475">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Energy Consumption (GJ/t)</label>
+                                <input type="number" step="0.01" name="energy" value="${kpis.energy?.value || ''}"
+                                    class="form-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none text-gray-900" 
+                                    placeholder="8.75">
+                            </div>
+                            
+                            <div class="pt-4 flex gap-3">
+                                <button type="button" onclick="Modal.close()" class="flex-1 px-4 py-3 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors">
+                                    Cancel
+                                </button>
+                                <button type="submit" class="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200">
+                                    Save KPIs
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                `;
+            },
+
+            renderAdditionalNotesForm: (plantId = null, isNewPlant = false) => {
+                const notes = isNewPlant ? state.currentForm.additionalNotes : 
+                    (plantId ? state.plants.find(p => p.id === plantId).additionalNotes : { text: '', images: [], files: [] });
+                
+                return `
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-xl font-bold text-gray-900">${isNewPlant ? 'Step 5: Additional Notes' : 'Edit Additional Notes'}</h2>
+                            <button onclick="Modal.close()" class="p-2 hover:bg-gray-100 rounded-full">
+                                <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <form id="additional-notes-form" class="space-y-6" onsubmit="event.preventDefault(); FormHandlers.saveAdditionalNotes(${plantId}, ${isNewPlant});">
+                            <!-- Text Notes -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Notes & Descriptions</label>
+                                <textarea name="text" rows="6" 
+                                    class="form-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none text-gray-900 resize-none" 
+                                    placeholder="Enter additional notes, observations, or descriptions here...">${notes.text || ''}</textarea>
+                            </div>
+                            
+                            <!-- Image Upload -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Images (PNG, JPG, max 3MB each)</label>
+                                
+                                <!-- Image Grid -->
+                                <div class="image-grid mb-3" id="uploaded-images">
+                                    ${(notes.images || []).map(img => `
+                                        <div class="image-thumb">
+                                            <img src="${img.url}" alt="${img.name}" onclick="openImageViewer('${img.url}')">
+                                            <button type="button" class="delete-btn" onclick="FormHandlers.removeImage('${img.id}', ${plantId}, ${isNewPlant})">×</button>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                
+                                <!-- Upload Zone -->
+                                <div class="upload-zone" onclick="document.getElementById('image-input').click()" 
+                                    ondrop="FormHandlers.handleImageDrop(event, ${plantId}, ${isNewPlant})" 
+                                    ondragover="event.preventDefault(); this.classList.add('dragover')" 
+                                    ondragleave="this.classList.remove('dragover')">
+                                    <svg class="w-8 h-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    <p class="text-sm text-gray-500">Click to upload or drag images here</p>
+                                    <p class="text-xs text-gray-400 mt-1">PNG, JPG up to 3MB</p>
+                                </div>
+                                <input type="file" id="image-input" class="hidden" accept="image/png,image/jpeg,image/jpg" multiple 
+                                    onchange="FormHandlers.handleImageSelect(event, ${plantId}, ${isNewPlant})">
+                            </div>
+                            
+                            <!-- File Upload -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Attachments (PDF, Excel, Word, max 5MB each)</label>
+                                
+                                <!-- File List -->
+                                <div class="space-y-2 mb-3" id="uploaded-files">
+                                    ${(notes.files || []).map(file => `
+                                        <div class="file-item">
+                                            <div class="file-icon ${file.type}">
+                                                ${file.type === 'pdf' ? '📄' : file.type === 'excel' ? '📊' : '📝'}
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <div class="text-sm font-medium text-gray-900 truncate">${file.name}</div>
+                                                <div class="text-xs text-gray-500">${file.size}</div>
+                                            </div>
+                                            <button type="button" onclick="FormHandlers.removeFile('${file.id}', ${plantId}, ${isNewPlant})" class="p-2 text-gray-400 hover:text-red-500">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                
+                                <!-- Upload Zone -->
+                                <div class="upload-zone" onclick="document.getElementById('file-input').click()"
+                                    ondrop="FormHandlers.handleFileDrop(event, ${plantId}, ${isNewPlant})" 
+                                    ondragover="event.preventDefault(); this.classList.add('dragover')" 
+                                    ondragleave="this.classList.remove('dragover')">
+                                    <svg class="w-8 h-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                    <p class="text-sm text-gray-500">Click to upload or drag files here</p>
+                                    <p class="text-xs text-gray-400 mt-1">PDF, Excel, Word up to 5MB</p>
+                                </div>
+                                <input type="file" id="file-input" class="hidden" accept=".pdf,.xlsx,.xls,.docx,.doc" multiple 
+                                    onchange="FormHandlers.handleFileSelect(event, ${plantId}, ${isNewPlant})">
+                            </div>
+                            
+                            <div class="pt-4 flex gap-3">
+                                ${isNewPlant ? `
+                                    <button type="button" onclick="FormHandlers.prevStep()" class="flex-1 px-4 py-3 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors">
+                                        Back
+                                    </button>
+                                ` : `
+                                    <button type="button" onclick="Modal.close()" class="flex-1 px-4 py-3 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors">
+                                        Cancel
+                                    </button>
+                                `}
+                                <button type="submit" class="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200">
+                                    ${isNewPlant ? 'Complete & Save' : 'Save Notes'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                `;
+            },
+
+            renderMultiStepForm: () => {
+                const step = state.currentForm.step;
+                const basicInfo = state.currentForm.basicInfo;
+                
+                let stepContent = '';
+                
+                if (step === 1) {
+                    stepContent = FormComponents.renderBasicInfoForm();
+                } else if (step === 2) {
+                    stepContent = `
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h2 class="text-xl font-bold text-gray-900">Step 2: Equipment Details</h2>
+                                <button onclick="Modal.close()" class="p-2 hover:bg-gray-100 rounded-full">
+                                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <div class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center text-sm font-bold">✓</div>
+                                    <div class="flex-1">
+                                        <div class="text-sm font-medium text-gray-900">${basicInfo.shortName || 'New Plant'}</div>
+                                        <div class="text-xs text-gray-500">${basicInfo.fullName || ''}</div>
+                                    </div>
+                                    <button onclick="FormHandlers.editBasicInfo()" class="text-blue-600 text-sm">Edit</button>
+                                </div>
+                            </div>
+
+                            <div class="space-y-3 mb-6">
+                                ${EQUIPMENT_TYPES.map(eq => {
+                                    const items = state.currentForm.equipments[eq.key] || [];
+                                    return `
+                                        <div class="border border-gray-200 rounded-xl overflow-hidden">
+                                            <div class="bg-gray-50 px-4 py-3 flex items-center justify-between cursor-pointer" onclick="FormHandlers.toggleAccordion('${eq.key}')">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="font-medium text-gray-900">${eq.label}</span>
+                                                    <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-xs">${items.length} items</span>
+                                                </div>
+                                                <button onclick="event.stopPropagation(); FormHandlers.openEquipmentForm('${eq.key}')" class="text-blue-600 hover:bg-blue-50 p-1 rounded">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                            <div id="accordion-${eq.key}" class="accordion-content ${items.length > 0 ? 'open' : ''}">
+                                                <div class="p-4 space-y-3">
+                                                    ${items.length === 0 ? '<div class="text-sm text-gray-400 italic">No equipment added yet</div>' : ''}
+                                                    ${items.map((item, idx) => `
+                                                        <div class="bg-gray-50 rounded-lg p-3 flex items-center justify-between">
+                                                            <div>
+                                                                <div class="font-medium text-sm text-gray-900">${item.name}</div>
+                                                                <div class="text-xs text-gray-500">Capacity: ${item.capacity} | Status: ${item.status}</div>
+                                                            </div>
+                                                            <div class="flex gap-2">
+                                                                <button onclick="FormHandlers.editEquipment('${eq.key}', ${idx})" class="text-blue-600 p-1">
+                                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                                    </svg>
+                                                                </button>
+                                                                <button onclick="FormHandlers.deleteEquipment('${eq.key}', ${idx})" class="text-red-500 p-1">
+                                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                                    </svg>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    `).join('')}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+
+                            <div class="flex gap-3">
+                                <button onclick="FormHandlers.prevStep()" class="flex-1 px-4 py-3 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors">
+                                    Back
+                                </button>
+                                <button onclick="FormHandlers.nextStep()" class="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200">
+                                    Next: Production
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } else if (step === 3) {
+                    stepContent = `
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h2 class="text-xl font-bold text-gray-900">Step 3: Production & Costs</h2>
+                                <button onclick="Modal.close()" class="p-2 hover:bg-gray-100 rounded-full">
+                                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div class="mb-4">
+                                <button onclick="FormHandlers.openProductionForm()" class="w-full py-3 border-2 border-dashed border-blue-300 text-blue-600 rounded-xl font-medium hover:bg-blue-50 transition-colors flex items-center justify-center gap-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                    </svg>
+                                    Add Production Data
+                                </button>
+                            </div>
+
+                            <div class="space-y-3 mb-6">
+                                ${state.currentForm.production.length === 0 ? '<div class="text-center text-gray-400 py-8">No production data added yet</div>' : ''}
+                                ${state.currentForm.production.map((item, idx) => `
+                                    <div class="bg-gray-50 rounded-xl p-4 flex items-center justify-between">
+                                        <div class="grid grid-cols-3 gap-4 flex-1">
+                                            <div>
+                                                <div class="text-xs text-gray-500">Item</div>
+                                                <div class="font-medium text-sm">${item.item}</div>
+                                            </div>
+                                            <div>
+                                                <div class="text-xs text-gray-500">Production</div>
+                                                <div class="font-medium text-sm">${item.production} t</div>
+                                            </div>
+                                            <div>
+                                                <div class="text-xs text-gray-500">Cost</div>
+                                                <div class="font-medium text-sm">$${item.cost}/t</div>
+                                            </div>
+                                        </div>
+                                        <div class="flex gap-2 ml-4">
+                                            <button onclick="FormHandlers.editProduction(${idx})" class="text-blue-600 p-2 hover:bg-blue-50 rounded-lg">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                </svg>
+                                            </button>
+                                            <button onclick="FormHandlers.deleteProduction(${idx})" class="text-red-500 p-2 hover:bg-red-50 rounded-lg">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+
+                            <div class="flex gap-3">
+                                <button onclick="FormHandlers.prevStep()" class="flex-1 px-4 py-3 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors">
+                                    Back
+                                </button>
+                                <button onclick="FormHandlers.nextStep()" class="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200">
+                                    Next: KPIs
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } else if (step === 4) {
+                    stepContent = `
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <h2 class="text-xl font-bold text-gray-900">Step 4: Operational KPIs</h2>
+                                <button onclick="Modal.close()" class="p-2 hover:bg-gray-100 rounded-full">
+                                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <form id="new-kpi-form" class="space-y-4" onsubmit="event.preventDefault(); FormHandlers.saveNewPlantKPIs();">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Revenue ($)</label>
+                                        <input type="number" step="0.1" name="revenue" 
+                                            class="form-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none text-gray-900" 
+                                            placeholder="467.7">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Profit ($)</label>
+                                        <input type="number" name="profit" 
+                                            class="form-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none text-gray-900" 
+                                            placeholder="275">
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Utilization (%)</label>
+                                        <input type="number" step="0.1" name="utilization" 
+                                            class="form-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none text-gray-900" 
+                                            placeholder="67.5">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Productivity (t/person)</label>
+                                        <input type="number" name="productivity" 
+                                            class="form-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none text-gray-900" 
+                                            placeholder="475">
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Energy Consumption (GJ/t)</label>
+                                    <input type="number" step="0.01" name="energy" 
+                                        class="form-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none text-gray-900" 
+                                        placeholder="8.75">
+                                </div>
+
+                                <div class="pt-6 flex gap-3">
+                                    <button type="button" onclick="FormHandlers.prevStep()" class="flex-1 px-4 py-3 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors">
+                                        Back
+                                    </button>
+                                    <button type="submit" class="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200">
+                                        Next: Additional Notes
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    `;
+                } else if (step === 5) {
+                    stepContent = FormComponents.renderAdditionalNotesForm(null, true);
+                }
+
+                return `
+                    <div class="bg-white">
+                        <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-1">
+                                    ${[1,2,3,4,5].map(s => `
+                                        <div class="flex items-center">
+                                            <div class="w-7 h-7 rounded-full ${s < step ? 'bg-green-500 text-white' : s === step ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500'} flex items-center justify-center text-xs font-bold">
+                                                ${s < step ? '✓' : s}
+                                            </div>
+                                            ${s < 5 ? `<div class="w-6 h-0.5 ${s < step ? 'bg-green-500' : 'bg-gray-200'}"></div>` : ''}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            <div class="flex justify-between text-xs mt-2 text-gray-500 px-0.5">
+                                <span>Basic</span>
+                                <span>Equip</span>
+                                <span>Prod</span>
+                                <span>KPIs</span>
+                                <span>Notes</span>
+                            </div>
+                        </div>
+                        ${stepContent}
+                    </div>
+                `;
+            }
+        };
+
+        // Form Handlers
+        const FormHandlers = {
+            // New Plant Flow
+            startNewPlant: () => {
+                state.currentForm = {
+                    step: 1,
+                    basicInfo: {},
+                    equipments: {},
+                    production: [],
+                    kpis: {},
+                    additionalNotes: { text: '', images: [], files: [] }
+                };
+                EQUIPMENT_TYPES.forEach(eq => state.currentForm.equipments[eq.key] = []);
+                Modal.open(FormComponents.renderMultiStepForm());
+            },
+
+            saveBasicInfo: (isEdit = false, plantId = null) => {
+                const form = document.getElementById('basic-info-form');
+                const formData = new FormData(form);
+                const data = {
+                    fullName: formData.get('fullName'),
+                    shortName: formData.get('shortName'),
+                    name: formData.get('shortName'),
+                    parentGroup: formData.get('parentGroup'),
+                    type: formData.get('type'),
+                    crudeSteelCapacity: parseInt(formData.get('crudeSteelCapacity')),
+                    country: formData.get('country'),
+                    locationDetail: formData.get('locationDetail'),
+                    location: formData.get('locationDetail').split(',')[0] || COUNTRIES.find(c => c.id === formData.get('country'))?.name || '',
+                    group: formData.get('parentGroup'),
+                    route: formData.get('type')
+                };
+
+                if (isEdit && plantId) {
+                    const plant = state.plants.find(p => p.id === plantId);
+                    Object.assign(plant, data);
+                    showToast('Basic info updated successfully');
+                    Modal.close();
+                    router.refresh();
+                } else {
+                    state.currentForm.basicInfo = data;
+                    FormHandlers.nextStep();
+                }
+            },
+
+            editBasicInfo: () => {
+                state.currentForm.step = 1;
+                document.getElementById('modal-content').innerHTML = FormComponents.renderMultiStepForm();
+            },
+
+            nextStep: () => {
+                if (state.currentForm.step < 5) {
+                    state.currentForm.step++;
+                    document.getElementById('modal-content').innerHTML = FormComponents.renderMultiStepForm();
+                }
+            },
+
+            prevStep: () => {
+                if (state.currentForm.step > 1) {
+                    state.currentForm.step--;
+                    document.getElementById('modal-content').innerHTML = FormComponents.renderMultiStepForm();
+                }
+            },
+
+            // Equipment Management
+            toggleAccordion: (key) => {
+                const el = document.getElementById(`accordion-${key}`);
+                el.classList.toggle('open');
+            },
+
+            openEquipmentForm: (section, editIndex = null) => {
+                const existingData = editIndex !== null ? state.currentForm.equipments[section][editIndex] : null;
+                state.editingSection = { section, editIndex };
+                document.getElementById('modal-content').innerHTML = FormComponents.renderEquipmentForm(section, existingData);
+            },
+
+            editEquipment: (section, index) => {
+                FormHandlers.openEquipmentForm(section, index);
+            },
+
+            deleteEquipment: (section, index) => {
+                if (confirm('Delete this equipment?')) {
+                    state.currentForm.equipments[section].splice(index, 1);
+                    document.getElementById('modal-content').innerHTML = FormComponents.renderMultiStepForm();
+                }
+            },
+
+            saveEquipment: (section, isEdit, itemId, plantId) => {
+                const form = document.getElementById('equipment-form');
+                const formData = new FormData(form);
+                const data = {
+                    id: isEdit ? itemId : generateId(),
+                    name: formData.get('name'),
+                    capacity: formData.get('capacity') || '--',
+                    status: formData.get('status'),
+                    format: formData.get('format') || '--',
+                    ovens: formData.get('ovens') || '',
+                    year: formData.get('year') || '--',
+                    supplier: formData.get('supplier') || ''
+                };
+
+                if (plantId) {
+                    const plant = state.plants.find(p => p.id === plantId);
+                    if (!plant.equipments[section]) plant.equipments[section] = [];
+                    if (isEdit) {
+                        const idx = plant.equipments[section].findIndex(i => i.id === itemId);
+                        plant.equipments[section][idx] = data;
+                    } else {
+                        plant.equipments[section].push(data);
+                    }
+                    showToast('Equipment saved successfully');
+                    Modal.close();
+                    router.refresh();
+                } else {
+                    if (isEdit && state.editingSection) {
+                        state.currentForm.equipments[section][state.editingSection.editIndex] = data;
+                    } else {
+                        state.currentForm.equipments[section].push(data);
+                    }
+                    document.getElementById('modal-content').innerHTML = FormComponents.renderMultiStepForm();
+                }
+            },
+
+            // Production Management
+            openProductionForm: (editIndex = null) => {
+                const existingData = editIndex !== null ? state.currentForm.production[editIndex] : null;
+                document.getElementById('modal-content').innerHTML = FormComponents.renderProductionForm(existingData);
+            },
+
+            editProduction: (index) => {
+                FormHandlers.openProductionForm(index);
+            },
+
+            deleteProduction: (index) => {
+                if (confirm('Delete this production data?')) {
+                    state.currentForm.production.splice(index, 1);
+                    document.getElementById('modal-content').innerHTML = FormComponents.renderMultiStepForm();
+                }
+            },
+
+            saveProduction: (isEdit, itemName, plantId) => {
+                const form = document.getElementById('production-form');
+                const formData = new FormData(form);
+                const data = {
+                    item: formData.get('item'),
+                    year: parseInt(formData.get('year')),
+                    production: parseInt(formData.get('production')) || 0,
+                    cost: parseInt(formData.get('cost')) || 0
+                };
+
+                if (plantId) {
+                    const plant = state.plants.find(p => p.id === plantId);
+                    if (isEdit) {
+                        const idx = plant.production.findIndex(p => p.item === itemName);
+                        plant.production[idx] = data;
+                    } else {
+                        plant.production.push(data);
+                    }
+                    showToast('Production data saved successfully');
+                    Modal.close();
+                    router.refresh();
+                } else {
+                    if (isEdit) {
+                        const idx = state.currentForm.production.findIndex(p => p.item === itemName);
+                        state.currentForm.production[idx] = data;
+                    } else {
+                        state.currentForm.production.push(data);
+                    }
+                    document.getElementById('modal-content').innerHTML = FormComponents.renderMultiStepForm();
+                }
+            },
+
+            // KPI Management
+            saveKPIs: (plantId) => {
+                const form = document.getElementById('kpi-form');
+                const formData = new FormData(form);
+                const kpis = {
+                    revenue: { value: parseFloat(formData.get('revenue')) || 0, unit: '$', year: 2025 },
+                    profit: { value: parseFloat(formData.get('profit')) || 0, unit: '$', year: 2025 },
+                    utilization: { value: parseFloat(formData.get('utilization')) || 0, unit: '%', year: 2025 },
+                    productivity: { value: parseFloat(formData.get('productivity')) || 0, unit: 't/person', year: 2025 },
+                    energy: { value: parseFloat(formData.get('energy')) || 0, unit: 'GJ/t', year: 2025 }
+                };
+
+                const plant = state.plants.find(p => p.id === plantId);
+                plant.kpis = kpis;
+                showToast('KPIs updated successfully');
+                Modal.close();
+                router.refresh();
+            },
+
+            saveNewPlantKPIs: () => {
+                const form = document.getElementById('new-kpi-form');
+                const formData = new FormData(form);
+                state.currentForm.kpis = {
+                    revenue: { value: parseFloat(formData.get('revenue')) || 0, unit: '$', year: 2025 },
+                    profit: { value: parseFloat(formData.get('profit')) || 0, unit: '$', year: 2025 },
+                    utilization: { value: parseFloat(formData.get('utilization')) || 0, unit: '%', year: 2025 },
+                    productivity: { value: parseFloat(formData.get('productivity')) || 0, unit: 't/person', year: 2025 },
+                    energy: { value: parseFloat(formData.get('energy')) || 0, unit: 'GJ/t', year: 2025 }
+                };
+                FormHandlers.nextStep();
+            },
+
+            // Additional Notes Management
+            handleImageSelect: (event, plantId, isNewPlant) => {
+                const files = event.target.files;
+                FileUpload.handleImageUpload(files, (imageData) => {
+                    if (isNewPlant) {
+                        state.currentForm.additionalNotes.images.push(imageData);
+                    } else {
+                        const plant = state.plants.find(p => p.id === plantId);
+                        if (!plant.additionalNotes) plant.additionalNotes = { text: '', images: [], files: [] };
+                        plant.additionalNotes.images.push(imageData);
+                    }
+                    Modal.open(FormComponents.renderAdditionalNotesForm(plantId, isNewPlant));
+                    showToast('Image uploaded successfully');
+                });
+            },
+
+            handleImageDrop: (event, plantId, isNewPlant) => {
+                event.preventDefault();
+                event.currentTarget.classList.remove('dragover');
+                const files = event.dataTransfer.files;
+                FileUpload.handleImageUpload(files, (imageData) => {
+                    if (isNewPlant) {
+                        state.currentForm.additionalNotes.images.push(imageData);
+                    } else {
+                        const plant = state.plants.find(p => p.id === plantId);
+                        if (!plant.additionalNotes) plant.additionalNotes = { text: '', images: [], files: [] };
+                        plant.additionalNotes.images.push(imageData);
+                    }
+                    Modal.open(FormComponents.renderAdditionalNotesForm(plantId, isNewPlant));
+                    showToast('Image uploaded successfully');
+                });
+            },
+
+            handleFileSelect: (event, plantId, isNewPlant) => {
+                const files = event.target.files;
+                FileUpload.handleFileUpload(files, (fileData) => {
+                    if (isNewPlant) {
+                        state.currentForm.additionalNotes.files.push(fileData);
+                    } else {
+                        const plant = state.plants.find(p => p.id === plantId);
+                        if (!plant.additionalNotes) plant.additionalNotes = { text: '', images: [], files: [] };
+                        plant.additionalNotes.files.push(fileData);
+                    }
+                    Modal.open(FormComponents.renderAdditionalNotesForm(plantId, isNewPlant));
+                    showToast('File uploaded successfully');
+                });
+            },
+
+            handleFileDrop: (event, plantId, isNewPlant) => {
+                event.preventDefault();
+                event.currentTarget.classList.remove('dragover');
+                const files = event.dataTransfer.files;
+                FileUpload.handleFileUpload(files, (fileData) => {
+                    if (isNewPlant) {
+                        state.currentForm.additionalNotes.files.push(fileData);
+                    } else {
+                        const plant = state.plants.find(p => p.id === plantId);
+                        if (!plant.additionalNotes) plant.additionalNotes = { text: '', images: [], files: [] };
+                        plant.additionalNotes.files.push(fileData);
+                    }
+                    Modal.open(FormComponents.renderAdditionalNotesForm(plantId, isNewPlant));
+                    showToast('File uploaded successfully');
+                });
+            },
+
+            removeImage: (imageId, plantId, isNewPlant) => {
+                if (isNewPlant) {
+                    state.currentForm.additionalNotes.images = state.currentForm.additionalNotes.images.filter(img => img.id !== imageId);
+                } else {
+                    const plant = state.plants.find(p => p.id === plantId);
+                    plant.additionalNotes.images = plant.additionalNotes.images.filter(img => img.id !== imageId);
+                }
+                Modal.open(FormComponents.renderAdditionalNotesForm(plantId, isNewPlant));
+            },
+
+            removeFile: (fileId, plantId, isNewPlant) => {
+                if (isNewPlant) {
+                    state.currentForm.additionalNotes.files = state.currentForm.additionalNotes.files.filter(f => f.id !== fileId);
+                } else {
+                    const plant = state.plants.find(p => p.id === plantId);
+                    plant.additionalNotes.files = plant.additionalNotes.files.filter(f => f.id !== fileId);
+                }
+                Modal.open(FormComponents.renderAdditionalNotesForm(plantId, isNewPlant));
+            },
+
+            saveAdditionalNotes: (plantId, isNewPlant) => {
+                const form = document.getElementById('additional-notes-form');
+                const formData = new FormData(form);
+                const text = formData.get('text');
+
+                if (isNewPlant) {
+                    state.currentForm.additionalNotes.text = text;
+                    
+                    // Create final plant object
+                    const newPlant = {
+                        id: generateId(),
+                        ...state.currentForm.basicInfo,
+                        equipments: state.currentForm.equipments,
+                        production: state.currentForm.production,
+                        kpis: state.currentForm.kpis,
+                        additionalNotes: state.currentForm.additionalNotes,
+                        submittedBy: 'current_user',
+                        submitTime: new Date().toISOString().split('T')[0]
+                    };
+
+                    state.plants.push(newPlant);
+                    state.mySubmissions.push(newPlant.id);
+                    filterData();
+                    showToast('New plant created successfully!');
+                    Modal.close();
+                    router.navigate('home');
+                } else {
+                    const plant = state.plants.find(p => p.id === plantId);
+                    if (!plant.additionalNotes) plant.additionalNotes = { text: '', images: [], files: [] };
+                    plant.additionalNotes.text = text;
+                    showToast('Additional notes saved successfully');
+                    Modal.close();
+                    router.refresh();
+                }
+            },
+
+            // Edit existing plant handlers
+            editBasicInfoExisting: (plantId) => {
+                const plant = state.plants.find(p => p.id === plantId);
+                Modal.open(FormComponents.renderBasicInfoForm(true, plant));
+            },
+
+            addEquipmentExisting: (plantId, section) => {
+                Modal.open(FormComponents.renderEquipmentForm(section, null, plantId));
+            },
+
+            editEquipmentExisting: (plantId, section, itemId) => {
+                const plant = state.plants.find(p => p.id === plantId);
+                const item = plant.equipments[section].find(i => i.id === itemId);
+                Modal.open(FormComponents.renderEquipmentForm(section, item, plantId));
+            },
+
+            deleteEquipmentExisting: (plantId, section, itemId) => {
+                if (!confirm('Delete this equipment?')) return;
+                const plant = state.plants.find(p => p.id === plantId);
+                plant.equipments[section] = plant.equipments[section].filter(i => i.id !== itemId);
+                showToast('Equipment deleted');
+                router.refresh();
+            },
+
+            addProductionExisting: (plantId) => {
+                Modal.open(FormComponents.renderProductionForm(null, plantId));
+            },
+
+            editProductionExisting: (plantId, itemName) => {
+                const plant = state.plants.find(p => p.id === plantId);
+                const item = plant.production.find(p => p.item === itemName);
+                Modal.open(FormComponents.renderProductionForm(item, plantId));
+            },
+
+            deleteProductionExisting: (plantId, itemName) => {
+                if (!confirm('Delete this production data?')) return;
+                const plant = state.plants.find(p => p.id === plantId);
+                plant.production = plant.production.filter(p => p.item !== itemName);
+                showToast('Production data deleted');
+                router.refresh();
+            },
+
+            editKPIsExisting: (plantId) => {
+                Modal.open(FormComponents.renderKPIForm(plantId));
+            },
+
+            editAdditionalNotesExisting: (plantId) => {
+                Modal.open(FormComponents.renderAdditionalNotesForm(plantId, false));
+            }
+        };
+
+        // View Components
+        const Components = {
+            Home: () => {
+                return `
+                    <div class="page-transition p-4 space-y-4">
+                        <!-- Filters -->
+                        <div class="space-y-4 bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+                            <!-- Country Select -->
+                            <div class="custom-select" id="country-select">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Country</label>
+                                <div class="select-trigger relative border border-gray-200 rounded-xl bg-white cursor-pointer" onclick="UI.toggleDropdown('country')">
+                                    <div class="flex items-center justify-between px-4 py-3">
+                                        <span id="country-display" class="${state.selectedCountry ? 'text-gray-900' : 'text-gray-400'}">
+                                            ${state.selectedCountry ? `${state.selectedCountry.flag} ${state.selectedCountry.name}` : 'Select'}
+                                        </span>
+                                        <svg class="w-5 h-5 text-gray-400 transition-transform" id="country-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </div>
+                                    <div id="country-dropdown" class="hidden absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl z-50 max-h-60 overflow-y-auto">
+                                        <div class="p-2 sticky top-0 bg-white border-b border-gray-100">
+                                            <input type="text" 
+                                                placeholder="Search country..." 
+                                                class="w-full px-3 py-2 bg-gray-50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                oninput="UI.handleSearch('country', this.value)"
+                                                onclick="event.stopPropagation()"
+                                            >
+                                        </div>
+                                        <div id="country-list" class="py-1">
+                                            ${COUNTRIES.map(c => `
+                                                <div class="px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center gap-2 transition-colors" 
+                                                     onclick="UI.selectCountry('${c.id}')">
+                                                    <span class="text-xl">${c.flag}</span>
+                                                    <span class="text-gray-700">${highlightText(c.name, state.searchQuery.country)}</span>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Plant Select -->
+                            <div class="custom-select" id="plant-select">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Plant</label>
+                                <div class="select-trigger relative border border-gray-200 rounded-xl bg-white cursor-pointer" onclick="UI.toggleDropdown('plant')">
+                                    <div class="flex items-center justify-between px-4 py-3">
+                                        <span id="plant-display" class="${state.selectedPlant ? 'text-gray-900' : 'text-gray-400'}">
+                                            ${state.selectedPlant ? state.selectedPlant.name : 'Select'}
+                                        </span>
+                                        <svg class="w-5 h-5 text-gray-400 transition-transform" id="plant-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </div>
+                                    <div id="plant-dropdown" class="hidden absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl z-50 max-h-60 overflow-y-auto">
+                                        <div class="p-2 sticky top-0 bg-white border-b border-gray-100">
+                                            <input type="text" 
+                                                placeholder="Search plant..." 
+                                                class="w-full px-3 py-2 bg-gray-50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                oninput="UI.handleSearch('plant', this.value)"
+                                                onclick="event.stopPropagation()"
+                                            >
+                                        </div>
+                                        <div id="plant-list" class="py-1">
+                                            ${state.plants.map(p => `
+                                                <div class="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors" 
+                                                     onclick="UI.selectPlant(${p.id})">
+                                                    <div class="font-medium text-gray-900">${highlightText(p.name, state.searchQuery.plant)}</div>
+                                                    <div class="text-xs text-gray-500 mt-0.5">${p.location} • ${p.group}</div>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- List Header -->
+                        <div class="flex items-center justify-between px-1">
+                            <h2 class="text-lg font-bold text-gray-900">Total ${state.filteredPlants.length} plants</h2>
+                            <button onclick="FormHandlers.startNewPlant()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-sm font-medium flex items-center gap-1.5 transition-colors shadow-lg shadow-blue-200">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                                Add New Plant
+                            </button>
+                        </div>
+
+                        <!-- Empty State -->
+                        ${state.filteredPlants.length === 0 ? `
+                            <div class="text-center py-12 bg-white rounded-2xl border border-dashed border-gray-300">
+                                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                    </svg>
+                                </div>
+                                <h3 class="text-gray-900 font-medium mb-1">No plants found</h3>
+                                <p class="text-gray-500 text-sm mb-4">Try adjusting your filters or add a new plant</p>
+                                <button onclick="FormHandlers.startNewPlant()" class="text-blue-600 font-medium hover:underline">Add New Plant</button>
+                            </div>
+                        ` : ''}
+
+                        <!-- Plant List -->
+                        <div class="space-y-3">
+                            ${state.filteredPlants.map((plant, index) => `
+                                <div class="plant-card bg-white rounded-2xl p-4 shadow-sm border border-gray-100 cursor-pointer fade-in" 
+                                     style="animation-delay: ${index * 0.05}s"
+                                     onclick="router.navigate('detail', ${plant.id})">
+                                    <div class="flex items-start justify-between mb-2">
+                                        <h3 class="text-lg font-semibold text-gray-900">${plant.name} | ${plant.location}</h3>
+                                        <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">${plant.crudeSteelCapacity}kt</span>
+                                    </div>
+                                    <div class="flex flex-wrap gap-2">
+                                        <span class="tag">${plant.group}</span>
+                                        <span class="tag">${plant.type}</span>
+                                        ${state.mySubmissions.includes(plant.id) ? '<span class="tag bg-green-100 text-green-700">My Submission</span>' : ''}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            },
+
+            Detail: (plantId) => {
+                const plant = state.plants.find(p => p.id === plantId);
+                if (!plant) return '<div class="p-4">Plant not found</div>';
+
+                const notes = plant.additionalNotes || { text: '', images: [], files: [] };
+
+                const renderEquipmentSection = (title, items, sectionKey) => {
+                    if (!items) items = [];
+                    const count = items.length;
+                    const totalCapacity = items.reduce((sum, item) => sum + (parseInt(item.capacity) || 0), 0);
+                    
+                    return `
+                        <div class="mb-6">
+                            <div class="equipment-header text-white p-3 rounded-t-xl flex items-center justify-between">
+                                <div class="flex items-center gap-3 flex-wrap">
+                                    <span class="font-bold text-sm">${title}</span>
+                                    <span class="bg-white/20 px-2 py-0.5 rounded text-xs">${count} Sets</span>
+                                    ${count > 0 ? `<span class="bg-white/20 px-2 py-0.5 rounded text-xs">Capacity: ${totalCapacity || '--'}</span>` : ''}
+                                </div>
+                                <button onclick="FormHandlers.addEquipmentExisting(${plantId}, '${sectionKey}')" class="text-white/80 hover:text-white p-1 hover:bg-white/20 rounded transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="bg-white border border-t-0 border-gray-200 rounded-b-xl overflow-hidden">
+                                ${items.length === 0 ? `
+                                    <div class="p-8 text-center text-gray-400 text-sm">
+                                        No equipment added yet
+                                        <button onclick="FormHandlers.addEquipmentExisting(${plantId}, '${sectionKey}')" class="block mx-auto mt-2 text-blue-600 hover:underline">Add Equipment</button>
+                                    </div>
+                                ` : ''}
+                                ${items.map((item, idx) => `
+                                    <div class="p-4 ${idx !== items.length - 1 ? 'border-b border-gray-100' : ''}">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <span class="font-semibold text-gray-900">${item.name}</span>
+                                            <div class="flex gap-2">
+                                                <button onclick="FormHandlers.editEquipmentExisting(${plantId}, '${sectionKey}', '${item.id}')" class="text-blue-600 text-sm flex items-center gap-1 hover:bg-blue-50 px-2 py-1 rounded">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                    </svg>
+                                                    Edit
+                                                </button>
+                                                <button onclick="FormHandlers.deleteEquipmentExisting(${plantId}, '${sectionKey}', '${item.id}')" class="text-red-500 text-sm flex items-center gap-1 hover:bg-red-50 px-2 py-1 rounded">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-4 text-sm">
+                                            <div>
+                                                <span class="text-gray-500 block text-xs mb-0.5">Capacity</span>
+                                                <span class="font-medium text-gray-900">${item.capacity}</span>
+                                            </div>
+                                            <div>
+                                                <span class="text-gray-500 block text-xs mb-0.5">Status</span>
+                                                <span class="operating-status">${item.status}</span>
+                                            </div>
+                                            ${item.format && item.format !== '--' ? `
+                                            <div>
+                                                <span class="text-gray-500 block text-xs mb-0.5">Format</span>
+                                                <span class="bg-gray-100 px-2 py-0.5 rounded text-xs inline-block">${item.format}</span>
+                                                ${item.ovens ? `<span class="bg-gray-100 px-2 py-0.5 rounded text-xs inline-block ml-1">${item.ovens} ovens</span>` : ''}
+                                            </div>
+                                            ` : ''}
+                                            <div>
+                                                <span class="text-gray-500 block text-xs mb-0.5">Year</span>
+                                                <span class="font-medium text-gray-900">${item.year}</span>
+                                            </div>
+                                            ${item.supplier ? `
+                                            <div class="col-span-2">
+                                                <span class="text-gray-500 block text-xs mb-0.5">Supplier</span>
+                                                <span class="font-medium text-gray-900">${item.supplier}</span>
+                                            </div>
+                                            ` : ''}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                };
+
+                return `
+                    <div class="page-transition bg-gray-50 min-h-screen">
+                        <!-- Detail Header -->
+                        <div class="bg-white sticky top-0 z-40 border-b border-gray-200">
+                            <div class="flex items-center px-4 py-3 gap-3">
+                                <button onclick="router.back()" class="p-2 -ml-2 hover:bg-gray-50 rounded-full transition-colors">
+                                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                    </svg>
+                                </button>
+                                <div class="flex-1 min-w-0">
+                                    <h1 class="text-lg font-bold text-gray-900 truncate">Steel Plant Info</h1>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="px-4 pb-3 flex items-center justify-between">
+                                <span class="text-blue-600 font-medium text-sm truncate max-w-[60%]">${plant.fullName}</span>
+                                <button class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-1 hover:bg-blue-700 transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                                    </svg>
+                                    Share
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="p-4 space-y-6">
+                            <!-- Basic Info -->
+                            <div id="basic-info" class="section-anchor bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+                                <div class="bg-blue-900 text-white p-3 flex items-center justify-between">
+                                    <span class="font-bold">Basic Info</span>
+                                    <button onclick="FormHandlers.editBasicInfoExisting(${plantId})" class="text-white/80 hover:text-white text-sm flex items-center gap-1 hover:bg-white/20 px-2 py-1 rounded transition-colors">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                        </svg>
+                                        Edit
+                                    </button>
+                                </div>
+                                <div class="p-4 space-y-3 text-sm">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-500">Full Name</span>
+                                        <span class="font-medium text-gray-900 text-right max-w-[60%]">${plant.fullName}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-500">Short Name</span>
+                                        <span class="font-medium text-gray-900">${plant.name}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-500">Parent Group</span>
+                                        <span class="font-medium text-gray-900">${plant.parentGroup}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-500">Type</span>
+                                        <span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded text-xs font-medium">${plant.type}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-500">Crude Steel Capacity</span>
+                                        <span class="font-medium text-gray-900">${plant.crudeSteelCapacity} kt/a</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-500">Location</span>
+                                        <span class="font-medium text-gray-900">${plant.locationDetail}</span>
+                                    </div>
+                                </div>
+                                <div class="px-4 pb-3 text-xs text-gray-400">
+                                    Source: Compiled by CISDI Consulting.<br>
+                                    Capacity Unit: 10kt/a
+                                </div>
+                            </div>
+
+                            <!-- Satellite Map -->
+                            <div id="satellite-map" class="section-anchor">
+                                <h2 class="text-lg font-bold text-gray-900 mb-3">Satellite View</h2>
+                                <div class="satellite-map shadow-sm">
+                                    <img src="/mnt/kimi/upload/map.png" alt="Satellite view of ${plant.name}" onerror="this.src='https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?w=800&h=400&fit=crop'">
+                                    <div class="map-overlay">
+                                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        </svg>
+                                        ${plant.locationDetail}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Equipments -->
+                            <div id="equipments" class="section-anchor">
+                                <h2 class="text-lg font-bold text-gray-900 mb-4">Equipments</h2>
+                                ${renderEquipmentSection('Coke', plant.equipments?.coke, 'coke')}
+                                ${renderEquipmentSection('Sinter', plant.equipments?.sinter, 'sinter')}
+                                ${renderEquipmentSection('Iron-making', plant.equipments?.ironmaking, 'ironmaking')}
+                                ${renderEquipmentSection('Steel-making', plant.equipments?.steelmaking, 'steelmaking')}
+                                ${renderEquipmentSection('Refining', plant.equipments?.refining, 'refining')}
+                                ${renderEquipmentSection('Continuous Casting', plant.equipments?.casting, 'casting')}
+                                ${renderEquipmentSection('Hot-rolling', plant.equipments?.hotRolling, 'hotRolling')}
+                                ${renderEquipmentSection('Cold-rolling', plant.equipments?.coldRolling, 'coldRolling')}
+                                ${renderEquipmentSection('Welded tube', plant.equipments?.tube, 'tube')}
+                            </div>
+
+                            <!-- Production & Costs - Optimized Layout -->
+                            <div id="production" class="section-anchor bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+                                <div class="bg-blue-900 text-white p-3 flex items-center justify-between">
+                                    <span class="font-bold">Production & Costs</span>
+                                    <button onclick="FormHandlers.addProductionExisting(${plantId})" class="text-white/80 hover:text-white text-sm flex items-center gap-1 hover:bg-white/20 px-2 py-1 rounded transition-colors">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                        </svg>
+                                        Add
+                                    </button>
+                                </div>
+                                <div class="p-4">
+                                    ${!plant.production || plant.production.length === 0 ? `
+                                        <div class="text-center py-8 text-gray-400">
+                                            No production data
+                                            <button onclick="FormHandlers.addProductionExisting(${plantId})" class="block mx-auto mt-2 text-blue-600 hover:underline">Add Data</button>
+                                        </div>
+                                    ` : `
+                                        <div class="space-y-3">
+                                            ${plant.production.map(p => `
+                                                <div class="production-card">
+                                                    <div class="flex items-center justify-between mb-3">
+                                                        <span class="font-semibold text-gray-900 text-base">${p.item}</span>
+                                                        <div class="flex gap-1">
+                                                            <button onclick="FormHandlers.editProductionExisting(${plantId}, '${p.item}')" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg">
+                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                                </svg>
+                                                            </button>
+                                                            <button onclick="FormHandlers.deleteProductionExisting(${plantId}, '${p.item}')" class="p-2 text-red-500 hover:bg-red-50 rounded-lg">
+                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                                </svg>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="grid grid-cols-3 gap-4 text-sm">
+                                                        <div>
+                                                            <span class="text-gray-500 text-xs block mb-1">Year</span>
+                                                            <span class="font-medium text-gray-900">${p.year}</span>
+                                                        </div>
+                                                        <div>
+                                                            <span class="text-gray-500 text-xs block mb-1">Production</span>
+                                                            <span class="font-medium text-gray-900">${p.production.toLocaleString()} t</span>
+                                                        </div>
+                                                        <div>
+                                                            <span class="text-gray-500 text-xs block mb-1">Cost</span>
+                                                            <span class="font-medium text-gray-900">$${p.cost}/t</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    `}
+                                </div>
+                                <div class="px-4 pb-3 text-xs text-gray-400 border-t border-gray-100">
+                                    Source: Compiled by CISDI Consulting.
+                                </div>
+                            </div>
+
+                            <!-- Operational KPIs -->
+                            <div id="kpis" class="section-anchor bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+                                <div class="bg-blue-900 text-white p-3 flex items-center justify-between">
+                                    <span class="font-bold">Operational KPIs</span>
+                                    <button onclick="FormHandlers.editKPIsExisting(${plantId})" class="text-white/80 hover:text-white text-sm flex items-center gap-1 hover:bg-white/20 px-2 py-1 rounded transition-colors">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                        </svg>
+                                        Edit
+                                    </button>
+                                </div>
+                                <div class="p-4">
+                                    ${!plant.kpis ? `
+                                        <div class="text-center py-8 text-gray-400">
+                                            No KPI data available
+                                            <button onclick="FormHandlers.editKPIsExisting(${plantId})" class="block mx-auto mt-2 text-blue-600 hover:underline">Add KPIs</button>
+                                        </div>
+                                    ` : `
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div class="bg-gray-50 rounded-xl p-3">
+                                                <div class="text-xs text-gray-500 mb-1">Revenue</div>
+                                                <div class="flex items-baseline gap-1">
+                                                    <span class="text-xl font-bold text-gray-900">${plant.kpis.revenue?.value || '--'}</span>
+                                                    <span class="text-sm text-gray-500">${plant.kpis.revenue?.unit || '$'}</span>
+                                                    <span class="text-xs text-gray-400 ml-auto">${plant.kpis.revenue?.year || ''}</span>
+                                                </div>
+                                            </div>
+                                            <div class="bg-gray-50 rounded-xl p-3">
+                                                <div class="text-xs text-gray-500 mb-1">Profit</div>
+                                                <div class="flex items-baseline gap-1">
+                                                    <span class="text-xl font-bold text-gray-900">${plant.kpis.profit?.value || '--'}</span>
+                                                    <span class="text-sm text-gray-500">${plant.kpis.profit?.unit || '$'}</span>
+                                                    <span class="text-xs text-gray-400 ml-auto">${plant.kpis.profit?.year || ''}</span>
+                                                </div>
+                                            </div>
+                                            <div class="bg-gray-50 rounded-xl p-3">
+                                                <div class="text-xs text-gray-500 mb-1">Utilization</div>
+                                                <div class="flex items-baseline gap-1">
+                                                    <span class="text-xl font-bold text-gray-900">${plant.kpis.utilization?.value || '--'}</span>
+                                                    <span class="text-sm text-gray-500">${plant.kpis.utilization?.unit || '%'}</span>
+                                                    <span class="text-xs text-gray-400 ml-auto">${plant.kpis.utilization?.year || ''}</span>
+                                                </div>
+                                            </div>
+                                            <div class="bg-gray-50 rounded-xl p-3">
+                                                <div class="text-xs text-gray-500 mb-1">Labor Productivity</div>
+                                                <div class="flex items-baseline gap-1">
+                                                    <span class="text-xl font-bold text-gray-900">${plant.kpis.productivity?.value || '--'}</span>
+                                                    <span class="text-sm text-gray-500">${plant.kpis.productivity?.unit || 't/person'}</span>
+                                                    <span class="text-xs text-gray-400 ml-auto">${plant.kpis.productivity?.year || ''}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4 bg-gray-50 rounded-xl p-3">
+                                            <div class="text-xs text-gray-500 mb-1">Comprehensive Energy Consumption</div>
+                                            <div class="flex items-baseline gap-1">
+                                                <span class="text-xl font-bold text-gray-900">${plant.kpis.energy?.value || '--'}</span>
+                                                <span class="text-sm text-gray-500">${plant.kpis.energy?.unit || 'GJ/t'}</span>
+                                                <span class="text-xs text-gray-400 ml-auto">${plant.kpis.energy?.year || ''}</span>
+                                            </div>
+                                        </div>
+                                    `}
+                                </div>
+                                <div class="px-4 pb-3 text-xs text-gray-400">
+                                    Source: Compiled by CISDI Consulting.
+                                </div>
+                            </div>
+
+                            <!-- Additional Notes -->
+                            <div id="additional-notes" class="section-anchor bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 mb-8">
+                                <div class="bg-blue-900 text-white p-3 flex items-center justify-between">
+                                    <span class="font-bold">Additional Notes</span>
+                                    <button onclick="FormHandlers.editAdditionalNotesExisting(${plantId})" class="text-white/80 hover:text-white text-sm flex items-center gap-1 hover:bg-white/20 px-2 py-1 rounded transition-colors">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                        </svg>
+                                        Edit
+                                    </button>
+                                </div>
+                                
+                                <div class="p-4">
+                                    ${!notes.text && (!notes.images || notes.images.length === 0) && (!notes.files || notes.files.length === 0) ? `
+                                        <div class="text-center py-8 text-gray-400">
+                                            <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                            </svg>
+                                            <p>No additional notes</p>
+                                            <button onclick="FormHandlers.editAdditionalNotesExisting(${plantId})" class="mt-2 text-blue-600 hover:underline text-sm">Add Notes</button>
+                                        </div>
+                                    ` : `
+                                        ${notes.text ? `
+                                            <div class="mb-6">
+                                                <h4 class="text-sm font-semibold text-gray-700 mb-2">Notes</h4>
+                                                <div class="bg-gray-50 rounded-xl p-4 text-sm text-gray-700 whitespace-pre-line">${notes.text}</div>
+                                            </div>
+                                        ` : ''}
+                                        
+                                        ${notes.images && notes.images.length > 0 ? `
+                                            <div class="mb-6">
+                                                <h4 class="text-sm font-semibold text-gray-700 mb-2">Images (${notes.images.length})</h4>
+                                                <div class="image-grid">
+                                                    ${notes.images.map(img => `
+                                                        <div class="image-thumb" onclick="openImageViewer('${img.url}')">
+                                                            <img src="${img.url}" alt="${img.name}">
+                                                        </div>
+                                                    `).join('')}
+                                                </div>
+                                            </div>
+                                        ` : ''}
+                                        
+                                        ${notes.files && notes.files.length > 0 ? `
+                                            <div>
+                                                <h4 class="text-sm font-semibold text-gray-700 mb-2">Attachments (${notes.files.length})</h4>
+                                                <div class="space-y-2">
+                                                    ${notes.files.map(file => `
+                                                        <div class="file-item">
+                                                            <div class="file-icon ${file.type}">
+                                                                ${file.type === 'pdf' ? '📄' : file.type === 'excel' ? '📊' : '📝'}
+                                                            </div>
+                                                            <div class="flex-1 min-w-0">
+                                                                <div class="text-sm font-medium text-gray-900 truncate">${file.name}</div>
+                                                                <div class="text-xs text-gray-500">${file.size}</div>
+                                                            </div>
+                                                            <button class="p-2 text-gray-400 hover:text-blue-600">
+                                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                                                </svg>
+                                                            </button>
+                                                        </div>
+                                                    `).join('')}
+                                                </div>
+                                            </div>
+                                        ` : ''}
+                                    `}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            },
+
+            Profile: () => {
+                const myPlants = state.plants.filter(p => state.mySubmissions.includes(p.id));
+                
+                return `
+                    <div class="page-transition p-4">
+                        <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 text-center">
+                            <div class="w-24 h-24 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full mx-auto mb-4 flex items-center justify-center text-white text-3xl font-bold shadow-lg">
+                                JS
+                            </div>
+                            <h2 class="text-xl font-bold text-gray-900 mb-1">John Smith</h2>
+                            <p class="text-gray-500 mb-6">Steel Industry Analyst</p>
+                            <div class="flex gap-3 justify-center">
+                                <button class="px-6 py-2 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors">
+                                    Edit Profile
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                            <!-- My Submissions Section -->
+                            <div class="p-4 border-b border-gray-100 flex items-center justify-between hover:bg-gray-50 cursor-pointer" onclick="router.navigate('mySubmissions')">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center text-green-600">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-700 font-medium block">My Submissions</span>
+                                        <span class="text-xs text-gray-500">${myPlants.length} plants submitted</span>
+                                    </div>
+                                </div>
+                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </div>
+                            
+                            <div class="p-4 border-b border-gray-100 flex items-center justify-between hover:bg-gray-50 cursor-pointer">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-600">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                        </svg>
+                                    </div>
+                                    <span class="text-gray-700 font-medium">My Favorites</span>
+                                </div>
+                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </div>
+                            <div class="p-4 border-b border-gray-100 flex items-center justify-between hover:bg-gray-50 cursor-pointer">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-gray-600">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        </svg>
+                                    </div>
+                                    <span class="text-gray-700 font-medium">Settings</span>
+                                </div>
+                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </div>
+                            <div class="p-4 flex items-center justify-between hover:bg-gray-50 cursor-pointer text-red-600">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-red-50 rounded-full flex items-center justify-center">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                        </svg>
+                                    </div>
+                                    <span class="font-medium">Logout</span>
+                                </div>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 text-center text-xs text-gray-400">
+                            Steel Plant Info v1.0.0<br>
+                            © 2025 CISDI Consulting
+                        </div>
+                    </div>
+                `;
+            },
+
+            MySubmissions: () => {
+                const myPlants = state.plants.filter(p => state.mySubmissions.includes(p.id));
+                
+                return `
+                    <div class="page-transition p-4">
+                        <div class="flex items-center mb-6">
+                            <button onclick="router.navigate('profile')" class="p-2 -ml-2 mr-2 hover:bg-gray-50 rounded-full">
+                                <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                </svg>
+                            </button>
+                            <h2 class="text-xl font-bold text-gray-900">My Submissions</h2>
+                        </div>
+
+                        ${myPlants.length === 0 ? `
+                            <div class="text-center py-12 bg-white rounded-2xl border border-dashed border-gray-300">
+                                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                </div>
+                                <h3 class="text-gray-900 font-medium mb-1">No submissions yet</h3>
+                                <p class="text-gray-500 text-sm mb-4">Start by adding a new steel plant</p>
+                                <button onclick="FormHandlers.startNewPlant()" class="bg-blue-600 text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-blue-700 transition-colors">
+                                    Add New Plant
+                                </button>
+                            </div>
+                        ` : `
+                            <div class="space-y-3">
+                                ${myPlants.map((plant, index) => `
+                                    <div class="plant-card bg-white rounded-2xl p-4 shadow-sm border border-gray-100 cursor-pointer fade-in" 
+                                         style="animation-delay: ${index * 0.05}s"
+                                         onclick="router.navigate('detail', ${plant.id})">
+                                        <div class="flex items-start justify-between mb-2">
+                                            <div>
+                                                <h3 class="text-lg font-semibold text-gray-900">${plant.name}</h3>
+                                                <p class="text-sm text-gray-500">${plant.location} • ${COUNTRIES.find(c => c.id === plant.country)?.flag || '🏳️'} ${COUNTRIES.find(c => c.id === plant.country)?.name || ''}</p>
+                                            </div>
+                                            <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Submitted</span>
+                                        </div>
+                                        <div class="flex flex-wrap gap-2 mb-3">
+                                            <span class="tag">${plant.group}</span>
+                                            <span class="tag">${plant.type}</span>
+                                            <span class="tag">${plant.crudeSteelCapacity}kt</span>
+                                        </div>
+                                        <div class="text-xs text-gray-400 flex items-center gap-1">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                            </svg>
+                                            Submitted on ${plant.submitTime}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `}
+                    </div>
+                `;
+            }
+        };
+
+        // UI Controller
+        const UI = {
+            toggleDropdown: (type) => {
+                const dropdown = document.getElementById(`${type}-dropdown`);
+                const arrow = document.getElementById(`${type}-arrow`);
+                const trigger = dropdown.previousElementSibling;
+                
+                const otherType = type === 'country' ? 'plant' : 'country';
+                const otherDropdown = document.getElementById(`${otherType}-dropdown`);
+                const otherArrow = document.getElementById(`${otherType}-arrow`);
+                const otherTrigger = otherDropdown.previousElementSibling;
+                
+                // Close other dropdown
+                otherDropdown.classList.add('hidden');
+                otherArrow.style.transform = 'rotate(0deg)';
+                otherTrigger.classList.remove('active');
+                
+                if (dropdown.classList.contains('hidden')) {
+                    dropdown.classList.remove('hidden');
+                    dropdown.classList.add('dropdown-enter');
+                    arrow.style.transform = 'rotate(180deg)';
+                    trigger.classList.add('active');
+                    setTimeout(() => {
+                        const input = dropdown.querySelector('input');
+                        if (input) input.focus();
+                    }, 100);
+                } else {
+                    dropdown.classList.add('hidden');
+                    arrow.style.transform = 'rotate(0deg)';
+                    trigger.classList.remove('active');
+                }
+            },
+
+            closeDropdown: (type) => {
+                const dropdown = document.getElementById(`${type}-dropdown`);
+                const arrow = document.getElementById(`${type}-arrow`);
+                const trigger = dropdown.previousElementSibling;
+                dropdown.classList.add('hidden');
+                arrow.style.transform = 'rotate(0deg)';
+                trigger.classList.remove('active');
+            },
+
+            handleSearch: (type, value) => {
+                state.searchQuery[type] = value;
+                const list = document.getElementById(`${type}-list`);
+                
+                if (type === 'country') {
+                    const filtered = COUNTRIES.filter(c => 
+                        c.name.toLowerCase().includes(value.toLowerCase())
+                    );
+                    list.innerHTML = filtered.map(c => `
+                        <div class="px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center gap-2 transition-colors" 
+                             onclick="UI.selectCountry('${c.id}')">
+                            <span class="text-xl">${c.flag}</span>
+                            <span class="text-gray-700">${highlightText(c.name, value)}</span>
+                        </div>
+                    `).join('');
+                } else {
+                    const filtered = state.plants.filter(p => 
+                        p.name.toLowerCase().includes(value.toLowerCase()) ||
+                        p.location.toLowerCase().includes(value.toLowerCase())
+                    );
+                    list.innerHTML = filtered.map(p => `
+                        <div class="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors" 
+                             onclick="UI.selectPlant(${p.id})">
+                            <div class="font-medium text-gray-900">${highlightText(p.name, value)}</div>
+                            <div class="text-xs text-gray-500 mt-0.5">${p.location} • ${p.group}</div>
+                        </div>
+                    `).join('');
+                }
+            },
+
+            selectCountry: (id) => {
+                state.selectedCountry = COUNTRIES.find(c => c.id === id);
+                state.searchQuery.country = '';
+                document.getElementById('country-display').innerHTML = `${state.selectedCountry.flag} ${state.selectedCountry.name}`;
+                document.getElementById('country-display').classList.remove('text-gray-400');
+                document.getElementById('country-display').classList.add('text-gray-900');
+                UI.closeDropdown('country');
+                filterData();
+                router.refresh();
+            },
+
+            selectPlant: (id) => {
+                state.selectedPlant = state.plants.find(p => p.id === id);
+                state.searchQuery.plant = '';
+                document.getElementById('plant-display').textContent = state.selectedPlant.name;
+                document.getElementById('plant-display').classList.remove('text-gray-400');
+                document.getElementById('plant-display').classList.add('text-gray-900');
+                UI.closeDropdown('plant');
+                filterData();
+                router.refresh();
+            },
+
+            closeAllDropdowns: () => {
+                ['country', 'plant'].forEach(type => {
+                    const dropdown = document.getElementById(`${type}-dropdown`);
+                    const arrow = document.getElementById(`${type}-arrow`);
+                    const trigger = dropdown.previousElementSibling;
+                    dropdown.classList.add('hidden');
+                    arrow.style.transform = 'rotate(0deg)';
+                    trigger.classList.remove('active');
+                });
+            }
+        };
+
+        // Router
+        const router = {
+            currentRoute: 'home',
+            history: [],
+            
+            navigate: (route, params = null) => {
+                router.history.push({ route: router.currentRoute, params: router.params });
+                router.currentRoute = route;
+                router.params = params;
+                router.render();
+                router.updateNav();
+                
+                // Show/hide FAB container based on route
+                const fabContainer = document.getElementById('fab-container');
+                if (fabContainer) {
+                    if (route === 'detail') {
+                        fabContainer.classList.remove('hidden');
+                    } else {
+                        fabContainer.classList.add('hidden');
+                        toggleToc(false);
+                    }
+                }
+            },
+
+            back: () => {
+                if (router.history.length > 0) {
+                    const prev = router.history.pop();
+                    router.currentRoute = prev.route;
+                    router.params = prev.params;
+                    router.render();
+                    router.updateNav();
+                    
+                    const fabContainer = document.getElementById('fab-container');
+                    if (fabContainer) {
+                        if (router.currentRoute === 'detail') {
+                            fabContainer.classList.remove('hidden');
+                        } else {
+                            fabContainer.classList.add('hidden');
+                            toggleToc(false);
+                        }
+                    }
+                } else {
+                    router.navigate('home');
+                }
+            },
+
+            refresh: () => {
+                router.render();
+            },
+
+            render: () => {
+                const main = document.getElementById('main-content');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+                switch(router.currentRoute) {
+                    case 'home':
+                        main.innerHTML = Components.Home();
+                        break;
+                    case 'detail':
+                        main.innerHTML = Components.Detail(router.params);
+                        break;
+                    case 'profile':
+                        main.innerHTML = Components.Profile();
+                        break;
+                    case 'mySubmissions':
+                        main.innerHTML = Components.MySubmissions();
+                        break;
+                    default:
+                        main.innerHTML = Components.Home();
+                }
+            },
+
+            updateNav: () => {
+                document.querySelectorAll('.nav-item').forEach(el => {
+                    el.classList.remove('active', 'text-blue-600');
+                    el.classList.add('text-gray-400');
+                });
+                
+                if (router.currentRoute === 'home' || router.currentRoute === 'detail') {
+                    const homeNav = document.querySelectorAll('.nav-item')[0];
+                    homeNav.classList.add('active');
+                    homeNav.classList.remove('text-gray-400');
+                } else if (router.currentRoute === 'profile' || router.currentRoute === 'mySubmissions') {
+                    const profileNav = document.querySelectorAll('.nav-item')[1];
+                    profileNav.classList.add('active');
+                    profileNav.classList.remove('text-gray-400');
+                }
+            }
+        };
+
+        // Event Listeners
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.custom-select')) {
+                UI.closeAllDropdowns();
+            }
+            if (!e.target.closest('.fab-container')) {
+                toggleToc(false);
+            }
+        });
+
+        // Initialize
+        initializeData();
+        router.render();
+    </script>
+</body>
+</html>
