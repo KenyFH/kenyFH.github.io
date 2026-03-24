@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GPS 定位工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: white;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .subtitle {
+            text-align: center;
+            opacity: 0.9;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .location-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 30px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 10px rgba(245, 87, 108, 0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .info-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .info-box.show {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .coordinate {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .coordinate:last-child {
+            border-bottom: none;
+        }
+        
+        .label {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .value {
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-align: right;
+            flex: 1;
+            margin-left: 10px;
+        }
+        
+        .location-info {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+            text-align: center;
+        }
+        
+        .location-label {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .location-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            line-height: 1.4;
+        }
+        
+        .accuracy {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            font-size: 13px;
+            opacity: 0.8;
+        }
+        
+        .error {
+            background: rgba(255, 71, 87, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+            display: none;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .error.show {
+            display: block;
+            animation: shake 0.5s ease;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .map-link {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .map-link:active {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .raw-output {
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            word-break: break-all;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .copy-btn {
+            margin-top: 8px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .copy-btn:active {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0.95);
+        }
+        
+        .copy-btn.copied {
+            background: rgba(46, 213, 115, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="location-icon">📍</div>
+        <h1>GPS 定位工具</h1>
+        <p class="subtitle">获取经纬度及所在国家、行政区</p>
+        
+        <button class="btn" id="locateBtn" onclick="getLocation()">
+            获取当前位置
+        </button>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p id="loadingText">正在获取 GPS 坐标...</p>
+        </div>
+        
+        <div class="info-box" id="infoBox">
+            <div class="coordinate">
+                <span class="label">纬度 (Latitude)</span>
+                <span class="value" id="latitude">--</span>
+            </div>
+            <div class="coordinate">
+                <span class="label">经度 (Longitude)</span>
+                <span class="value" id="longitude">--</span>
+            </div>
+            
+            <div class="location-info">
+                <div class="location-label">所在位置</div>
+                <div class="location-value" id="locationName">--</div>
+            </div>
+            
+            <div class="accuracy" id="accuracy"></div>
+            
+            <div class="raw-output" id="rawOutput">
+                等待获取位置信息...
+            </div>
+            <button class="copy-btn" id="copyBtn" onclick="copyToClipboard()">复制位置信息</button>
+            
+            <a href="#" class="map-link" id="mapLink" target="_blank">
+                在地图中查看位置
+            </a>
+        </div>
+        
+        <div class="error" id="errorBox"></div>
+    </div>
+
+    <script>
+        let currentLocationData = null;
+        
+        function getLocation() {
+            const btn = document.getElementById('locateBtn');
+            const loading = document.getElementById('loading');
+            const loadingText = document.getElementById('loadingText');
+            const infoBox = document.getElementById('infoBox');
+            const errorBox = document.getElementById('errorBox');
+            
+            // 重置状态
+            btn.disabled = true;
+            btn.textContent = '定位中...';
+            loading.classList.add('show');
+            loadingText.textContent = '正在获取 GPS 坐标...';
+            infoBox.classList.remove('show');
+            errorBox.classList.remove('show');
+            
+            // 检查浏览器支持
+            if (!navigator.geolocation) {
+                showError('您的浏览器不支持地理定位功能');
+                return;
+            }
+            
+            // 配置选项
+            const options = {
+                enableHighAccuracy: true,
+                timeout: 15000,
+                maximumAge: 0
+            };
+            
+            // 请求定位
+            navigator.geolocation.getCurrentPosition(
+                async function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    const acc = position.coords.accuracy;
+                    
+                    // 显示坐标
+                    document.getElementById('latitude').textContent = lat.toFixed(6) + '°';
+                    document.getElementById('longitude').textContent = lng.toFixed(6) + '°';
+                    document.getElementById('accuracy').textContent = 'GPS 精度: ±' + acc.toFixed(0) + ' 米';
+                    
+                    // 更新地图链接
+                    const mapUrl = `https://maps.google.com/?q=${lat},${lng}`;
+                    document.getElementById('mapLink').href = mapUrl;
+                    
+                    // 开始反向地理编码
+                    loadingText.textContent = '正在解析地址信息...';
+                    
+                    try {
+                        const locationInfo = await reverseGeocode(lat, lng);
+                        currentLocationData = {
+                            latitude: lat.toFixed(6),
+                            longitude: lng.toFixed(6),
+                            country: locationInfo.country,
+                            admin1: locationInfo.admin1
+                        };
+                        
+                        // 显示位置信息
+                        document.getElementById('locationName').innerHTML = 
+                            `<span style="color: #ffd93d;">${locationInfo.country}</span>, <span style="color: #6bcb77;">${locationInfo.admin1}</span>`;
+                        
+                        // 显示原始格式输出
+                        const rawText = `${lat.toFixed(6)}, ${lng.toFixed(6)}, ${locationInfo.country}, ${locationInfo.admin1}`;
+                        document.getElementById('rawOutput').textContent = rawText;
+                        
+                        loading.classList.remove('show');
+                        btn.disabled = false;
+                        btn.textContent = '重新获取位置';
+                        infoBox.classList.add('show');
+                        
+                    } catch (error) {
+                        loading.classList.remove('show');
+                        btn.disabled = false;
+                        btn.textContent = '重新获取位置';
+                        
+                        // 即使没有地址信息，也显示坐标
+                        document.getElementById('locationName').textContent = '地址解析失败';
+                        document.getElementById('rawOutput').textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}, Unknown, Unknown`;
+                        infoBox.classList.add('show');
+                        
+                        showError('无法获取地址信息，仅显示坐标');
+                    }
+                },
+                function(error) {
+                    loading.classList.remove('show');
+                    btn.disabled = false;
+                    btn.textContent = '重新获取位置';
+                    
+                    let message = '';
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            message = '定位权限被拒绝，请在手机设置中开启定位权限';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            message = '位置信息不可用，请检查 GPS 是否开启';
+                            break;
+                        case error.TIMEOUT:
+                            message = '定位超时，请重试或检查网络连接';
+                            break;
+                        default:
+                            message = '定位失败: ' + error.message;
+                    }
+                    showError(message);
+                },
+                options
+            );
+        }
+        
+        // 反向地理编码：使用 OpenStreetMap Nominatim API
+        async function reverseGeocode(lat, lng) {
+            // Nominatim 使用说明：https://nominatim.org/release-docs/develop/api/Reverse/
+            const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10&addressdetails=1&accept-language=en`;
+            
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'User-Agent': 'GPSLocatorApp/1.0'  // Nominatim 要求提供 User-Agent
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Geocoding service error');
+                }
+                
+                const data = await response.json();
+                
+                if (!data.address) {
+                    throw new Error('No address data');
+                }
+                
+                const address = data.address;
+                
+                // 提取国家和一级行政区
+                // 注意：不同国家字段名可能不同
+                const country = address.country || 'Unknown';
+                
+                // 一级行政区可能是 state / province / region / county 等
+                let admin1 = address.state || 
+                            address.province || 
+                            address.region || 
+                            address.county || 
+                            address.state_district ||
+                            'Unknown';
+                
+                // 针对特定国家的特殊处理
+                if (address.country_code === 'cn' && address.province) {
+                    admin1 = address.province;  // 中国省份
+                } else if (address.country_code === 'us' && address.state) {
+                    admin1 = address.state;     // 美国州名
+                } else if (address.country_code === 'gb' && address.state) {
+                    admin1 = address.state;     // 英国郡/区
+                } else if (address.country_code === 'jp' && address.province) {
+                    admin1 = address.province;  // 日本都道府县
+                }
+                
+                return {
+                    country: country,
+                    admin1: admin1,
+                    fullAddress: data.display_name
+                };
+                
+            } catch (error) {
+                console.error('Reverse geocoding error:', error);
+                throw error;
+            }
+        }
+        
+        function showError(msg) {
+            const errorBox = document.getElementById('errorBox');
+            errorBox.textContent = msg;
+            errorBox.classList.add('show');
+        }
+        
+        function copyToClipboard() {
+            if (!currentLocationData) return;
+            
+            const text = `${currentLocationData.latitude}, ${currentLocationData.longitude}, ${currentLocationData.country}, ${currentLocationData.admin1}`;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.getElementById('copyBtn');
+                btn.textContent = '已复制!';
+                btn.classList.add('copied');
+                
+                setTimeout(() => {
+                    btn.textContent = '复制位置信息';
+                    btn.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                // 降级方案
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                
+                const btn = document.getElementById('copyBtn');
+                btn.textContent = '已复制!';
+                setTimeout(() => {
+                    btn.textContent = '复制位置信息';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
