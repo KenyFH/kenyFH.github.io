@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>海外市场营销信息 · 审核</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+  background: #f5f6f8;
+  color: #1a1a1a;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== 顶部 ===== */
+.page-header {
+  background: #fff;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid #eee;
+  position: sticky; top: 0; z-index: 50;
+}
+.page-header h1 { font-size: 16px; font-weight: 600; color: #111; }
+.page-header .sub { font-size: 12px; color: #888; margin-top: 2px; }
+
+/* ===== Tab 筛选 ===== */
+.tab-bar {
+  display: flex; align-items: center; background: #fff;
+  border-bottom: 1px solid #eee;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tab-bar::-webkit-scrollbar { display: none; }
+.tab-item {
+  padding: 10px 16px; font-size: 13px; color: #888;
+  white-space: nowrap; cursor: pointer;
+  border-bottom: 2px solid transparent;
+  user-select: none; flex-shrink: 0;
+}
+.tab-item.active { color: #185FA5; border-bottom-color: #185FA5; font-weight: 600; }
+
+/* 集团领导开关 */
+.leader-filter {
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 12px; flex-shrink: 0;
+  white-space: nowrap; font-size: 12px; color: #854F0B;
+  font-weight: 500; cursor: pointer; user-select: none;
+  border-left: 1px solid #eee;
+  height: 42px;
+}
+.leader-filter input[type="checkbox"] {
+  width: 16px; height: 16px; accent-color: #854F0B;
+}
+
+/* ===== 卡片列表 ===== */
+.list-area { padding: 8px 12px 90px; }
+.empty-tip { text-align: center; color: #aaa; font-size: 14px; padding: 60px 0; }
+
+/* ===== 每人卡片 ===== */
+.person-card {
+  background: #fff; border-radius: 12px;
+  border: 1px solid #eee;
+  margin-bottom: 10px;
+  overflow: hidden;
+  transition: border-color .15s;
+}
+.person-card:active { border-color: #85B7EB; }
+.person-card.leader-highlight {
+  border-color: #F0C674;
+  box-shadow: 0 0 0 1px #F0C674;
+}
+
+.card-head {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 13px 14px 10px;
+  cursor: pointer;
+}
+.card-head-left { display: flex; align-items: center; gap: 10px; }
+.avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600; flex-shrink: 0;
+}
+.person-name { font-size: 14px; font-weight: 600; color: #111; }
+.person-meta { font-size: 12px; color: #888; margin-top: 2px; }
+
+.badge {
+  font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 500;
+}
+.badge.pending  { background: #FAEEDA; color: #854F0B; }
+.badge.passed   { background: #EAF3DE; color: #3B6D11; }
+.badge.rejected { background: #FCEBEB; color: #A32D2D; }
+
+.card-tags {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  padding: 0 14px 10px;
+}
+.tag {
+  font-size: 11px; background: #f4f5f7;
+  color: #666; padding: 3px 9px; border-radius: 6px;
+}
+.tag.important { background: #FAEEDA; color: #854F0B; }
+
+.card-actions {
+  display: flex; gap: 0;
+  border-top: 1px solid #f0f0f0;
+}
+.card-actions .act-btn {
+  flex: 1; padding: 11px 0; border: none; background: transparent;
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  font-family: inherit; display: flex; align-items: center;
+  justify-content: center; gap: 4px;
+  border-right: 1px solid #f0f0f0;
+  transition: background .1s;
+}
+.card-actions .act-btn:last-child { border-right: none; }
+.act-btn.pass   { color: #3B6D11; }
+.act-btn.pass:active   { background: #EAF3DE; }
+.act-btn.reject { color: #A32D2D; }
+.act-btn.reject:active { background: #FCEBEB; }
+.act-btn.detail { color: #185FA5; }
+.act-btn.detail:active { background: #E6F1FB; }
+.act-btn.delete { color: #A32D2D; }
+.act-btn.delete:active { background: #FCEBEB; }
+
+/* ===== 已操作卡片变灰 ===== */
+.person-card.done .card-head { opacity: 0.65; }
+
+/* ===== 批量操作栏 ===== */
+.bulk-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: #fff; border-top: 1px solid #eee;
+  padding: 10px 14px; z-index: 100;
+}
+.bulk-row {
+  display: flex; align-items: center; gap: 10px;
+}
+.bulk-check-label {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 13px; color: #555; cursor: pointer; flex-shrink: 0;
+}
+.bulk-check-label input { width: 16px; height: 16px; accent-color: #185FA5; }
+.bulk-btns { display: flex; gap: 8px; flex: 1; justify-content: flex-end; }
+.bulk-btn {
+  padding: 9px 16px; border-radius: 8px; border: none;
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  font-family: inherit;
+}
+.bulk-btn.all-pass   { background: #3B6D11; color: #fff; }
+.bulk-btn.all-reject { background: #A32D2D; color: #fff; }
+.bulk-btn:disabled   { opacity: 0.4; cursor: default; }
+
+/* ===== 抽屉 ===== */
+.drawer-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.45); z-index: 200;
+}
+.drawer-overlay.show { display: block; }
+
+.drawer {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: #fff; border-radius: 16px 16px 0 0;
+  z-index: 201; max-height: 92vh;
+  transform: translateY(100%);
+  transition: transform .28s cubic-bezier(.32,.72,0,1);
+  display: flex; flex-direction: column;
+}
+.drawer.show { transform: translateY(0); }
+
+.drawer-handle {
+  width: 36px; height: 4px; background: #ddd;
+  border-radius: 2px; margin: 10px auto 0;
+  flex-shrink: 0;
+}
+.drawer-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px 10px;
+  border-bottom: 1px solid #f0f0f0;
+  flex-shrink: 0;
+}
+.drawer-title { font-size: 15px; font-weight: 600; color: #111; }
+.drawer-close {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: #f0f0f0; display: flex; align-items: center;
+  justify-content: center; cursor: pointer; font-size: 16px; color: #666;
+  border: none; font-family: inherit;
+}
+
+.drawer-body {
+  flex: 1; overflow-y: auto; padding: 0 16px 16px;
+}
+
+/* 详情内容 */
+.detail-section {
+  margin: 14px 0 0;
+}
+.detail-section-title {
+  font-size: 13px; color: #185FA5; font-weight: 700;
+  display: flex; align-items: center; gap: 8px;
+  margin: 18px 0 10px;
+  letter-spacing: .02em;
+}
+.detail-section-title::before {
+  content: ""; width: 3px; height: 14px;
+  background: #185FA5; border-radius: 2px; flex-shrink: 0;
+}
+.detail-section-title::after {
+  content: ""; flex: 1; height: 1px; background: #e6eefc;
+}
+
+.field-group { margin-bottom: 12px; }
+.field-label { font-size: 12px; color: #888; margin-bottom: 4px; }
+.field-val {
+  font-size: 13px; color: #111; background: #f7f8fa;
+  border-radius: 8px; padding: 9px 11px; line-height: 1.5;
+}
+.field-val.editable {
+  border: 1px solid #e0e0e0; background: #fff;
+  cursor: text; outline: none;
+  min-height: 38px; white-space: pre-wrap;
+}
+.field-val.editable:focus { border-color: #85B7EB; }
+.field-val textarea {
+  width: 100%; background: transparent; border: none;
+  outline: none; font-size: 13px; color: #111;
+  font-family: inherit; resize: none; line-height: 1.5;
+  min-height: 60px;
+}
+
+/* 抽屉内下拉选择 */
+.drawer-select-wrap {
+  position: relative;
+}
+.drawer-select {
+  width: 100%; background: #f4f5f7; border: none;
+  border-radius: 8px; padding: 9px 32px 9px 11px;
+  font-size: 13px; color: #333; outline: none;
+  appearance: none; -webkit-appearance: none;
+  font-family: inherit; min-height: 38px;
+}
+.drawer-select:focus {
+  background: #eef0f5;
+  box-shadow: 0 0 0 1.5px #7ba7d4;
+}
+.drawer-select-wrap::after {
+  content: ""; position: absolute;
+  right: 13px; top: 50%; transform: translateY(-50%);
+  width: 0; height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid #b0b3bb;
+  pointer-events: none;
+}
+
+/* 抽屉内 textarea */
+.drawer-textarea {
+  width: 100%; background: #f4f5f7; border: none;
+  border-radius: 8px; padding: 9px 11px;
+  font-size: 13px; color: #333; outline: none;
+  font-family: inherit; resize: none; min-height: 60px; line-height: 1.5;
+}
+.drawer-textarea:focus {
+  background: #eef0f5;
+  box-shadow: 0 0 0 1.5px #7ba7d4;
+}
+
+/* 填报者信息合并行 */
+.submitter-info {
+  background: #f4f5f7; border-radius: 8px;
+  padding: 9px 11px; font-size: 13px; color: #111;
+  line-height: 1.5;
+}
+
+.remark-area {
+  margin: 14px 0 8px;
+}
+.remark-area .field-label { font-size: 12px; color: #888; margin-bottom: 4px; }
+.remark-area textarea {
+  width: 100%; border: 1px solid #e0e0e0; border-radius: 8px;
+  padding: 9px 11px; font-size: 13px; color: #111;
+  font-family: inherit; resize: none; outline: none;
+  min-height: 72px;
+}
+.remark-area textarea:focus { border-color: #85B7EB; }
+
+.drawer-footer {
+  padding: 10px 16px 18px;
+  border-top: 1px solid #f0f0f0;
+  display: flex; gap: 10px; flex-shrink: 0;
+}
+.footer-btn {
+  flex: 1; padding: 12px 0; border-radius: 9px;
+  border: none; font-size: 15px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+}
+.footer-btn.pass    { background: #3B6D11; color: #fff; }
+.footer-btn.reject  { background: #A32D2D; color: #fff; }
+.footer-btn.save    { background: #3a7bd5; color: #fff; flex: 2; }
+.footer-btn.delete  { background: #f0f0f0; color: #A32D2D; }
+
+/* ===== Toast ===== */
+.toast {
+  position: fixed; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,.72); color: #fff;
+  padding: 11px 22px; border-radius: 8px;
+  font-size: 14px; z-index: 999; opacity: 0;
+  pointer-events: none; transition: opacity .2s;
+  white-space: nowrap;
+}
+.toast.show { opacity: 1; }
+
+/* ===== 确认弹窗 ===== */
+.confirm-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.4); z-index: 300;
+  align-items: center; justify-content: center;
+}
+.confirm-overlay.show { display: flex; }
+.confirm-box {
+  background: #fff; border-radius: 14px;
+  padding: 22px 22px 14px; width: 280px;
+  text-align: center;
+}
+.confirm-box h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+.confirm-box p  { font-size: 13px; color: #666; margin-bottom: 18px; line-height: 1.5; }
+.confirm-btns   { display: flex; gap: 10px; }
+.confirm-btns button {
+  flex: 1; padding: 11px 0; border-radius: 9px; border: none;
+  font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;
+}
+.confirm-btns .c-cancel  { background: #f0f0f0; color: #555; }
+.confirm-btns .c-confirm { background: #A32D2D; color: #fff; }
+.confirm-btns .c-pass    { background: #3B6D11; color: #fff; }
+</style>
+</head>
+<body>
+
+<!-- 顶部 -->
+<div class="page-header">
+  <h1>海外部市场营销信息 · 审核</h1>
+  <div class="sub" id="headerSub">加载中...</div>
+</div>
+
+<!-- Tab -->
+<div class="tab-bar" id="tabBar">
+  <div class="tab-item active" data-tab="all">全部</div>
+  <div class="tab-item" data-tab="pending">待审核</div>
+  <div class="tab-item" data-tab="passed">已通过</div>
+  <div class="tab-item" data-tab="rejected">已拒绝</div>
+  <label class="leader-filter" id="leaderFilter">
+    <input type="checkbox" id="leaderToggle" onchange="toggleLeaderFilter(this.checked)">
+    <span>报送</span>
+  </label>
+</div>
+
+<!-- 列表 -->
+<div class="list-area" id="listArea"></div>
+
+<!-- 批量操作栏 -->
+<div class="bulk-bar">
+  <div class="bulk-row">
+    <label class="bulk-check-label">
+      <input type="checkbox" id="checkAll" onchange="toggleSelectAll(this.checked)"> 全选
+    </label>
+    <span style="font-size:12px;color:#888;" id="selectedCount">已选 0 条</span>
+    <div class="bulk-btns">
+      <button class="bulk-btn all-pass" id="btnBulkPass" disabled onclick="bulkAction('passed')">批量通过</button>
+      <button class="bulk-btn all-reject" id="btnBulkReject" disabled onclick="bulkAction('rejected')">批量拒绝</button>
+    </div>
+  </div>
+</div>
+
+<!-- 抽屉 -->
+<div class="drawer-overlay" id="overlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-header">
+    <div class="drawer-title" id="drawerTitle">详情</div>
+    <button class="drawer-close" onclick="closeDrawer()">×</button>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+  <div class="drawer-footer" id="drawerFooter"></div>
+</div>
+
+<!-- 确认弹窗 -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <h3 id="confirmTitle"></h3>
+    <p id="confirmMsg"></p>
+    <div class="confirm-btns">
+      <button class="c-cancel" onclick="closeConfirm()">取消</button>
+      <button id="confirmOkBtn" onclick="confirmAction()"></button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================================================================
+   与填报页面一致的下拉选项
+   ================================================================ */
+const COUNTRIES = [
+  "沙特阿拉伯","阿联酋","卡塔尔","科威特","阿曼","巴林","伊拉克","伊朗",
+  "印度","巴基斯坦","孟加拉国","越南","泰国","印度尼西亚","马来西亚","菲律宾","缅甸",
+  "日本","韩国","新加坡","中国台湾",
+  "土耳其","沙特阿拉伯",
+  "巴西","墨西哥","阿根廷","智利","秘鲁、哥伦比亚",
+  "俄罗斯","乌克兰","哈萨克斯坦、乌兹别克斯坦",
+  "德国","法国、意大利、西班牙、英国","波兰、捷克、罗马尼亚、匈牙利",
+  "南非","埃及、尼日利亚、阿尔及利亚","摩洛哥",
+  "澳大利亚"
+];
+
+const DEVELOP_CATEGORIES = ["保持关注项目", "正常跟踪项目", "重点投入项目"];
+const DEVELOP_PROGRESS_L1 = [
+  "项目前期跟踪", "技术交流", "商务报价", "项目中标",
+  "合同签订", "项目丢标", "项目延期", "项目取消", "其他"
+];
+const DEVELOP_PROGRESS_L2 = {
+  "项目前期跟踪": [
+    "1）收到业主询价信息，进行沟通澄清",
+    "2）出于内部人力、竞争力、项目可靠性等原因判断，我方不参与本项目跟踪",
+    "3）业主计划来访交流和参观样板厂，内部安排准备",
+    "4）收集项目的商务背景信息，计划拜访业主",
+    "5）提供预算性报价和方案",
+    "6）内部立项，成立报价团队"
+  ],
+  "技术交流": [
+    "1）交流技术方案，准备初步技术附件",
+    "2）业主计划来访交流和参观样板厂，内部安排准备",
+    "3）提交初步技术附件，等待业主反馈审核意见",
+    "4）收到业主审核意见并澄清，内部确认和修改技术附件",
+    "5）业主提出方案的变化，内部确认和修改",
+    "6）提交最终修改的技术附件",
+    "7）双方签署技术附件"
+  ],
+  "商务报价": [
+    "1）业主要求提供商务报价，内部确认",
+    "2）内部准备、审核价格",
+    "3）提交报价，等待业主反馈",
+    "4）和业主澄清价格对应的范围、主要商务条款等",
+    "5）业主推迟决策",
+    "6）业主提出降价要求",
+    "7）应业主要求，我方提供修改报价",
+    "8）和业主进行商务谈判",
+    "9）提供最终价格",
+    "10）业主确认我方价格"
+  ],
+  "项目中标": [
+    "1）业主口头/书面确认接受我方价格",
+    "2）业主发布中标通知书",
+    "3）我方确认业主发送的中标通知书",
+    "4）完成业主系统的供应商注册"
+  ],
+  "合同签订": [
+    "1）谈判合同条款",
+    "2）内部走合同评审流程",
+    "3）完成合同签订"
+  ],
+  "项目丢标": [
+    "1）我方未中标，了解中标方",
+    "2）内部分析丢标原因"
+  ],
+  "项目延期": [
+    "1）业主通知项目延期",
+    "2）了解业主重启时间"
+  ],
+  "项目取消": ["业主通知项目取消"],
+  "其他": null
+};
+
+const CUSTOMER_CHANGE_TYPES = [
+  "重大经营状况变化", "宣布重大投资计划", "客户管理层/关键人员变化",
+  "涉及重大诉讼或处罚", "其他影响履约能力的事项", "无"
+];
+const IMPACT_TYPES = [
+  "影响较小", "有影响，将专题分析汇报", "影响较大，将专题分析汇报"
+];
+const PRODUCTION_CHANGE_TYPES = ["产能扩张", "新建设施", "关停拆除", "无"];
+
+const EXECUTE_CATEGORIES = ["一类项目", "二类项目"];
+const EXECUTE_PROGRESS_L1 = [
+  "项目启动", "设计阶段", "制造发货阶段", "安装调试阶段", "项目结算", "其他"
+];
+const EXECUTE_PROGRESS_L2 = {
+  "项目启动": [
+    "1）内部立项、成立团队",
+    "2）和业主召开开球会"
+  ],
+  "设计阶段": [
+    "1）提交基本设计文本",
+    "2）业主进行基本设计审核",
+    "3）提交详细设计文本",
+    "4）完成收款"
+  ],
+  "制造发货阶段": [
+    "1）开展设备制造",
+    "2）进行出厂检验",
+    "3）发货准备",
+    "4）完成交货",
+    "5）完成收款"
+  ],
+  "安装调试阶段": [
+    "1）派遣技术服务",
+    "2）完成热试车",
+    "3）项目投产",
+    "4）收取尾款"
+  ],
+  "项目结算": [
+    "1）开展性能考核测试",
+    "2）质保期问题整改",
+    "3）完成收款"
+  ],
+  "其他": null
+};
+
+/* ================================================================
+   模拟数据
+   ================================================================ */
+const AVATARS = [
+  {bg:'#B5D4F4',fg:'#185FA5'}, {bg:'#C0DD97',fg:'#3B6D11'},
+  {bg:'#F4C0D1',fg:'#993556'}, {bg:'#FAC775',fg:'#854F0B'},
+  {bg:'#9FE1CB',fg:'#0F6E56'}, {bg:'#CECBF6',fg:'#3C3489'},
+  {bg:'#F0997B',fg:'#712B13'}, {bg:'#B5D4F4',fg:'#185FA5'},
+  {bg:'#C0DD97',fg:'#3B6D11'}, {bg:'#F4C0D1',fg:'#993556'},
+];
+
+const NAMES = ['张磊','李雯','王浩','陈思远','刘晓','赵明','杨帆','吴悦','周强','孙艺'];
+const CTRY = ['沙特阿拉伯','德国','日本','韩国','印度','巴西','阿联酋','越南','土耳其','南非'];
+const TIMES = ['08:12','08:45','09:01','09:22','09:47','10:03','10:15','10:28','10:31','10:55'];
+
+function randItem(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+function randInt(a,b) { return Math.floor(Math.random()*(b-a+1))+a; }
+
+function genDevelopProjects(n) {
+  const customers = ['ACME Corp','GlobalTech Ltd','Tata Steel','POSCO','ArcelorMittal','ThyssenKrupp'];
+  const projects  = ['Omega Steel Phase II','Phoenix Greenfield','Atlas Upgrade','Delta Coking','Horizon BF'];
+  const items = [];
+  for (let i=0;i<n;i++) {
+    const l1 = randItem(DEVELOP_PROGRESS_L1);
+    const l2List = DEVELOP_PROGRESS_L2[l1];
+    items.push({
+      customer: randItem(customers),
+      projectName: randItem(projects),
+      category: randItem(DEVELOP_CATEGORIES),
+      progressL1: l1,
+      progressL2: l2List ? randItem(l2List) : '行业政策发生重大变化，需持续跟踪',
+      progressL2IsCustom: l1 === '其他',
+      competitor: i%2===0?'西门子、ABB':'',
+      reportLeader: Math.random()>0.4?'是':'否',
+    });
+  }
+  return items;
+}
+
+function genCustomers(n) {
+  const customers = ['ACME Corp','GlobalTech Ltd','Tata Steel','POSCO','ArcelorMittal'];
+  const items=[];
+  for(let i=0;i<n;i++){
+    const ct = randItem(CUSTOMER_CHANGE_TYPES);
+    const pc = randItem(PRODUCTION_CHANGE_TYPES);
+    items.push({
+      customer: randItem(customers),
+      changeType: ct,
+      changeDetail: ct==='无'?'':'当地市场政策收紧，客户宣布暂停新增投资计划',
+      impact: randItem(IMPACT_TYPES),
+      productionChange: pc,
+      productionDetail: pc==='无'?'':'拟在越南新建年产50万吨轧钢产线',
+    });
+  }
+  return items;
+}
+
+function genExecuteProjects(n) {
+  const customers = ['ACME Corp','Tata Steel','POSCO','Nippon Steel'];
+  const projects  = ['Omega Steel Phase II','Delta Coking','Horizon BF','Nova Caster'];
+  const items=[];
+  for(let i=0;i<n;i++){
+    const l1 = randItem(EXECUTE_PROGRESS_L1);
+    const l2List = EXECUTE_PROGRESS_L2[l1];
+    items.push({
+      customer: randItem(customers),
+      projectName: randItem(projects),
+      category: randItem(EXECUTE_CATEGORIES),
+      progressL1: l1,
+      progressL2: l2List ? randItem(l2List) : '因不可抗力延期，需重新制定计划',
+      progressL2IsCustom: l1 === '其他',
+    });
+  }
+  return items;
+}
+
+function generateRecords() {
+  const records = [];
+  for(let i=0;i<10;i++){
+    const devN = randInt(0,3);
+    const cusN = randInt(0,2);
+    const exeN = randInt(0,2);
+    records.push({
+      id: i+1,
+      name: NAMES[i],
+      country: CTRY[i],
+      time: '2026-05-27 ' + TIMES[i],
+      status: i<6 ? 'pending' : (i<9 ? 'passed' : 'rejected'),
+      selected: false,
+      remark: '',
+      developProjects: genDevelopProjects(devN),
+      customers: genCustomers(cusN),
+      executeProjects: genExecuteProjects(exeN),
+      otherInfo: i%3===0?'本周市场竞争加剧，建议加快推进报价流程':'',
+      avatarBg: AVATARS[i].bg,
+      avatarFg: AVATARS[i].fg,
+    });
+  }
+  return records;
+}
+
+let records = generateRecords();
+let currentTab = 'all';
+let leaderFilterOn = false;
+let drawerRecordId = null;
+let confirmCb = null;
+
+/* ================================================================
+   渲染
+   ================================================================ */
+function hasLeaderReport(r) {
+  return r.developProjects.some(d => d.reportLeader === '是');
+}
+
+function getFiltered() {
+  let list = currentTab === 'all' ? records : records.filter(r => r.status === currentTab);
+  if (leaderFilterOn) list = list.filter(r => hasLeaderReport(r));
+  return list;
+}
+
+function updateStats() {
+  const pending  = records.filter(r=>r.status==='pending').length;
+  const passed   = records.filter(r=>r.status==='passed').length;
+  const rejected = records.filter(r=>r.status==='rejected').length;
+  const sub = `截止 2026-05-28 10:30 | 共 ${records.length} 份 / 待审 ${pending} 份`;
+  document.getElementById('headerSub').textContent = sub;
+
+  const tabs = document.querySelectorAll('.tab-item');
+  const counts = { all: records.length, pending, passed, rejected };
+  tabs.forEach(t => {
+    const k = t.dataset.tab;
+    t.textContent = ({all:'全部',pending:'待审',passed:'通过',rejected:'拒绝'}[k]) + ` (${counts[k]})`;
+  });
+}
+
+function statusLabel(s) {
+  return {pending:'待审',passed:'通过',rejected:'拒绝'}[s]||s;
+}
+
+function renderList() {
+  const list = getFiltered();
+  const area = document.getElementById('listArea');
+  updateStats();
+
+  if (!list.length) {
+    area.innerHTML = '<div class="empty-tip">暂无记录</div>';
+    updateBulkBar();
+    return;
+  }
+
+  area.innerHTML = '';
+  list.forEach(r => {
+    const isLeader = hasLeaderReport(r);
+    const card = document.createElement('div');
+    card.className = 'person-card' + (r.status!=='pending'?' done':'') + (isLeader && leaderFilterOn?' leader-highlight':'');
+    card.id = 'card_'+r.id;
+
+    const tags = [];
+    if (r.developProjects.length) tags.push(`开拓项目 ×${r.developProjects.length}`);
+    if (r.customers.length)       tags.push(`客户管理 ×${r.customers.length}`);
+    if (r.executeProjects.length) tags.push(`执行项目 ×${r.executeProjects.length}`);
+    if (r.otherInfo)               tags.push('其他信息');
+
+    card.innerHTML = `
+      <div class="card-head" onclick="toggleSelect(${r.id})">
+        <div class="card-head-left">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;" onclick="event.stopPropagation()">
+            <input type="checkbox" id="chk_${r.id}" style="width:16px;height:16px;accent-color:#185FA5;"
+              onchange="onCardCheck(${r.id},this.checked)" ${r.selected?'checked':''}>
+            <div class="avatar" style="background:${r.avatarBg};color:${r.avatarFg};">${r.name[0]}</div>
+          </label>
+          <div style="display:flex;align-items:center;gap:0;flex-wrap:wrap;">
+            <span class="person-name" style="margin-right:6px;">${r.name}</span>
+            <span class="person-meta">${r.country}&nbsp;·&nbsp;${r.time}</span>
+          </div>
+        </div>
+        <span class="badge ${r.status}">${statusLabel(r.status)}</span>
+      </div>
+      <div class="card-tags">
+        ${tags.map(t=>`<span class="tag">${t}</span>`).join('')}
+        ${isLeader?'<span class="tag important">报送</span>':''}
+      </div>
+      <div class="card-actions">
+        ${r.status==='pending' ? `
+          <button class="act-btn pass" onclick="quickAction(${r.id},'passed')">✓ 通过</button>
+          <button class="act-btn reject" onclick="quickAction(${r.id},'rejected')">✗ 拒绝</button>
+          <button class="act-btn detail" onclick="openDrawer(${r.id})">详情/编辑</button>
+        ` : `
+          <button class="act-btn detail" onclick="openDrawer(${r.id})">查看详情</button>
+          <button class="act-btn delete" onclick="confirmDelete(${r.id})">删除</button>
+        `}
+      </div>
+    `;
+    area.appendChild(card);
+  });
+
+  updateBulkBar();
+}
+
+/* ================================================================
+   集团领导筛选
+   ================================================================ */
+function toggleLeaderFilter(on) {
+  leaderFilterOn = on;
+  renderList();
+}
+
+/* ================================================================
+   选择 & 批量
+   ================================================================ */
+function onCardCheck(id, checked) {
+  const r = records.find(x=>x.id===id);
+  if (r) r.selected = checked;
+  updateBulkBar();
+}
+function toggleSelect(id) {}
+
+function toggleSelectAll(checked) {
+  const filtered = getFiltered().filter(r=>r.status==='pending');
+  filtered.forEach(r => {
+    r.selected = checked;
+    const chk = document.getElementById('chk_'+r.id);
+    if (chk) chk.checked = checked;
+  });
+  updateBulkBar();
+}
+
+function updateBulkBar() {
+  const sel = records.filter(r=>r.selected && r.status==='pending');
+  const n = sel.length;
+  document.getElementById('selectedCount').textContent = `已选 ${n} 条`;
+  document.getElementById('btnBulkPass').disabled   = n===0;
+  document.getElementById('btnBulkReject').disabled = n===0;
+  const pending = getFiltered().filter(r=>r.status==='pending');
+  document.getElementById('checkAll').checked = pending.length>0 && pending.every(r=>r.selected);
+}
+
+function bulkAction(status) {
+  const sel = records.filter(r=>r.selected && r.status==='pending');
+  if (!sel.length) return;
+  const label = status==='passed'?'通过':'拒绝';
+  showConfirm(
+    `批量${label}`,
+    `确认将已选 ${sel.length} 条记录批量${label}？`,
+    status==='passed'?'c-pass':'c-confirm',
+    `确认${label}`,
+    () => {
+      sel.forEach(r => { r.status=status; r.selected=false; });
+      document.getElementById('checkAll').checked = false;
+      renderList();
+      showToast(`已批量${label} ${sel.length} 条`);
+    }
+  );
+}
+
+/* ================================================================
+   快捷操作
+   ================================================================ */
+function quickAction(id, status) {
+  const r = records.find(x=>x.id===id);
+  if (!r) return;
+  const label = status==='passed'?'通过':'拒绝';
+  showConfirm(
+    `确认${label}`,
+    `确认将 ${r.name} 的填报${label}？`,
+    status==='passed'?'c-pass':'c-confirm',
+    `确认${label}`,
+    () => {
+      r.status = status;
+      r.selected = false;
+      renderList();
+      showToast(`已${label}：${r.name}`);
+    }
+  );
+}
+
+function confirmDelete(id) {
+  const r = records.find(x=>x.id===id);
+  if (!r) return;
+  showConfirm(
+    '确认删除',
+    `确认删除 ${r.name} 的填报记录？此操作不可撤销。`,
+    'c-confirm',
+    '确认删除',
+    () => {
+      records = records.filter(x=>x.id!==id);
+      renderList();
+      showToast('已删除');
+    }
+  );
+}
+
+/* ================================================================
+   抽屉
+   ================================================================ */
+function makeSelect(options, selected, id) {
+  const wrap = document.createElement('div');
+  wrap.className = 'drawer-select-wrap';
+  const sel = document.createElement('select');
+  sel.className = 'drawer-select';
+  sel.id = id;
+  const defOpt = document.createElement('option');
+  defOpt.value = ''; defOpt.textContent = '请选择';
+  sel.appendChild(defOpt);
+  options.forEach(o => {
+    const opt = document.createElement('option');
+    opt.value = o; opt.textContent = o;
+    if (o === selected) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  wrap.appendChild(sel);
+  return wrap;
+}
+
+function makeL2Select(l1Val, l2Val, l2IsCustom, idPrefix, sourceL2) {
+  const wrap = document.createElement('div');
+  wrap.id = idPrefix + '_l2wrap';
+  const l2List = sourceL2[l1Val];
+  if (l2List) {
+    const sel = makeSelect(l2List, l2Val, idPrefix + '_l2');
+    wrap.appendChild(sel);
+  } else if (l1Val === '其他') {
+    const ta = document.createElement('textarea');
+    ta.className = 'drawer-textarea';
+    ta.id = idPrefix + '_l2';
+    ta.placeholder = '请输入进展详情';
+    ta.value = l2Val || '';
+    ta.style.minHeight = '60px';
+    wrap.appendChild(ta);
+  } else {
+    wrap.innerHTML = '<div style="font-size:12px;color:#aaa;">请先选择阶段</div>';
+  }
+  return wrap;
+}
+
+function openDrawer(id) {
+  const r = records.find(x=>x.id===id);
+  if (!r) return;
+  drawerRecordId = id;
+
+  document.getElementById('drawerTitle').textContent = `${r.name} · 填报详情`;
+
+  const body = document.getElementById('drawerBody');
+  body.innerHTML = '';
+
+  // 基本信息 — 合并为单行
+  const infoDiv = document.createElement('div');
+  infoDiv.className = 'submitter-info';
+  infoDiv.textContent = `${r.name}  |  ${r.country}  |  ${r.time}`;
+  body.appendChild(infoDiv);
+
+  // 开拓项目
+  {
+    const secDiv = sectionTitleWithAdd(`开拓项目（营销管理）· 共 ${r.developProjects.length} 个`, () => {
+      r.developProjects.push({
+        customer:'', projectName:'', category:'',
+        progressL1:'', progressL2:'', progressL2IsCustom:false,
+        competitor:'', reportLeader:'否',
+      });
+      openDrawer(id);
+    });
+    body.appendChild(secDiv);
+    if (!r.developProjects.length) {
+      const emptyHint = document.createElement('div');
+      emptyHint.style.cssText = 'text-align:center;color:#aaa;font-size:13px;padding:16px 0 8px;';
+      emptyHint.textContent = '暂无开拓项目，点击右上角 + 新增';
+      body.appendChild(emptyHint);
+    }
+    r.developProjects.forEach((p, i) => {
+      const sub = document.createElement('div');
+      sub.style.cssText = 'border:1px solid #eee;border-radius:10px;padding:12px;margin-bottom:10px;background:#fafbfc;position:relative;';
+      // 删除按钮
+      if (r.developProjects.length > 1) {
+        const delBtn = document.createElement('button');
+        delBtn.style.cssText = 'position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:50%;border:none;background:#fcebeb;color:#A32D2D;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;';
+        delBtn.textContent = '×';
+        delBtn.onclick = () => {
+          showConfirm('删除项目', `确认删除第 ${i+1} 个开拓项目？`, 'c-confirm', '确认删除', () => {
+            r.developProjects.splice(i, 1);
+            openDrawer(id);
+          });
+        };
+        sub.appendChild(delBtn);
+      }
+      if (r.developProjects.length>1) {
+        const idx = document.createElement('div');
+        idx.style.cssText = 'font-size:11px;color:#aaa;margin-bottom:8px;';
+        idx.textContent = `第 ${i+1} 个项目`;
+        sub.appendChild(idx);
+      }
+
+      // 客户名称 - text
+      sub.appendChild(fieldRow('客户名称', p.customer, true, `dev_${i}_customer`));
+      // 项目名称 - text
+      sub.appendChild(fieldRow('项目名称', p.projectName, true, `dev_${i}_project`));
+      // 项目分类 - select
+      const catG = document.createElement('div');
+      catG.className = 'field-group';
+      const catL = document.createElement('div');
+      catL.className = 'field-label'; catL.textContent = '项目分类';
+      catG.appendChild(catL);
+      catG.appendChild(makeSelect(DEVELOP_CATEGORIES, p.category, `dev_${i}_cat`));
+      sub.appendChild(catG);
+
+      // 当前进展 L1 - select
+      const l1G = document.createElement('div');
+      l1G.className = 'field-group';
+      const l1L = document.createElement('div');
+      l1L.className = 'field-label'; l1L.textContent = '当前进展（阶段）';
+      l1G.appendChild(l1L);
+      const l1Sel = makeSelect(DEVELOP_PROGRESS_L1, p.progressL1, `dev_${i}_l1`);
+      l1Sel.querySelector('select').addEventListener('change', function() {
+        const l2Wrap = document.getElementById(`dev_${i}_l2wrap`);
+        if (l2Wrap) l2Wrap.remove();
+        const newL2 = makeL2Select(this.value, '', false, `dev_${i}`, DEVELOP_PROGRESS_L2);
+        newL2.id = `dev_${i}_l2wrap`;
+        l1G.after(newL2);
+      });
+      l1G.appendChild(l1Sel);
+      sub.appendChild(l1G);
+
+      // 当前进展 L2
+      const l2G = document.createElement('div');
+      l2G.className = 'field-group';
+      const l2L = document.createElement('div');
+      l2L.className = 'field-label'; l2L.textContent = '当前进展（详情）';
+      l2G.appendChild(l2L);
+      const l2Wrap = makeL2Select(p.progressL1, p.progressL2, p.progressL2IsCustom, `dev_${i}`, DEVELOP_PROGRESS_L2);
+      l2Wrap.id = `dev_${i}_l2wrap`;
+      l2G.appendChild(l2Wrap);
+      sub.appendChild(l2G);
+
+      // 竞争对手 - text
+      sub.appendChild(fieldRow('竞争对手', p.competitor||'', true, `dev_${i}_comp`));
+      // 报送 - select
+      const rlG = document.createElement('div');
+      rlG.className = 'field-group';
+      const rlL = document.createElement('div');
+      rlL.className = 'field-label'; rlL.textContent = '报送';
+      rlG.appendChild(rlL);
+      rlG.appendChild(makeSelect(['是','否'], p.reportLeader, `dev_${i}_leader`));
+      sub.appendChild(rlG);
+
+      body.appendChild(sub);
+    });
+  }
+
+  // 客户管理
+  {
+    const secDiv = sectionTitleWithAdd(`客户管理 · 共 ${r.customers.length} 个`, () => {
+      r.customers.push({
+        customer:'', changeType:'无', changeDetail:'',
+        impact:'影响较小', productionChange:'无', productionDetail:'',
+      });
+      openDrawer(id);
+    });
+    body.appendChild(secDiv);
+    if (!r.customers.length) {
+      const emptyHint = document.createElement('div');
+      emptyHint.style.cssText = 'text-align:center;color:#aaa;font-size:13px;padding:16px 0 8px;';
+      emptyHint.textContent = '暂无客户管理记录，点击右上角 + 新增';
+      body.appendChild(emptyHint);
+    } else {
+    r.customers.forEach((c, i) => {
+      const sub = document.createElement('div');
+      sub.style.cssText = 'border:1px solid #eee;border-radius:10px;padding:12px;margin-bottom:10px;background:#fafbfc;position:relative;';
+      // 删除按钮
+      if (r.customers.length > 1) {
+        const delBtn = document.createElement('button');
+        delBtn.style.cssText = 'position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:50%;border:none;background:#fcebeb;color:#A32D2D;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;';
+        delBtn.textContent = '×';
+        delBtn.onclick = () => {
+          showConfirm('删除客户', `确认删除第 ${i+1} 条客户管理记录？`, 'c-confirm', '确认删除', () => {
+            r.customers.splice(i, 1);
+            openDrawer(id);
+          });
+        };
+        sub.appendChild(delBtn);
+      }
+
+      sub.appendChild(fieldRow('客户名称', c.customer, true, `cus_${i}_name`));
+
+      // 客户重大变化 - select
+      const ctG = document.createElement('div');
+      ctG.className = 'field-group';
+      const ctL = document.createElement('div');
+      ctL.className = 'field-label'; ctL.textContent = '客户重大变化';
+      ctG.appendChild(ctL);
+      ctG.appendChild(makeSelect(CUSTOMER_CHANGE_TYPES, c.changeType, `cus_${i}_type`));
+      ctG.querySelector('select').addEventListener('change', function() {
+        const detailWrap = document.getElementById(`cus_${i}_detailwrap`);
+        if (this.value === '无') {
+          if (detailWrap) detailWrap.style.display = 'none';
+        } else {
+          if (detailWrap) detailWrap.style.display = '';
+          else {
+            // 在 ctG 后面插入变化详情
+            const dG = document.createElement('div');
+            dG.className = 'field-group'; dG.id = `cus_${i}_detailwrap`;
+            const dL = document.createElement('div');
+            dL.className = 'field-label'; dL.textContent = '变化详情';
+            dG.appendChild(dL);
+            const dTa = document.createElement('textarea');
+            dTa.className = 'drawer-textarea'; dTa.id = `cus_${i}_detail`;
+            dTa.placeholder = '请输入变化详情';
+            dG.appendChild(dTa);
+            ctG.after(dG);
+          }
+        }
+      });
+      sub.appendChild(ctG);
+
+      // 变化详情（条件）
+      if (c.changeType !== '无') {
+        const dG = document.createElement('div');
+        dG.className = 'field-group'; dG.id = `cus_${i}_detailwrap`;
+        const dL = document.createElement('div');
+        dL.className = 'field-label'; dL.textContent = '变化详情';
+        dG.appendChild(dL);
+        const dTa = document.createElement('textarea');
+        dTa.className = 'drawer-textarea'; dTa.id = `cus_${i}_detail`;
+        dTa.value = c.changeDetail; dTa.placeholder = '请输入变化详情';
+        dG.appendChild(dTa);
+        sub.appendChild(dG);
+      }
+
+      // 对我公司影响 - select
+      const impG = document.createElement('div');
+      impG.className = 'field-group';
+      const impL = document.createElement('div');
+      impL.className = 'field-label'; impL.textContent = '对我公司影响';
+      impG.appendChild(impL);
+      impG.appendChild(makeSelect(IMPACT_TYPES, c.impact, `cus_${i}_impact`));
+      sub.appendChild(impG);
+
+      // 产线设备变化 - select
+      const pcG = document.createElement('div');
+      pcG.className = 'field-group';
+      const pcL = document.createElement('div');
+      pcL.className = 'field-label'; pcL.textContent = '产线设备变化';
+      pcG.appendChild(pcL);
+      pcG.appendChild(makeSelect(PRODUCTION_CHANGE_TYPES, c.productionChange, `cus_${i}_prod`));
+      pcG.querySelector('select').addEventListener('change', function() {
+        const pdWrap = document.getElementById(`cus_${i}_prodDetailwrap`);
+        if (this.value === '无') {
+          if (pdWrap) pdWrap.style.display = 'none';
+        } else {
+          if (pdWrap) pdWrap.style.display = '';
+          else {
+            const pG = document.createElement('div');
+            pG.className = 'field-group'; pG.id = `cus_${i}_prodDetailwrap`;
+            const pL = document.createElement('div');
+            pL.className = 'field-label'; pL.textContent = '设备变化详情';
+            pG.appendChild(pL);
+            const pTa = document.createElement('textarea');
+            pTa.className = 'drawer-textarea'; pTa.id = `cus_${i}_prodDetail`;
+            pTa.placeholder = '请输入设备变化详情';
+            pG.appendChild(pTa);
+            pcG.after(pG);
+          }
+        }
+      });
+      sub.appendChild(pcG);
+
+      // 设备变化详情（条件）
+      if (c.productionChange !== '无') {
+        const pG = document.createElement('div');
+        pG.className = 'field-group'; pG.id = `cus_${i}_prodDetailwrap`;
+        const pL = document.createElement('div');
+        pL.className = 'field-label'; pL.textContent = '设备变化详情';
+        pG.appendChild(pL);
+        const pTa = document.createElement('textarea');
+        pTa.className = 'drawer-textarea'; pTa.id = `cus_${i}_prodDetail`;
+        pTa.value = c.productionDetail; pTa.placeholder = '请输入设备变化详情';
+        pG.appendChild(pTa);
+        sub.appendChild(pG);
+      }
+
+      body.appendChild(sub);
+    });
+    }
+  }
+
+  // 执行项目
+  {
+    const secDiv = sectionTitleWithAdd(`执行项目（履约管理）· 共 ${r.executeProjects.length} 个`, () => {
+      r.executeProjects.push({
+        customer:'', projectName:'', category:'',
+        progressL1:'', progressL2:'', progressL2IsCustom:false,
+      });
+      openDrawer(id);
+    });
+    body.appendChild(secDiv);
+    if (!r.executeProjects.length) {
+      const emptyHint = document.createElement('div');
+      emptyHint.style.cssText = 'text-align:center;color:#aaa;font-size:13px;padding:16px 0 8px;';
+      emptyHint.textContent = '暂无执行项目，点击右上角 + 新增';
+      body.appendChild(emptyHint);
+    } else {
+    r.executeProjects.forEach((p, i) => {
+      const sub = document.createElement('div');
+      sub.style.cssText = 'border:1px solid #eee;border-radius:10px;padding:12px;margin-bottom:10px;background:#fafbfc;position:relative;';
+      // 删除按钮
+      if (r.executeProjects.length > 1) {
+        const delBtn = document.createElement('button');
+        delBtn.style.cssText = 'position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:50%;border:none;background:#fcebeb;color:#A32D2D;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;';
+        delBtn.textContent = '×';
+        delBtn.onclick = () => {
+          showConfirm('删除项目', `确认删除第 ${i+1} 个执行项目？`, 'c-confirm', '确认删除', () => {
+            r.executeProjects.splice(i, 1);
+            openDrawer(id);
+          });
+        };
+        sub.appendChild(delBtn);
+      }
+
+      sub.appendChild(fieldRow('客户名称', p.customer, true, `exe_${i}_cus`));
+      sub.appendChild(fieldRow('项目名称', p.projectName, true, `exe_${i}_proj`));
+
+      // 项目分类 - select
+      const catG = document.createElement('div');
+      catG.className = 'field-group';
+      const catL = document.createElement('div');
+      catL.className = 'field-label'; catL.textContent = '项目分类';
+      catG.appendChild(catL);
+      catG.appendChild(makeSelect(EXECUTE_CATEGORIES, p.category, `exe_${i}_cat`));
+      sub.appendChild(catG);
+
+      // 项目进展 L1 - select
+      const l1G = document.createElement('div');
+      l1G.className = 'field-group';
+      const l1L = document.createElement('div');
+      l1L.className = 'field-label'; l1L.textContent = '项目进展（阶段）';
+      l1G.appendChild(l1L);
+      const l1Sel = makeSelect(EXECUTE_PROGRESS_L1, p.progressL1, `exe_${i}_l1`);
+      l1Sel.querySelector('select').addEventListener('change', function() {
+        const l2Wrap = document.getElementById(`exe_${i}_l2wrap`);
+        if (l2Wrap) l2Wrap.remove();
+        const newL2 = makeL2Select(this.value, '', false, `exe_${i}`, EXECUTE_PROGRESS_L2);
+        newL2.id = `exe_${i}_l2wrap`;
+        l1G.after(newL2);
+      });
+      l1G.appendChild(l1Sel);
+      sub.appendChild(l1G);
+
+      // 项目进展 L2
+      const l2G = document.createElement('div');
+      l2G.className = 'field-group';
+      const l2L = document.createElement('div');
+      l2L.className = 'field-label'; l2L.textContent = '项目进展（详情）';
+      l2G.appendChild(l2L);
+      const l2Wrap = makeL2Select(p.progressL1, p.progressL2, p.progressL2IsCustom, `exe_${i}`, EXECUTE_PROGRESS_L2);
+      l2Wrap.id = `exe_${i}_l2wrap`;
+      l2G.appendChild(l2Wrap);
+      sub.appendChild(l2G);
+
+      body.appendChild(sub);
+    });
+    }
+  }
+
+  // 其他信息（始终显示）
+  body.appendChild(sectionTitle('其他关键信息'));
+  const otherG = document.createElement('div');
+  otherG.className = 'field-group';
+  const otherL = document.createElement('div');
+  otherL.className = 'field-label'; otherL.textContent = '内容';
+  otherG.appendChild(otherL);
+  const otherTa = document.createElement('textarea');
+  otherTa.className = 'drawer-textarea'; otherTa.id = 'otherInfo';
+  otherTa.value = r.otherInfo || '';
+  otherTa.placeholder = '请输入其他关键信息（选填）';
+  otherG.appendChild(otherTa);
+  body.appendChild(otherG);
+
+  // 审核备注（仅在拒绝时需要，先隐藏）
+  const remarkDiv = document.createElement('div');
+  remarkDiv.className = 'remark-area';
+  remarkDiv.id = 'drawerRemarkArea';
+  remarkDiv.style.display = 'none';
+  remarkDiv.innerHTML = `
+    <div class="field-label">拒绝原因 <span style="color:#A32D2D">*</span></div>
+    <textarea id="drawerRemark" placeholder="请输入拒绝原因或审核意见...">${r.remark||''}</textarea>
+  `;
+  body.appendChild(remarkDiv);
+
+  // 底部按钮
+  const footer = document.getElementById('drawerFooter');
+  footer.innerHTML = '';
+  if (r.status==='pending') {
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'footer-btn save';
+    saveBtn.textContent = '保存修改';
+    saveBtn.onclick = () => saveDrawerEdits();
+
+    const passBtn = document.createElement('button');
+    passBtn.className = 'footer-btn pass';
+    passBtn.textContent = '✓ 通过';
+    passBtn.onclick = () => drawerAction('passed');
+
+    const rejectBtn = document.createElement('button');
+    rejectBtn.className = 'footer-btn reject';
+    rejectBtn.textContent = '✗ 拒绝';
+    rejectBtn.onclick = () => showRejectRemark();
+
+    footer.appendChild(saveBtn);
+    footer.appendChild(passBtn);
+    footer.appendChild(rejectBtn);
+  } else {
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'footer-btn save';
+    saveBtn.textContent = '保存修改';
+    saveBtn.onclick = () => saveDrawerEdits();
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'footer-btn delete';
+    delBtn.textContent = '删除';
+    delBtn.onclick = () => { closeDrawer(); confirmDelete(id); };
+
+    footer.appendChild(saveBtn);
+    footer.appendChild(delBtn);
+  }
+
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('drawer').classList.add('show');
+  document.getElementById('drawerBody').scrollTop = 0;
+}
+
+function sectionTitle(text) {
+  const div = document.createElement('div');
+  div.className = 'detail-section-title';
+  div.textContent = text;
+  const line = document.createElement('span');
+  line.style.cssText = 'flex:1;height:1px;background:#e6eefc;';
+  div.appendChild(line);
+  return div;
+}
+
+function sectionTitleWithAdd(text, onAdd) {
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = 'display:flex;align-items:center;gap:8px;margin:18px 0 10px;';
+  const title = document.createElement('div');
+  title.className = 'detail-section-title';
+  title.style.cssText = 'margin:0;flex:1;';
+  title.textContent = text;
+  const line = document.createElement('span');
+  line.style.cssText = 'flex:1;height:1px;background:#e6eefc;';
+  title.appendChild(line);
+  wrapper.appendChild(title);
+  const addBtn = document.createElement('button');
+  addBtn.style.cssText = 'width:24px;height:24px;border-radius:50%;border:1.5px solid #185FA5;background:#fff;color:#185FA5;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1;font-weight:500;';
+  addBtn.textContent = '+';
+  addBtn.onclick = onAdd;
+  wrapper.appendChild(addBtn);
+  return wrapper;
+}
+
+function fieldRow(label, value, editable, fieldKey) {
+  const g = document.createElement('div');
+  g.className = 'field-group';
+  const lbl = document.createElement('div');
+  lbl.className = 'field-label';
+  lbl.textContent = label;
+  g.appendChild(lbl);
+  const val = document.createElement('div');
+  val.className = 'field-val' + (editable?' editable':'');
+  if (editable) {
+    val.contentEditable = 'true';
+    val.dataset.fieldKey = fieldKey||'';
+  }
+  val.textContent = value || '';
+  g.appendChild(val);
+  return g;
+}
+
+function saveDrawerEdits() {
+  const r = records.find(x=>x.id===drawerRecordId);
+  if (!r) return;
+  const ta = document.getElementById('drawerRemark');
+  if (ta) r.remark = ta.value;
+  const other = document.getElementById('otherInfo');
+  if (other) r.otherInfo = other.value;
+  showToast('修改已保存');
+  renderList();
+}
+
+function showRejectRemark() {
+  const remarkArea = document.getElementById('drawerRemarkArea');
+  if (remarkArea) {
+    remarkArea.style.display = 'block';
+    remarkArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    document.getElementById('drawerRemark').focus();
+  }
+  const footer = document.getElementById('drawerFooter');
+  footer.innerHTML = '';
+
+  const cancelBtn = document.createElement('button');
+  cancelBtn.className = 'footer-btn save';
+  cancelBtn.style.background = '#f0f0f0';
+  cancelBtn.style.color = '#555';
+  cancelBtn.textContent = '取消';
+  cancelBtn.onclick = () => {
+    const ra = document.getElementById('drawerRemarkArea');
+    if (ra) ra.style.display = 'none';
+    restoreDrawerFooter();
+  };
+
+  const confirmRejectBtn = document.createElement('button');
+  confirmRejectBtn.className = 'footer-btn reject';
+  confirmRejectBtn.style.flex = '2';
+  confirmRejectBtn.textContent = '确认拒绝';
+  confirmRejectBtn.onclick = () => drawerAction('rejected');
+
+  footer.appendChild(cancelBtn);
+  footer.appendChild(confirmRejectBtn);
+}
+
+function restoreDrawerFooter() {
+  const r = records.find(x=>x.id===drawerRecordId);
+  if (!r || r.status!=='pending') return;
+  const footer = document.getElementById('drawerFooter');
+  footer.innerHTML = '';
+
+  const saveBtn = document.createElement('button');
+  saveBtn.className = 'footer-btn save';
+  saveBtn.textContent = '保存修改';
+  saveBtn.onclick = () => saveDrawerEdits();
+
+  const passBtn = document.createElement('button');
+  passBtn.className = 'footer-btn pass';
+  passBtn.textContent = '✓ 通过';
+  passBtn.onclick = () => drawerAction('passed');
+
+  const rejectBtn = document.createElement('button');
+  rejectBtn.className = 'footer-btn reject';
+  rejectBtn.textContent = '✗ 拒绝';
+  rejectBtn.onclick = () => showRejectRemark();
+
+  footer.appendChild(saveBtn);
+  footer.appendChild(passBtn);
+  footer.appendChild(rejectBtn);
+}
+
+function drawerAction(status) {
+  const r = records.find(x=>x.id===drawerRecordId);
+  if (!r) return;
+  const label = status==='passed'?'通过':'拒绝';
+  if (status === 'passed') {
+    showConfirm(
+      `确认${label}`,
+      `确认将 ${r.name} 的填报${label}？`,
+      'c-pass',
+      `确认${label}`,
+      () => {
+        r.status = status; r.selected = false;
+        closeDrawer(); renderList();
+        showToast(`已${label}：${r.name}`);
+      }
+    );
+    return;
+  }
+  const remark = document.getElementById('drawerRemark')?.value || '';
+  showConfirm(
+    `确认${label}`,
+    `确认将 ${r.name} 的填报${label}？`,
+    'c-confirm',
+    `确认${label}`,
+    () => {
+      r.status = status; r.remark = remark; r.selected = false;
+      closeDrawer(); renderList();
+      showToast(`已${label}：${r.name}`);
+    }
+  );
+}
+
+function closeDrawer() {
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('drawer').classList.remove('show');
+  drawerRecordId = null;
+}
+
+/* ================================================================
+   确认弹窗
+   ================================================================ */
+function showConfirm(title, msg, btnCls, btnText, cb) {
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmMsg').textContent = msg;
+  const btn = document.getElementById('confirmOkBtn');
+  btn.className = btnCls;
+  btn.textContent = btnText;
+  confirmCb = cb;
+  document.getElementById('confirmOverlay').classList.add('show');
+}
+function closeConfirm() {
+  document.getElementById('confirmOverlay').classList.remove('show');
+  confirmCb = null;
+}
+function confirmAction() {
+  closeConfirm();
+  if (confirmCb) confirmCb();
+}
+
+/* ================================================================
+   Toast
+   ================================================================ */
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+/* ================================================================
+   Tab 切换
+   ================================================================ */
+document.getElementById('tabBar').addEventListener('click', e => {
+  const tab = e.target.closest('.tab-item');
+  if (!tab) return;
+  document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
+  tab.classList.add('active');
+  currentTab = tab.dataset.tab;
+  records.forEach(r=>r.selected=false);
+  document.getElementById('checkAll').checked = false;
+  renderList();
+});
+
+/* ================================================================
+   初始化
+   ================================================================ */
+renderList();
+</script>
+</body>
+</html>
