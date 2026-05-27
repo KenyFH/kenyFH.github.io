@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>海外部市场营销信息系统</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+    background: #f5f6f8;
+    color: #333;
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+
+  /* ===== 顶部标题 ===== */
+  .page-header {
+    background: #fff;
+    text-align: center;
+    padding: 16px 16px 12px;
+    border-bottom: 1px solid #eee;
+  }
+  .page-header h1 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1a1a1a;
+    letter-spacing: 0.5px;
+  }
+  .page-header .subtitle {
+    font-size: 12px;
+    color: #888;
+    margin-top: 4px;
+  }
+
+  /* ===== 国家选择 ===== */
+  .country-section {
+    background: #fff;
+    margin: 8px 0 0;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .country-label {
+    font-size: 14px;
+    color: #333;
+    white-space: nowrap;
+    font-weight: 500;
+  }
+  .country-select-wrapper {
+    flex: 1;
+    position: relative;
+  }
+
+  /* ===== 卡片区域 ===== */
+  .cards-container {
+    margin-top: 8px;
+  }
+
+  .card {
+    background: #fff;
+    margin-bottom: 8px;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .card-header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-icon {
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  .card-collapse-btn {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    transition: transform 0.25s;
+    font-size: 14px;
+  }
+  .card-collapse-btn.collapsed {
+    transform: rotate(180deg);
+  }
+
+  .card-body {
+    padding: 0 16px 16px;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  .card-body.hidden {
+    display: none;
+  }
+
+  /* ===== 表单项 ===== */
+  .form-group {
+    margin-bottom: 14px;
+  }
+  .form-label {
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 6px;
+    display: block;
+    font-weight: 500;
+  }
+  .form-label.required::after {
+    content: " *";
+    color: #e74c3c;
+  }
+
+  /* 通用 input/select/textarea 样式 */
+  .form-input,
+  .form-select,
+  .form-textarea,
+  .searchable-input {
+    width: 100%;
+    background: #f4f5f7;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 13px;
+    font-size: 14px;
+    color: #333;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    font-family: inherit;
+  }
+  .form-input::placeholder,
+  .form-select::placeholder,
+  .form-textarea::placeholder,
+  .searchable-input::placeholder {
+    color: #b0b3bb;
+  }
+  .form-input:focus,
+  .form-select:focus,
+  .form-textarea:focus,
+  .searchable-input:focus {
+    background: #eef0f5;
+    box-shadow: 0 0 0 1.5px #7ba7d4;
+  }
+
+  /* select 箭头 */
+  .select-wrapper {
+    position: relative;
+  }
+  .select-wrapper::after {
+    content: "";
+    position: absolute;
+    right: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid #b0b3bb;
+    pointer-events: none;
+  }
+  .form-select {
+    padding-right: 32px;
+  }
+
+  .form-textarea {
+    resize: none;
+    min-height: 88px;
+    line-height: 1.5;
+  }
+
+  /* ===== 搜索下拉 ===== */
+  .searchable-wrapper {
+    position: relative;
+  }
+  .searchable-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0; right: 0;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    z-index: 100;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  .searchable-dropdown.show { display: block; }
+  .dropdown-item {
+    padding: 11px 14px;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    border-bottom: 1px solid #f5f5f5;
+  }
+  .dropdown-item:last-child { border-bottom: none; }
+  .dropdown-item:hover, .dropdown-item.active {
+    background: #eef4fc;
+    color: #3a7bd5;
+  }
+  .dropdown-item em {
+    color: #3a7bd5;
+    font-style: normal;
+    font-weight: 600;
+  }
+  .dropdown-empty {
+    padding: 14px;
+    font-size: 13px;
+    color: #aaa;
+    text-align: center;
+  }
+
+  /* ===== 联动选择框 ===== */
+  .dynamic-select-wrapper {
+    margin-top: 8px;
+  }
+
+  /* ===== 复选/单选 ===== */
+  .radio-group {
+    display: flex;
+    gap: 24px;
+    margin-top: 4px;
+  }
+  .radio-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+  }
+  .radio-item input[type="radio"],
+  .radio-item input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #3a7bd5;
+    cursor: pointer;
+  }
+
+  /* ===== 卡片分隔线（多个子卡片） ===== */
+  .sub-card {
+    border: 1px solid #eaecef;
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 12px;
+    background: #fafbfc;
+    position: relative;
+  }
+  .sub-card-remove {
+    position: absolute;
+    top: 10px; right: 12px;
+    font-size: 18px;
+    color: #c0c4cc;
+    cursor: pointer;
+    line-height: 1;
+    padding: 2px 4px;
+  }
+  .sub-card-remove:hover { color: #e74c3c; }
+
+  /* ===== 新增按钮 ===== */
+  .add-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 12px;
+    background: #d6e4f7;
+    color: #3a7bd5;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 4px;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+  .add-btn:hover { background: #c2d8f2; }
+  .add-btn:active { background: #aeccea; }
+
+  /* ===== 底部操作栏 ===== */
+  .bottom-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: #fff;
+    border-top: 1px solid #eee;
+    padding: 10px 16px;
+    display: flex;
+    gap: 10px;
+    z-index: 200;
+  }
+  .btn-submit {
+    flex: 2;
+    padding: 13px;
+    background: #3a7bd5;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+  .btn-submit:hover { background: #2e6abf; }
+  .btn-submit:active { background: #2558a0; }
+  .btn-save {
+    flex: 1;
+    padding: 13px;
+    background: #f0f0f0;
+    color: #666;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+  .btn-save:hover { background: #e4e4e4; }
+
+  /* ===== 弹窗提示 ===== */
+  .toast {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.72);
+    color: #fff;
+    padding: 12px 22px;
+    border-radius: 8px;
+    font-size: 14px;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; }
+
+  /* 区块标题分割 */
+  .section-divider {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-divider::before, .section-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #e8e8e8;
+  }
+</style>
+</head>
+<body>
+
+<!-- 顶部标题 -->
+<div class="page-header">
+  <h1>海外部市场营销信息系统</h1>
+  <div class="subtitle">填报时间截止次日 10：30</div>
+</div>
+
+<!-- 当前所在国家 -->
+<div class="country-section">
+  <span class="country-label">当前所在国家：</span>
+  <div class="country-select-wrapper">
+    <div class="searchable-wrapper" id="countryWrapper">
+      <input class="searchable-input" type="text" id="countryInput"
+             placeholder="请选择当前所在国家" autocomplete="off" readonly
+             onclick="toggleDropdown('country')" />
+      <div class="searchable-dropdown" id="countryDropdown"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 主体卡片区 -->
+<div class="cards-container">
+
+  <!-- ===== 开拓项目（营销管理） ===== -->
+  <div class="card">
+    <div class="card-header" onclick="toggleCard('develop')">
+      <div class="card-header-left">
+        <div class="card-icon">🎯</div>
+        <div class="card-title">开拓项目（营销管理）</div>
+      </div>
+      <div class="card-collapse-btn" id="developCollapseBtn">&#8963;</div>
+    </div>
+    <div class="card-body" id="developBody">
+      <div id="developCards"></div>
+      <button class="add-btn" onclick="addDevelopCard()">
+        <span style="font-size:18px">⊕</span> 新增开拓项目
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== 客户管理 ===== -->
+  <div class="card">
+    <div class="card-header" onclick="toggleCard('customer')">
+      <div class="card-header-left">
+        <div class="card-icon">🗂️</div>
+        <div class="card-title">客户管理</div>
+      </div>
+      <div class="card-collapse-btn" id="customerCollapseBtn">&#8963;</div>
+    </div>
+    <div class="card-body" id="customerBody">
+      <div id="customerCards"></div>
+      <button class="add-btn" onclick="addCustomerCard()">
+        <span style="font-size:18px">⊕</span> 新增客户管理
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== 执行项目 ===== -->
+  <div class="card">
+    <div class="card-header" onclick="toggleCard('execute')">
+      <div class="card-header-left">
+        <div class="card-icon" style="font-size:16px;color:#888;">⊙</div>
+        <div class="card-title">执行项目（履约管理）</div>
+      </div>
+      <div class="card-collapse-btn" id="executeCollapseBtn">&#8963;</div>
+    </div>
+    <div class="card-body" id="executeBody">
+      <div id="executeCards"></div>
+      <button class="add-btn" onclick="addExecuteCard()">
+        <span style="font-size:18px">⊕</span> 新增执行项目
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== 其他关键信息 ===== -->
+  <div class="card">
+    <div class="card-header" onclick="toggleCard('other')">
+      <div class="card-header-left">
+        <div class="card-icon" style="font-size:16px;color:#888;">⊙</div>
+        <div class="card-title">其他关键信息</div>
+      </div>
+      <div class="card-collapse-btn" id="otherCollapseBtn">&#8963;</div>
+    </div>
+    <div class="card-body" id="otherBody">
+      <div class="form-group">
+        <textarea class="form-textarea" id="otherInfo" maxlength="500"
+          placeholder="请输入其他需要汇报的关键信息。如商务信息、市场动态等（500字以内）"
+          style="min-height:110px;"></textarea>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 底部操作栏 -->
+<div class="bottom-bar">
+  <button class="btn-submit" onclick="submitForm()">提交</button>
+  <button class="btn-save" onclick="saveForm()">保存</button>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================================================================
+   数据字典
+   ================================================================ */
+const COUNTRIES = [
+  "中国", "美国", "德国", "法国", "英国", "日本", "韩国", "印度", "巴西",
+  "俄罗斯", "沙特阿拉伯", "阿联酋", "土耳其", "南非", "澳大利亚",
+  "加拿大", "墨西哥", "阿根廷", "印度尼西亚", "越南", "泰国", "马来西亚",
+  "新加坡", "菲律宾", "波兰", "荷兰", "比利时", "意大利", "西班牙", "葡萄牙",
+  "瑞典", "挪威", "丹麦", "芬兰", "捷克", "匈牙利", "罗马尼亚", "哈萨克斯坦",
+  "乌兹别克斯坦", "巴基斯坦", "孟加拉国", "伊朗", "伊拉克", "埃及",
+  "尼日利亚", "肯尼亚", "坦桑尼亚", "摩洛哥", "阿尔及利亚"
+];
+
+const CUSTOMERS = [
+  "ACME Corp", "GlobalTech Ltd", "Pacific Steel Co.",
+  "ArcelorMittal", "Tata Steel", "POSCO", "Nippon Steel",
+  "Tenaris", "Voestalpine", "ThyssenKrupp", "Nucor Corporation",
+  "SSAB", "Outokumpu", "Salzgitter AG", "Aperam"
+];
+
+const PROJECTS = [
+  "Omega Steel Plant Phase II", "Phoenix Greenfield Project",
+  "Atlas Rolling Mill Upgrade", "Delta Coking Plant",
+  "Horizon Blast Furnace Relining", "Nova Continuous Caster",
+  "Summit EAF Modernization", "Titan Wire Rod Mill",
+  "Apex Pelletizing Plant", "Eclipse Cold Rolling Mill"
+];
+
+const DEVELOP_PROGRESS_L1 = [
+  "项目前期跟踪", "技术交流", "商务报价", "项目中标",
+  "合同签订", "项目丢标", "项目延期", "项目取消", "其他"
+];
+
+const DEVELOP_PROGRESS_L2 = {
+  "项目前期跟踪": [
+    "1）收到业主询价信息，进行沟通澄清",
+    "2）出于内部人力、竞争力、项目可靠性等原因判断，我方不参与本项目跟踪",
+    "3）业主计划来访交流和参观样板厂，内部安排准备",
+    "4）收集项目的商务背景信息，计划拜访业主",
+    "5）提供预算性报价和方案",
+    "6）内部立项，成立报价团队"
+  ],
+  "技术交流": [
+    "1）交流技术方案，准备初步技术附件",
+    "2）业主计划来访交流和参观样板厂，内部安排准备",
+    "3）提交初步技术附件，等待业主反馈审核意见",
+    "4）收到业主审核意见并澄清，内部确认和修改技术附件",
+    "5）业主提出方案的变化，内部确认和修改",
+    "6）提交最终修改的技术附件",
+    "7）双方签署技术附件"
+  ],
+  "商务报价": [
+    "1）业主要求提供商务报价，内部确认",
+    "2）内部准备、审核价格",
+    "3）提交报价，等待业主反馈",
+    "4）和业主澄清价格对应的范围、主要商务条款等",
+    "5）业主推迟决策",
+    "6）业主提出降价要求",
+    "7）应业主要求，我方提供修改报价",
+    "8）和业主进行商务谈判",
+    "9）提供最终价格",
+    "10）业主确认我方价格"
+  ],
+  "项目中标": [
+    "1）业主口头/书面确认接受我方价格",
+    "2）业主发布中标通知书",
+    "3）我方确认业主发送的中标通知书",
+    "4）完成业主系统的供应商注册"
+  ],
+  "合同签订": [
+    "1）谈判合同条款",
+    "2）内部走合同评审流程",
+    "3）完成合同签订"
+  ],
+  "项目丢标": [
+    "1）我方未中标，了解中标方",
+    "2）内部分析丢标原因"
+  ],
+  "项目延期": [
+    "1）业主通知项目延期",
+    "2）了解业主重启时间"
+  ],
+  "项目取消": ["业主通知项目取消"],
+  "其他": null  // input
+};
+
+const CUSTOMER_CHANGE_TYPES = [
+  "重大经营状况变化", "宣布重大投资计划", "客户管理层/关键人员变化",
+  "涉及重大诉讼或处罚", "其他影响履约能力的事项", "无"
+];
+
+const IMPACT_TYPES = [
+  "影响较小", "有影响，将专题分析汇报", "影响较大，将专题分析汇报"
+];
+
+const PRODUCTION_CHANGE_TYPES = ["产能扩张", "新建设施", "关停拆除", "无"];
+
+const EXECUTE_CATEGORY = ["一类项目", "二类项目"];
+
+const EXECUTE_PROGRESS_L1 = [
+  "项目启动", "设计阶段", "制造发货阶段", "安装调试阶段", "项目结算", "其他"
+];
+
+const EXECUTE_PROGRESS_L2 = {
+  "项目启动": [
+    "1）内部立项、成立团队",
+    "2）和业主召开开球会"
+  ],
+  "设计阶段": [
+    "1）提交基本设计文本",
+    "2）业主进行基本设计审核",
+    "3）提交详细设计文本",
+    "4）完成收款"
+  ],
+  "制造发货阶段": [
+    "1）开展设备制造",
+    "2）进行出厂检验",
+    "3）发货准备",
+    "4）完成交货",
+    "5）完成收款"
+  ],
+  "安装调试阶段": [
+    "1）派遣技术服务",
+    "2）完成热试车",
+    "3）项目投产",
+    "4）收取尾款"
+  ],
+  "项目结算": [
+    "1）开展性能考核测试",
+    "2）质保期问题整改",
+    "3）完成收款"
+  ],
+  "其他": null  // input
+};
+
+/* ================================================================
+   工具函数
+   ================================================================ */
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function toggleCard(id) {
+  const body = document.getElementById(id + 'Body');
+  const btn = document.getElementById(id + 'CollapseBtn');
+  if (body.classList.contains('hidden')) {
+    body.classList.remove('hidden');
+    btn.classList.remove('collapsed');
+  } else {
+    body.classList.add('hidden');
+    btn.classList.add('collapsed');
+  }
+}
+
+/* ================================================================
+   通用搜索下拉
+   ================================================================ */
+let activeDropdown = null;
+
+function buildDropdownItems(dropdownEl, list, inputEl, onSelect) {
+  dropdownEl.innerHTML = '';
+  if (list.length === 0) {
+    dropdownEl.innerHTML = '<div class="dropdown-empty">无匹配结果</div>';
+    return;
+  }
+  const query = inputEl.value.toLowerCase();
+  list.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'dropdown-item';
+    if (query && item.toLowerCase().includes(query)) {
+      const idx = item.toLowerCase().indexOf(query);
+      div.innerHTML = item.slice(0, idx) +
+        '<em>' + item.slice(idx, idx + query.length) + '</em>' +
+        item.slice(idx + query.length);
+    } else {
+      div.textContent = item;
+    }
+    div.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      inputEl.value = item;
+      inputEl.dataset.value = item;
+      dropdownEl.classList.remove('show');
+      activeDropdown = null;
+      onSelect && onSelect(item);
+    });
+    dropdownEl.appendChild(div);
+  });
+}
+
+function toggleDropdown(id) {
+  const input = document.getElementById(id + 'Input');
+  const dropdown = document.getElementById(id + 'Dropdown');
+  if (!dropdown) return;
+  if (dropdown.classList.contains('show')) {
+    dropdown.classList.remove('show');
+    activeDropdown = null;
+    return;
+  }
+  dropdown.classList.add('show');
+  activeDropdown = id;
+  buildDropdownItems(dropdown, COUNTRIES, input, null);
+}
+
+// 国家搜索输入
+document.addEventListener('DOMContentLoaded', () => {
+  const ci = document.getElementById('countryInput');
+  ci.removeAttribute('readonly');
+  const cd = document.getElementById('countryDropdown');
+  ci.addEventListener('input', () => {
+    const q = ci.value.toLowerCase();
+    const filtered = q ? COUNTRIES.filter(c => c.toLowerCase().includes(q)) : COUNTRIES;
+    buildDropdownItems(cd, filtered, ci, null);
+    cd.classList.add('show');
+  });
+  ci.addEventListener('focus', () => {
+    buildDropdownItems(cd, COUNTRIES, ci, null);
+    cd.classList.add('show');
+  });
+
+  document.addEventListener('click', (e) => {
+    document.querySelectorAll('.searchable-dropdown.show').forEach(dd => {
+      const wrapper = dd.closest('.searchable-wrapper');
+      if (wrapper && !wrapper.contains(e.target)) {
+        dd.classList.remove('show');
+      }
+    });
+  });
+
+  // 初始化各卡片区至少一个
+  addDevelopCard();
+  addCustomerCard();
+  addExecuteCard();
+});
+
+/* ================================================================
+   搜索下拉（通用，用于子卡片内部）
+   ================================================================ */
+function makeSearchableSelect(list, placeholder, onSelect, readonlyMode) {
+  const uid = 'sd_' + Math.random().toString(36).slice(2);
+  const wrapper = document.createElement('div');
+  wrapper.className = 'searchable-wrapper';
+
+  const input = document.createElement('input');
+  input.className = 'searchable-input';
+  input.placeholder = placeholder;
+  input.autocomplete = 'off';
+  input.dataset.uid = uid;
+  if (readonlyMode) input.readOnly = true;
+
+  const dropdown = document.createElement('div');
+  dropdown.className = 'searchable-dropdown';
+  dropdown.id = uid;
+
+  function renderItems(q) {
+    dropdown.innerHTML = '';
+    const filtered = q ? list.filter(i => i.toLowerCase().includes(q.toLowerCase())) : list;
+    if (!filtered.length) {
+      dropdown.innerHTML = '<div class="dropdown-empty">无匹配结果</div>';
+      return;
+    }
+    filtered.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'dropdown-item';
+      if (q) {
+        const idx = item.toLowerCase().indexOf(q.toLowerCase());
+        div.innerHTML = item.slice(0, idx) +
+          '<em>' + item.slice(idx, idx + q.length) + '</em>' +
+          item.slice(idx + q.length);
+      } else {
+        div.textContent = item;
+      }
+      div.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        input.value = item;
+        input.dataset.selectedValue = item;
+        dropdown.classList.remove('show');
+        onSelect && onSelect(item, wrapper);
+      });
+      dropdown.appendChild(div);
+    });
+  }
+
+  if (readonlyMode) {
+    input.addEventListener('click', () => {
+      if (dropdown.classList.contains('show')) {
+        dropdown.classList.remove('show');
+      } else {
+        renderItems('');
+        dropdown.classList.add('show');
+      }
+    });
+  } else {
+    input.addEventListener('focus', () => { renderItems(input.value); dropdown.classList.add('show'); });
+    input.addEventListener('input', () => { renderItems(input.value); dropdown.classList.add('show'); });
+  }
+
+  wrapper.appendChild(input);
+  wrapper.appendChild(dropdown);
+  return { wrapper, input };
+}
+
+/* ================================================================
+   native select helper
+   ================================================================ */
+function makeNativeSelect(options, placeholder) {
+  const wrap = document.createElement('div');
+  wrap.className = 'select-wrapper';
+  const sel = document.createElement('select');
+  sel.className = 'form-select';
+  const ph = document.createElement('option');
+  ph.value = '';
+  ph.textContent = placeholder;
+  ph.disabled = true;
+  ph.selected = true;
+  sel.appendChild(ph);
+  options.forEach(o => {
+    const opt = document.createElement('option');
+    opt.value = o;
+    opt.textContent = o;
+    sel.appendChild(opt);
+  });
+  wrap.appendChild(sel);
+  return { wrap, sel };
+}
+
+/* ================================================================
+   开拓项目卡片
+   ================================================================ */
+let developCount = 0;
+
+function addDevelopCard() {
+  developCount++;
+  const idx = developCount;
+  const container = document.getElementById('developCards');
+
+  const sub = document.createElement('div');
+  sub.className = 'sub-card';
+  sub.id = 'dev_' + idx;
+
+  if (idx > 1) {
+    const rm = document.createElement('span');
+    rm.className = 'sub-card-remove';
+    rm.innerHTML = '&times;';
+    rm.onclick = () => sub.remove();
+    sub.appendChild(rm);
+    const div = document.createElement('div');
+    div.className = 'section-divider';
+    div.textContent = '第' + idx + '个项目';
+    sub.appendChild(div);
+  }
+
+  // 客户名称
+  sub.appendChild(makeFormGroup('客户名称', true, () => {
+    const { wrapper } = makeSearchableSelect(CUSTOMERS, '请选择客户', null, false);
+    return wrapper;
+  }));
+
+  // 项目名称
+  sub.appendChild(makeFormGroup('项目名称', true, () => {
+    const { wrapper } = makeSearchableSelect(PROJECTS, '请输入项目简称', null, false);
+    wrapper.querySelector('input').placeholder = '请输入项目简称';
+    return wrapper;
+  }));
+
+  // 项目分类
+  sub.appendChild(makeFormGroup('项目分类', true, () => {
+    const { wrap } = makeNativeSelect(['保持关注项目', '正常跟踪项目', '重点投入项目'], '请选择项目当前分类');
+    return wrap;
+  }));
+
+  // 当前项目进展
+  const progressGroup = makeFormGroup('当前项目进展', true, () => {
+    const wrap = document.createElement('div');
+    const { wrap: l1Wrap, sel: l1Sel } = makeNativeSelect(DEVELOP_PROGRESS_L1, '请选择当前项目进展状态');
+    wrap.appendChild(l1Wrap);
+
+    const l2Container = document.createElement('div');
+    l2Container.className = 'dynamic-select-wrapper';
+    wrap.appendChild(l2Container);
+
+    l1Sel.addEventListener('change', () => {
+      const val = l1Sel.value;
+      l2Container.innerHTML = '';
+      if (!val) return;
+      const opts = DEVELOP_PROGRESS_L2[val];
+      if (opts === null) {
+        // 其他 → 输入框
+        const ta = document.createElement('textarea');
+        ta.className = 'form-textarea';
+        ta.placeholder = '请输入具体进展内容（200字以内）';
+        ta.maxLength = 200;
+        ta.style.minHeight = '80px';
+        l2Container.appendChild(ta);
+      } else if (opts && opts.length > 0) {
+        const { wrap: l2Wrap } = makeNativeSelect(opts, '请选择当前项目进展状态');
+        l2Container.appendChild(l2Wrap);
+      }
+    });
+    return wrap;
+  });
+  sub.appendChild(progressGroup);
+
+  // 项目竞争对手
+  sub.appendChild(makeFormGroup('项目竞争对手', false, () => {
+    const ta = document.createElement('textarea');
+    ta.className = 'form-textarea';
+    ta.placeholder = '请输入项目竞争对手情况（200字以内）';
+    ta.maxLength = 200;
+    return ta;
+  }));
+
+  // 是否报送集团领导
+  sub.appendChild(makeFormGroup('是否报送集团领导', true, () => {
+    const wrap = document.createElement('div');
+    wrap.className = 'radio-group';
+    const name = 'devReport_' + idx;
+    ['是', '否'].forEach((opt, i) => {
+      const label = document.createElement('label');
+      label.className = 'radio-item';
+      const inp = document.createElement('input');
+      inp.type = 'radio';
+      inp.name = name;
+      inp.value = opt;
+      if (i === 0) inp.checked = true;
+      label.appendChild(inp);
+      label.appendChild(document.createTextNode(opt));
+      wrap.appendChild(label);
+    });
+    return wrap;
+  }));
+
+  container.appendChild(sub);
+}
+
+/* ================================================================
+   客户管理卡片
+   ================================================================ */
+let customerCount = 0;
+
+function addCustomerCard() {
+  customerCount++;
+  const idx = customerCount;
+  const container = document.getElementById('customerCards');
+
+  const sub = document.createElement('div');
+  sub.className = 'sub-card';
+
+  if (idx > 1) {
+    const rm = document.createElement('span');
+    rm.className = 'sub-card-remove';
+    rm.innerHTML = '&times;';
+    rm.onclick = () => sub.remove();
+    sub.appendChild(rm);
+    const div = document.createElement('div');
+    div.className = 'section-divider';
+    div.textContent = '第' + idx + '个客户';
+    sub.appendChild(div);
+  }
+
+  // 客户名称
+  sub.appendChild(makeFormGroup('客户名称', true, () => {
+    const { wrapper } = makeSearchableSelect(CUSTOMERS, '请选择客户', null, false);
+    return wrapper;
+  }));
+
+  // 客户重大变化
+  sub.appendChild(makeFormGroup('客户重大变化', false, () => {
+    const wrap = document.createElement('div');
+    const { wrap: l1Wrap, sel: l1Sel } = makeNativeSelect(CUSTOMER_CHANGE_TYPES, '请选择');
+    wrap.appendChild(l1Wrap);
+    const l2Container = document.createElement('div');
+    l2Container.className = 'dynamic-select-wrapper';
+    wrap.appendChild(l2Container);
+    l1Sel.addEventListener('change', () => {
+      l2Container.innerHTML = '';
+      if (l1Sel.value && l1Sel.value !== '无') {
+        const ta = document.createElement('textarea');
+        ta.className = 'form-textarea';
+        ta.placeholder = '请输入具体内容（200字以内）';
+        ta.maxLength = 200;
+        ta.style.minHeight = '80px';
+        l2Container.appendChild(ta);
+      }
+    });
+    return wrap;
+  }));
+
+  // 对我公司影响判断
+  sub.appendChild(makeFormGroup('对我公司的影响判断', false, () => {
+    const { wrap } = makeNativeSelect(IMPACT_TYPES, '请选择');
+    return wrap;
+  }));
+
+  // 客户产线设备的变化
+  sub.appendChild(makeFormGroup('客户生产产线设备的变化', false, () => {
+    const wrap = document.createElement('div');
+    const { wrap: l1Wrap, sel: l1Sel } = makeNativeSelect(PRODUCTION_CHANGE_TYPES, '请选择');
+    wrap.appendChild(l1Wrap);
+    const l2Container = document.createElement('div');
+    l2Container.className = 'dynamic-select-wrapper';
+    wrap.appendChild(l2Container);
+    l1Sel.addEventListener('change', () => {
+      l2Container.innerHTML = '';
+      if (l1Sel.value && l1Sel.value !== '无') {
+        const ta = document.createElement('textarea');
+        ta.className = 'form-textarea';
+        ta.placeholder = '请输入具体内容（200字以内）';
+        ta.maxLength = 200;
+        ta.style.minHeight = '80px';
+        l2Container.appendChild(ta);
+      }
+    });
+    return wrap;
+  }));
+
+  container.appendChild(sub);
+}
+
+/* ================================================================
+   执行项目卡片
+   ================================================================ */
+let executeCount = 0;
+
+function addExecuteCard() {
+  executeCount++;
+  const idx = executeCount;
+  const container = document.getElementById('executeCards');
+
+  const sub = document.createElement('div');
+  sub.className = 'sub-card';
+
+  if (idx > 1) {
+    const rm = document.createElement('span');
+    rm.className = 'sub-card-remove';
+    rm.innerHTML = '&times;';
+    rm.onclick = () => sub.remove();
+    sub.appendChild(rm);
+    const div = document.createElement('div');
+    div.className = 'section-divider';
+    div.textContent = '第' + idx + '个项目';
+    sub.appendChild(div);
+  }
+
+  // 客户名称
+  sub.appendChild(makeFormGroup('客户名称', true, () => {
+    const { wrapper } = makeSearchableSelect(CUSTOMERS, '请选择客户', null, false);
+    return wrapper;
+  }));
+
+  // 项目名称
+  sub.appendChild(makeFormGroup('项目名称', true, () => {
+    const { wrapper } = makeSearchableSelect(PROJECTS, '请选择项目', null, true);
+    return wrapper;
+  }));
+
+  // 项目分类
+  sub.appendChild(makeFormGroup('项目分类', true, () => {
+    const { wrap } = makeNativeSelect(EXECUTE_CATEGORY, '请选择项目');
+    return wrap;
+  }));
+
+  // 项目进展
+  sub.appendChild(makeFormGroup('项目进展', true, () => {
+    const wrap = document.createElement('div');
+    const { wrap: l1Wrap, sel: l1Sel } = makeNativeSelect(EXECUTE_PROGRESS_L1, '请选择项目进展');
+    wrap.appendChild(l1Wrap);
+    const l2Container = document.createElement('div');
+    l2Container.className = 'dynamic-select-wrapper';
+    wrap.appendChild(l2Container);
+    l1Sel.addEventListener('change', () => {
+      l2Container.innerHTML = '';
+      const opts = EXECUTE_PROGRESS_L2[l1Sel.value];
+      if (opts === null) {
+        const ta = document.createElement('textarea');
+        ta.className = 'form-textarea';
+        ta.placeholder = '请输入具体进展内容（200字以内）';
+        ta.maxLength = 200;
+        ta.style.minHeight = '80px';
+        l2Container.appendChild(ta);
+      } else if (opts && opts.length > 0) {
+        const { wrap: l2Wrap } = makeNativeSelect(opts, '请选择项目进展');
+        l2Container.appendChild(l2Wrap);
+      }
+    });
+    return wrap;
+  }));
+
+  container.appendChild(sub);
+}
+
+/* ================================================================
+   makeFormGroup 辅助函数
+   ================================================================ */
+function makeFormGroup(label, required, contentFn) {
+  const group = document.createElement('div');
+  group.className = 'form-group';
+  const lbl = document.createElement('label');
+  lbl.className = 'form-label' + (required ? ' required' : '');
+  lbl.textContent = label;
+  group.appendChild(lbl);
+  const content = contentFn();
+  group.appendChild(content);
+  return group;
+}
+
+/* ================================================================
+   提交 / 保存
+   ================================================================ */
+function collectFormData() {
+  const data = {};
+  data.country = document.getElementById('countryInput').value;
+  data.otherInfo = document.getElementById('otherInfo').value;
+  return data;
+}
+
+function validateRequired() {
+  const country = document.getElementById('countryInput').value.trim();
+  if (!country) {
+    showToast('请先选择当前所在国家');
+    return false;
+  }
+  return true;
+}
+
+function submitForm() {
+  if (!validateRequired()) return;
+  showToast('提交成功！感谢您的填报');
+}
+
+function saveForm() {
+  showToast('已保存草稿');
+}
+</script>
+</body>
+</html>
