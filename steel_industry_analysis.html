@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中国钢铁行业上市公司深度分析报告 (2020–2025)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --blue-50: #E6F1FB; --blue-100: #B5D4F4; --blue-200: #85B7EB; --blue-400: #378ADD;
+  --blue-600: #185FA5; --blue-800: #0C447C; --blue-900: #042C53;
+  --gray-50: #F1EFE8; --gray-100: #D3D1C7; --gray-200: #B4B2A9; --gray-400: #888780;
+  --gray-600: #5F5E5A; --gray-800: #444441; --gray-900: #2C2C2A;
+  --teal-400: #1D9E75; --teal-600: #0F6E56;
+  --coral-400: #D85A30; --coral-600: #993C1D;
+  --red-400: #E24B4A; --red-600: #A32D2D;
+  --amber-400: #BA7517; --amber-600: #854F0B;
+  --green-400: #639922; --green-600: #3B6D11;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: #FAFAF8; color: #2C2C2A; line-height: 1.7; font-size: 14px;
+}
+.report { max-width: 1100px; margin: 0 auto; padding: 40px 32px 80px; }
+.cover {
+  text-align: center; padding: 80px 20px 60px;
+  border-bottom: 2px solid var(--blue-600);
+  margin-bottom: 48px;
+}
+.cover h1 { font-size: 32px; font-weight: 600; color: var(--blue-900); letter-spacing: 2px; margin-bottom: 16px; }
+.cover .subtitle { font-size: 16px; color: var(--gray-600); margin-bottom: 8px; }
+.cover .meta { font-size: 13px; color: var(--gray-400); margin-top: 24px; }
+.section { margin-bottom: 56px; }
+.section-title {
+  font-size: 20px; font-weight: 600; color: var(--blue-900);
+  padding-bottom: 12px; border-bottom: 2px solid var(--blue-600);
+  margin-bottom: 24px; display: flex; align-items: center; gap: 10px;
+}
+.section-title .num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--blue-600); color: #fff; font-size: 15px; font-weight: 500;
+}
+.sub-title {
+  font-size: 16px; font-weight: 600; color: var(--blue-800);
+  margin: 28px 0 16px; padding-left: 12px;
+  border-left: 3px solid var(--blue-400);
+}
+.text { font-size: 14px; color: var(--gray-800); line-height: 1.8; margin-bottom: 16px; }
+.text strong { color: var(--blue-900); }
+.highlight-box {
+  background: var(--blue-50); border-left: 4px solid var(--blue-600);
+  padding: 16px 20px; margin: 20px 0; border-radius: 0 6px 6px 0;
+}
+.highlight-box p { font-size: 14px; color: var(--blue-800); line-height: 1.8; }
+.kpi-row {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px; margin: 24px 0;
+}
+.kpi-card {
+  background: #fff; border: 1px solid #E8E8E4; border-radius: 10px;
+  padding: 20px 24px; text-align: center;
+}
+.kpi-card .kpi-label { font-size: 12px; color: var(--gray-400); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.kpi-card .kpi-value { font-size: 28px; font-weight: 600; color: var(--blue-900); }
+.kpi-card .kpi-unit { font-size: 13px; color: var(--gray-600); margin-left: 2px; }
+.kpi-card .kpi-change { font-size: 12px; margin-top: 6px; }
+.kpi-card .kpi-change.up { color: var(--green-600); }
+.kpi-card .kpi-change.down { color: var(--red-600); }
+.chart-container {
+  background: #fff; border: 1px solid #E8E8E4; border-radius: 10px;
+  padding: 24px; margin: 20px 0;
+}
+.chart-header { font-size: 14px; font-weight: 600; color: var(--blue-900); margin-bottom: 16px; }
+.chart-wrap { position: relative; width: 100%; }
+table.data-table {
+  width: 100%; border-collapse: collapse; font-size: 13px;
+  background: #fff; border-radius: 8px; overflow: hidden;
+  border: 1px solid #E8E8E4; margin: 20px 0;
+}
+table.data-table thead th {
+  background: var(--blue-900); color: #fff; font-weight: 500;
+  padding: 12px 14px; text-align: left; font-size: 12px; letter-spacing: 0.5px;
+}
+table.data-table tbody td {
+  padding: 10px 14px; border-bottom: 1px solid #F0F0EC;
+}
+table.data-table tbody tr:hover { background: var(--blue-50); }
+table.data-table tbody tr:nth-child(even) { background: #FAFAF8; }
+table.data-table tbody tr:nth-child(even):hover { background: var(--blue-50); }
+.badge {
+  display: inline-block; padding: 2px 8px; border-radius: 10px;
+  font-size: 11px; font-weight: 500;
+}
+.badge-profit { background: #E8F5E9; color: #2E7D32; }
+.badge-loss { background: #FFEBEE; color: #C62828; }
+.conclusion-card {
+  background: #fff; border: 1px solid #E8E8E4; border-radius: 10px;
+  padding: 24px 28px; margin: 16px 0;
+}
+.conclusion-card .cc-title {
+  font-size: 15px; font-weight: 600; color: var(--blue-900);
+  margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+}
+.conclusion-card .cc-title .dot {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--blue-400);
+}
+.conclusion-card p { font-size: 13px; color: var(--gray-800); line-height: 1.8; }
+.footer {
+  text-align: center; padding: 32px 0; border-top: 1px solid #E8E8E4;
+  color: var(--gray-400); font-size: 12px;
+}
+.data-note { font-size: 11px; color: var(--gray-400); margin-top: 8px; font-style: italic; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 768px) {
+  .report { padding: 20px 16px 60px; }
+  .cover h1 { font-size: 22px; }
+  .two-col { grid-template-columns: 1fr; }
+  .kpi-row { grid-template-columns: repeat(2, 1fr); }
+  table.data-table { font-size: 11px; }
+  table.data-table thead th, table.data-table tbody td { padding: 8px 6px; }
+}
+</style>
+</head>
+<body>
+<div class="report">
+
+<!-- Cover -->
+<div class="cover">
+  <h1>中国钢铁行业上市公司<br>深度经营分析报告</h1>
+  <p class="subtitle">基于2020–2025年财报数据的系统性研究</p>
+  <p class="meta">报告日期：2026年5月 &nbsp;|&nbsp; 数据来源：中钢协、国家统计局、东方财富、我的钢铁网</p>
+</div>
+
+<!-- Section 1: Executive Summary -->
+<div class="section">
+  <div class="section-title"><span class="num">1</span> 执行摘要</div>
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <div class="kpi-label">2025年全国粗钢产量</div>
+      <div class="kpi-value">9.61<span class="kpi-unit">亿吨</span></div>
+      <div class="kpi-change down">同比下降 4.4%</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">2025年行业利润总额</div>
+      <div class="kpi-value">1,151<span class="kpi-unit">亿元</span></div>
+      <div class="kpi-change up">同比增长 138%</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">2024年盈利上市钢企</div>
+      <div class="kpi-value">21<span class="kpi-unit">/ 36家</span></div>
+      <div class="kpi-change down">亏损面达 41.7%</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">2025年行业利润率</div>
+      <div class="kpi-value">1.90<span class="kpi-unit">%</span></div>
+      <div class="kpi-change up">同比 +1.13pp</div>
+    </div>
+  </div>
+  <div class="highlight-box">
+    <p><strong>核心结论：</strong>中国钢铁行业正处于"长周期减量调结构"阶段。2020–2025年粗钢产量累计下降9.8%，需求结构从"建筑主导"转向"制造主导"。行业利润经历"过山车"式波动（3,459亿→483亿→1,151亿），分化加剧：头部企业（宝钢、中信特钢）凭借品种结构、成本控制和技术优势逆势增长，而大量区域性普钢企业陷入持续亏损。2025年行业初步实现触底回升，但利润率仍处于历史低位。</p>
+  </div>
+</div>
+
+<!-- Section 2: Macro -->
+<div class="section">
+  <div class="section-title"><span class="num">2</span> 行业宏观运行分析</div>
+
+  <div class="sub-title">2.1 粗钢产量：五年连降，首次跌破10亿吨</div>
+  <p class="text">受房地产下行、需求结构转型及产能调控政策影响，中国粗钢产量从2020年峰值10.65亿吨波动下降至2025年9.61亿吨，五年累计减少1.04亿吨。2024年产量10.05亿吨，仍居全球首位，占全球粗钢产量约54%，但较峰值已下降5.6%。</p>
+  <div class="chart-container">
+    <div class="chart-header">全国粗钢产量变化趋势（2020–2025）</div>
+    <div class="chart-wrap" style="height:340px">
+      <canvas id="chartProduction" role="img" aria-label="粗钢产量趋势图"></canvas>
+    </div>
+    <p class="data-note">数据来源：国家统计局、世界钢铁协会。2025年为中钢协初步统计值。</p>
+  </div>
+
+  <div class="sub-title">2.2 表观消费量与需求结构转型</div>
+  <p class="text">粗钢表观消费量从2020年峰值10.48亿吨下降至2025年8.29亿吨，五年累计下降20.9%。需求结构发生根本性变化：建筑业用钢占比从2020年的58%降至2025年的49%，制造业用钢占比从42%升至51%，中国钢铁需求已正式进入"制造业主导"时代。</p>
+  <div class="two-col">
+    <div class="chart-container">
+      <div class="chart-header">需求结构变化（2020 vs 2025）</div>
+      <div class="chart-wrap" style="height:280px">
+        <canvas id="chartDemand" role="img" aria-label="需求结构对比图"></canvas>
+      </div>
+    </div>
+    <div class="chart-container">
+      <div class="chart-header">粗钢表观消费量变化（亿吨）</div>
+      <div class="chart-wrap" style="height:280px">
+        <canvas id="chartConsumption" role="img" aria-label="消费量变化图"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="sub-title">2.3 行业利润：剧烈波动后的触底回升</div>
+  <p class="text">中钢协重点统计钢铁企业利润总额从2021年峰值3,459亿元骤降至2024年的483亿元，降幅达86%。2022–2024年连续三年亏损企业合计亏损超过1,000亿元，行业平均利润率从峰值约5.5%降至2024年的0.71%。2025年利润总额反弹至1,151亿元（+138%），利润率回升至1.9%，钢铁主业实现扭亏为盈。</p>
+  <div class="chart-container">
+    <div class="chart-header">中钢协重点企业利润总额及利润率变化</div>
+    <div class="chart-wrap" style="height:340px">
+      <canvas id="chartProfit" role="img" aria-label="行业利润趋势图"></canvas>
+    </div>
+    <p class="data-note">数据来源：中国钢铁工业协会。2022年利润约1,365亿元，2023年约429亿元（行业公开报道综合估算）。</p>
+  </div>
+</div>
+
+<!-- Section 3: Company Analysis -->
+<div class="section">
+  <div class="section-title"><span class="num">3</span> 主要上市公司经营分析</div>
+
+  <div class="sub-title">3.1 2024年度核心财务数据</div>
+  <p class="text">2024年36家上市钢企合计营业收入19,592亿元，其中仅21家实现盈利（58.3%），行业亏损面扩大。宝钢股份以超3,200亿营收和73.62亿净利润稳居"双料第一"。</p>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>排名</th>
+        <th>公司名称</th>
+        <th>营业收入（亿元）</th>
+        <th>净利润（亿元）</th>
+        <th>盈利/亏损</th>
+        <th>备注</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>宝钢股份</td><td>3,264</td><td>73.62</td><td><span class="badge badge-profit">盈利</span></td><td>营收/利润双第一</td></tr>
+      <tr><td>2</td><td>华菱钢铁</td><td>1,441</td><td>16.50</td><td><span class="badge badge-profit">盈利</span></td><td>品种结构优势</td></tr>
+      <tr><td>3</td><td>中信特钢</td><td>1,056</td><td>51.26</td><td><span class="badge badge-profit">盈利</span></td><td>特钢龙头，利润第二</td></tr>
+      <tr><td>4</td><td>鞍钢股份</td><td>1,051</td><td>-50.74</td><td><span class="badge badge-loss">亏损</span></td><td>大型国企巨亏</td></tr>
+      <tr><td>5</td><td>河钢股份</td><td>1,228</td><td>6.50</td><td><span class="badge badge-profit">盈利</span></td><td>微利经营</td></tr>
+      <tr><td>6</td><td>首钢股份</td><td>1,022</td><td>-11.50</td><td><span class="badge badge-loss">亏损</span></td><td>由盈转亏</td></tr>
+      <tr><td>7</td><td>太钢不锈</td><td>1,053</td><td>3.72</td><td><span class="badge badge-profit">盈利</span></td><td>不锈钢龙头</td></tr>
+      <tr><td>8</td><td>南钢股份</td><td>684</td><td>22.61</td><td><span class="badge badge-profit">盈利</span></td><td>利润第三</td></tr>
+      <tr><td>9</td><td>马钢股份</td><td>818</td><td>-43.26</td><td><span class="badge badge-loss">亏损</span></td><td>区域钢企承压</td></tr>
+      <tr><td>10</td><td>包钢股份</td><td>699</td><td>-35.42</td><td><span class="badge badge-loss">亏损</span></td><td>北方钢企重灾</td></tr>
+      <tr><td>11</td><td>山东钢铁</td><td>803</td><td>-22.50</td><td><span class="badge badge-loss">亏损</span></td><td>持续亏损</td></tr>
+      <tr><td>12</td><td>本钢板材</td><td>617</td><td>-38.50</td><td><span class="badge badge-loss">亏损</span></td><td>区域性亏损</td></tr>
+      <tr><td>13</td><td>柳钢股份</td><td>805</td><td>-12.50</td><td><span class="badge badge-loss">亏损</span></td><td>由盈转亏</td></tr>
+      <tr><td>14</td><td>重庆钢铁</td><td>316</td><td>-35.20</td><td><span class="badge badge-loss">亏损</span></td><td>产能重组中</td></tr>
+      <tr><td>15</td><td>八一钢铁</td><td>196</td><td>-25.50</td><td><span class="badge badge-loss">亏损</span></td><td>新疆区域承压</td></tr>
+    </tbody>
+  </table>
+  <p class="data-note">数据来源：各公司2024年年报、东方财富、我的钢铁网。部分数据为行业综合统计值。</p>
+
+  <div class="sub-title">3.2 龙头企业净利润五年走势对比</div>
+  <p class="text">选取宝钢股份、中信特钢、华菱钢铁三家代表企业对比分析。中信特钢作为特钢龙头，利润波动最小、稳定性最强；宝钢股份利润绝对值最大但波动幅度也最大；华菱钢铁作为区域普钢转型代表，利润波动剧烈。</p>
+  <div class="chart-container">
+    <div class="chart-header">三家企业归母净利润对比（亿元，2020–2025）</div>
+    <div class="chart-wrap" style="height:340px">
+      <canvas id="chartCompanyProfit" role="img" aria-label="企业利润对比图"></canvas>
+    </div>
+    <p class="data-note">数据来源：各公司年报。2025年数据为业绩预告/快报口径。宝钢2025为预计超百亿，图中取114亿（业绩预告值）。</p>
+  </div>
+
+  <div class="sub-title">3.3 龙头企业盈利能力对比</div>
+  <p class="text">从毛利率和利润率角度，特钢企业持续优于普钢企业。中信特钢凭借高端品种溢价，毛利率常年维持在12%以上，2024年为11.8%；而宝钢股份2024年毛利率仅5.45%，但远超行业平均的0.71%。</p>
+  <div class="chart-container">
+    <div class="chart-header">毛利率对比（%，2020–2025）</div>
+    <div class="chart-wrap" style="height:320px">
+      <canvas id="chartMargin" role="img" aria-label="毛利率对比图"></canvas>
+    </div>
+    <p class="data-note">数据来源：各公司年报。中信特钢毛利率为行业领先水平，宝钢为普钢龙头代表。</p>
+  </div>
+
+  <div class="sub-title">3.4 2024年行业盈利分布</div>
+  <div class="two-col">
+    <div class="chart-container">
+      <div class="chart-header">2024年36家上市钢企盈亏分布</div>
+      <div class="chart-wrap" style="height:280px">
+        <canvas id="chartDist" role="img" aria-label="盈亏分布饼图"></canvas>
+      </div>
+    </div>
+    <div class="chart-container">
+      <div class="chart-header">2024年TOP5净利润贡献（亿元）</div>
+      <div class="chart-wrap" style="height:280px">
+        <canvas id="chartTop5" role="img" aria-label="利润TOP5图"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Section 4: Key Issues -->
+<div class="section">
+  <div class="section-title"><span class="num">4</span> 关键议题与趋势研判</div>
+
+  <div class="sub-title">4.1 行业分化加剧：冰火两重天</div>
+  <p class="text">2024年钢铁行业呈现极端分化格局：头部3家企业（宝钢、中信特钢、南钢）净利润合计147.49亿元，占36家上市钢企利润总额的绝大部分；而鞍钢股份单家亏损50.74亿元，接近净利润前三名之和。2025年这一分化趋势延续：中信特钢利润增长15.7%至59.29亿元，而鞍钢股份续亏40.68亿元。</p>
+  <div class="chart-container">
+    <div class="chart-header">2025年主要上市钢企净利润排名（亿元）</div>
+    <div class="chart-wrap" style="height:420px">
+      <canvas id="chartRank2025" role="img" aria-label="2025年利润排名图"></canvas>
+    </div>
+    <p class="data-note">数据来源：各公司2025年业绩预告/快报。红色柱体为亏损企业。</p>
+  </div>
+
+  <div class="sub-title">4.2 产品结构转型：从"量"到"质"</div>
+  <div class="conclusion-card">
+    <div class="cc-title"><span class="dot"></span>品种结构升级</div>
+    <p>宝钢股份通过深化"一公司多基地"战略，高牌号硅钢、汽车板等高端品种占比持续提升；中信特钢专注轴承钢、齿轮钢等特钢领域，毛利率稳定在12%以上；华菱钢铁重点发展宽厚板、线棒材等品种，2025年利润同比增长28.5%。</p>
+  </div>
+  <div class="conclusion-card">
+    <div class="cc-title"><span class="dot"></span>需求结构转变</div>
+    <p>建筑业用钢占比从58%降至49%，制造业用钢升至51%。新能源、汽车、家电等高端制造领域用钢需求增长明显，热轧板卷（+9,288万吨）、冷轧板卷（+2,155万吨）、电工钢（+775万吨）等品种2020–2025年增量显著。</p>
+  </div>
+
+  <div class="sub-title">4.3 成本与财务风险</div>
+  <p class="text">行业资产负债率整体偏高，但企业间差异巨大。宝钢股份2024年资产负债率39.66%（2025年降至37.97%），远低于行业平均63.59%；而部分区域性钢企资产负债率超过70%，在行业下行周期面临较大的偿债压力和财务风险。</p>
+  <div class="chart-container">
+    <div class="chart-header">资产负债率对比（%，2024年）</div>
+    <div class="chart-wrap" style="height:300px">
+      <canvas id="chartDebt" role="img" aria-label="资产负债率对比图"></canvas>
+    </div>
+  </div>
+
+  <div class="sub-title">4.4 产能优化与政策导向</div>
+  <div class="conclusion-card">
+    <div class="cc-title"><span class="dot"></span>产能调控持续</div>
+    <p>2025年发改委再次提出粗钢产量调控，推动减量重组。截至2025年4月，完成全流程超低排放改造的钢企达141家，涉及粗钢产能约5.91亿吨。能效标杆企业累计15家。2027年后碳排放配额将逐步收紧，加速落后产能出清。</p>
+  </div>
+  <div class="conclusion-card">
+    <div class="cc-title"><span class="dot"></span>出口双刃剑</div>
+    <p>2024年粗钢净出口量达1.09亿吨，占总产量10.8%，创历史新高。但2025年美国对全球加征"对等关税"，欧盟亦收紧贸易壁垒，外需不确定性增加，出口驱动的增长模式面临挑战。</p>
+  </div>
+</div>
+
+<!-- Section 5: Outlook -->
+<div class="section">
+  <div class="section-title"><span class="num">5</span> 结论与展望</div>
+
+  <div class="conclusion-card" style="border-left:4px solid var(--blue-600)">
+    <div class="cc-title"><span class="dot" style="background:var(--blue-600)"></span>一、行业进入"存量竞争"新常态</div>
+    <p>粗钢产量已跌破10亿吨，需求进入"减量发展"阶段。未来行业增长将主要依靠品种升级和效率提升，而非规模扩张。预计2026–2030年粗钢产量将在9.0–9.5亿吨区间波动，行业竞争从"量"转向"质"。</p>
+  </div>
+
+  <div class="conclusion-card" style="border-left:4px solid var(--teal-400)">
+    <div class="cc-title"><span class="dot" style="background:var(--teal-400)"></span>二、头部集中度将进一步提升</div>
+    <p>行业利润向头部企业集中的趋势不可逆转。宝钢、中信特钢等龙头企业凭借技术、品牌、规模和资金优势，将通过并购重组和产能置换进一步提升市场份额。预计未来3–5年，TOP10上市钢企的营收集中度将从目前的约55%提升至65%以上。</p>
+  </div>
+
+  <div class="conclusion-card" style="border-left:4px solid var(--amber-400)">
+    <div class="cc-title"><span class="dot" style="background:var(--amber-400)"></span>三、特钢和高端品种是核心增长极</div>
+    <p>制造业用钢占比已超过建筑业，新能源汽车、风电、航空航天等领域对高端特钢的需求将持续增长。中信特钢的成功证明了"品种差异化"战略的有效性，预计未来更多钢企将向特钢、精密不锈钢、电工钢等高附加值领域转型。</p>
+  </div>
+
+  <div class="conclusion-card" style="border-left:4px solid var(--coral-400)">
+    <div class="cc-title"><span class="dot" style="background:var(--coral-400)"></span>四、绿色低碳转型重塑成本曲线</div>
+    <p>2027年后碳排放配额逐步收紧，超低排放改造和能效提升将成为钢企的核心竞争力。已完成改造的141家钢企（产能5.91亿吨）将在碳成本上获得显著优势。预计到2030年，钢铁行业碳排放强度将较2020年下降18%以上。</p>
+  </div>
+
+  <div class="conclusion-card" style="border-left:4px solid var(--green-400)">
+    <div class="cc-title"><span class="dot" style="background:var(--green-400)"></span>五、投资建议</div>
+    <p><strong>重点关注：</strong>中信特钢（特钢龙头，利润稳定性强）、宝钢股份（综合竞争力最强，估值修复空间大）、南钢股份（利润增速快，效率改善显著）。</p>
+    <p style="margin-top:8px"><strong>谨慎规避：</strong>产品结构单一、资产负债率高、区域需求依赖性强的普钢企业，在行业下行周期中面临持续的盈利压力和出清风险。</p>
+  </div>
+
+  <div class="highlight-box" style="background:#FFF8E1; border-left-color:var(--amber-400); margin-top:32px">
+    <p><strong>风险提示：</strong>本报告基于公开数据整理分析，不构成投资建议。钢铁行业受宏观经济、房地产政策、国际贸易环境等多重因素影响，未来走势存在不确定性。部分2025年数据为业绩预告口径，最终数据以年报为准。</p>
+  </div>
+</div>
+
+<div class="footer">
+  中国钢铁行业上市公司深度经营分析报告 &nbsp;|&nbsp; 数据截至2026年5月 &nbsp;|&nbsp; 仅供参考，不构成投资建议
+</div>
+
+</div><!-- /report -->
+
+<script>
+const FONT = '"SF Pro Text","Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif';
+Chart.defaults.font.family = FONT;
+Chart.defaults.font.size = 12;
+Chart.defaults.color = '#5F5E5A';
+const BLUE = '#185FA5', BLUE_L = '#85B7EB', BLUE_D = '#042C53';
+const TEAL = '#0F6E56', TEAL_L = '#5DCAA5';
+const CORAL = '#D85A30', CORAL_L = '#F0997B';
+const GRAY = '#888780', GRAY_L = '#D3D1C7';
+const RED = '#A32D2D', RED_L = '#F09595';
+const GREEN = '#2E7D32', GREEN_L = '#97C459';
+const AMBER = '#BA7517';
+
+// 1. 粗钢产量
+new Chart(document.getElementById('chartProduction'), {
+  type: 'bar',
+  data: {
+    labels: ['2020','2021','2022','2023','2024','2025'],
+    datasets: [{
+      label: '粗钢产量（亿吨）',
+      data: [10.65, 10.35, 10.18, 10.19, 10.05, 9.61],
+      backgroundColor: ['#185FA5','#185FA5','#185FA5','#185FA5','#185FA5','#0C447C'],
+      borderRadius: 4, barPercentage: 0.6
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: c => c.parsed.y + ' 亿吨' } }
+    },
+    scales: {
+      y: { min: 9.0, max: 11.0, ticks: { callback: v => v + '亿吨' }, grid: { color: '#F0F0EC' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// 2a. 需求结构
+new Chart(document.getElementById('chartDemand'), {
+  type: 'bar',
+  data: {
+    labels: ['建筑业用钢', '制造业用钢'],
+    datasets: [
+      { label: '2020', data: [58, 42], backgroundColor: BLUE, borderRadius: 4, barPercentage: 0.35 },
+      { label: '2025', data: [49, 51], backgroundColor: TEAL, borderRadius: 4, barPercentage: 0.35 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'bottom', labels: { boxWidth: 12, padding: 16 } },
+      tooltip: { callbacks: { label: c => c.dataset.label + ': ' + c.parsed.y + '%' } }
+    },
+    scales: {
+      y: { max: 70, ticks: { callback: v => v + '%' }, grid: { color: '#F0F0EC' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// 2b. 表观消费量
+new Chart(document.getElementById('chartConsumption'), {
+  type: 'line',
+  data: {
+    labels: ['2020','2021','2022','2023','2024','2025'],
+    datasets: [{
+      label: '表观消费量（亿吨）',
+      data: [10.48, 10.35, 9.50, 9.30, 8.93, 8.29],
+      borderColor: BLUE, backgroundColor: BLUE_L,
+      fill: true, tension: 0.3, pointRadius: 5, pointBackgroundColor: BLUE, borderWidth: 2
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: c => c.parsed.y + ' 亿吨' } }
+    },
+    scales: {
+      y: { min: 7.5, max: 11, ticks: { callback: v => v + '亿吨' }, grid: { color: '#F0F0EC' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// 3. 行业利润（双轴）
+new Chart(document.getElementById('chartProfit'), {
+  type: 'bar',
+  data: {
+    labels: ['2020','2021','2022','2023','2024','2025'],
+    datasets: [
+      {
+        label: '利润总额（亿元）',
+        data: [2460, 3459, 1365, 429, 483, 1151],
+        backgroundColor: function(ctx) {
+          const v = ctx.parsed?.y ?? 0;
+          return v > 2000 ? '#185FA5' : v > 1000 ? '#378ADD' : v > 400 ? '#85B7EB' : '#B5D4F4';
+        },
+        borderRadius: 4, barPercentage: 0.55, yAxisID: 'y'
+      },
+      {
+        label: '利润率（%）',
+        data: [4.2, 5.5, 2.0, 0.6, 0.71, 1.9],
+        type: 'line', borderColor: CORAL, backgroundColor: CORAL_L,
+        fill: false, tension: 0.3, pointRadius: 5, pointBackgroundColor: CORAL,
+        borderWidth: 2.5, yAxisID: 'y1'
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'bottom', labels: { boxWidth: 12, padding: 16 } },
+      tooltip: { callbacks: { label: c => c.dataset.label + ': ' + c.parsed.y } }
+    },
+    scales: {
+      y: { position: 'left', ticks: { callback: v => v + '亿' }, grid: { color: '#F0F0EC' }, title: { display: true, text: '利润总额（亿元）', font: { size: 11 } } },
+      y1: { position: 'right', min: 0, max: 7, ticks: { callback: v => v + '%' }, grid: { display: false }, title: { display: true, text: '利润率（%）', font: { size: 11 } } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// 4. 企业利润对比
+new Chart(document.getElementById('chartCompanyProfit'), {
+  type: 'bar',
+  data: {
+    labels: ['2020','2021','2022','2023','2024','2025E'],
+    datasets: [
+      { label: '宝钢股份', data: [126.8, 236.2, 121.9, 119.4, 73.6, 114.1], backgroundColor: BLUE, borderRadius: 3, barPercentage: 0.7 },
+      { label: '中信特钢', data: [60.2, 79.5, 71.1, 57.2, 51.3, 59.3], backgroundColor: TEAL, borderRadius: 3, barPercentage: 0.7 },
+      { label: '华菱钢铁', data: [63.9, 84.4, 63.8, 50.8, 16.5, 26.1], backgroundColor: AMBER, borderRadius: 3, barPercentage: 0.7 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'bottom', labels: { boxWidth: 12, padding: 16 } },
+      tooltip: { callbacks: { label: c => c.dataset.label + ': ' + c.parsed.y + ' 亿元' } }
+    },
+    scales: {
+      y: { ticks: { callback: v => v + '亿' }, grid: { color: '#F0F0EC' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// 5. 毛利率对比
+new Chart(document.getElementById('chartMargin'), {
+  type: 'line',
+  data: {
+    labels: ['2020','2021','2022','2023','2024','2025E'],
+    datasets: [
+      { label: '中信特钢', data: [14.2, 13.8, 12.5, 12.1, 11.8, 12.5], borderColor: TEAL, tension: 0.3, pointRadius: 4, pointBackgroundColor: TEAL, borderWidth: 2 },
+      { label: '宝钢股份', data: [9.8, 11.2, 6.5, 5.8, 5.5, 7.2], borderColor: BLUE, tension: 0.3, pointRadius: 4, pointBackgroundColor: BLUE, borderWidth: 2 },
+      { label: '行业平均', data: [4.2, 5.5, 2.0, 0.6, 0.71, 1.9], borderColor: GRAY, borderDash: [6,3], tension: 0.3, pointRadius: 4, pointBackgroundColor: GRAY, borderWidth: 1.5 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'bottom', labels: { boxWidth: 12, padding: 16 } },
+      tooltip: { callbacks: { label: c => c.dataset.label + ': ' + c.parsed.y + '%' } }
+    },
+    scales: {
+      y: { min: 0, max: 16, ticks: { callback: v => v + '%' }, grid: { color: '#F0F0EC' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// 6. 盈亏分布（圆环图）
+new Chart(document.getElementById('chartDist'), {
+  type: 'doughnut',
+  data: {
+    labels: ['盈利企业（21家）', '亏损企业（15家）'],
+    datasets: [{ data: [21, 15], backgroundColor: [TEAL, RED_L], borderWidth: 0 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    cutout: '60%',
+    plugins: {
+      legend: { position: 'bottom', labels: { boxWidth: 12, padding: 16 } }
+    }
+  }
+});
+
+// 7. TOP5利润
+new Chart(document.getElementById('chartTop5'), {
+  type: 'bar',
+  data: {
+    labels: ['宝钢股份', '中信特钢', '南钢股份', '华菱钢铁', '方大特钢'],
+    datasets: [{
+      data: [73.62, 51.26, 22.61, 16.50, 2.47],
+      backgroundColor: [BLUE_D, BLUE, BLUE_L, GRAY, GRAY_L],
+      borderRadius: 4, barPercentage: 0.6
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => c.parsed.x + ' 亿元' } } },
+    scales: {
+      x: { ticks: { callback: v => v + '亿' }, grid: { color: '#F0F0EC' } },
+      y: { grid: { display: false } }
+    }
+  }
+});
+
+// 8. 2025年利润排名
+const rank2025Companies = ['中信特钢','华菱钢铁','南钢股份','宝钢股份','方大特钢','首钢股份','河钢股份','太钢不锈','马钢股份','柳钢股份','包钢股份','本钢板材','酒钢宏兴','重庆钢铁','鞍钢股份'];
+const rank2025Values = [59.29, 26.11, 28.67, 114.1, 9.42, 9.90, 8.23, 5.10, -2.09, -3.07, -5.16, -22.0, -18.79, -26.50, -40.68];
+const rankColors = rank2025Values.map(v => v >= 0 ? (v >= 50 ? BLUE_D : v >= 20 ? BLUE : v >= 5 ? TEAL : GREEN) : RED);
+
+new Chart(document.getElementById('chartRank2025'), {
+  type: 'bar',
+  data: {
+    labels: rank2025Companies,
+    datasets: [{
+      data: rank2025Values,
+      backgroundColor: rankColors,
+      borderRadius: 3, barPercentage: 0.65
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => c.parsed.x + ' 亿元' } } },
+    scales: {
+      x: { ticks: { callback: v => v + '亿' }, grid: { color: '#F0F0EC' } },
+      y: { grid: { display: false }, ticks: { font: { size: 11 } } }
+    }
+  }
+});
+
+// 9. 资产负债率
+new Chart(document.getElementById('chartDebt'), {
+  type: 'bar',
+  data: {
+    labels: ['宝钢股份', '中信特钢', '南钢股份', '华菱钢铁', '河钢股份', '首钢股份', '鞍钢股份', '行业平均'],
+    datasets: [{
+      data: [39.66, 55.2, 52.8, 58.3, 66.5, 72.1, 68.7, 63.59],
+      backgroundColor: function(ctx) {
+        const v = ctx.parsed?.y ?? 0;
+        return v <= 50 ? TEAL : v <= 60 ? BLUE_L : v <= 70 ? AMBER : RED_L;
+      },
+      borderRadius: 4, barPercentage: 0.6
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => c.parsed.y + '%' } } },
+    scales: {
+      y: { min: 30, max: 80, ticks: { callback: v => v + '%' }, grid: { color: '#F0F0EC' } },
+      x: { grid: { display: false }, ticks: { font: { size: 11 } } }
+    }
+  }
+});
+</script>
+</body>
+</html>
