@@ -1,0 +1,2443 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中国汽车行业用钢分析及预测模型</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+tailwind.config={theme:{extend:{colors:{
+  pri:{50:'#E1F5EE',100:'#9FE1CB',200:'#5DCAA5',400:'#1D9E75',600:'#0F6E56',800:'#085041'},
+  acc:{50:'#FAECE7',100:'#F5C4B3',200:'#F0997B',400:'#D85A30',600:'#993C1D'},
+  warm:{50:'#F1EFE8',100:'#D3D1C7',200:'#B4B2A9',400:'#888780',600:'#5F5E5A',800:'#2C2C2A',900:'#1A1A19'},
+}}}}
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+:root{--bg:#FAFAF8;--card:#FFFFFF;--border:#E8E6E0;--text:#1A1A19;--text2:#5F5E5A;--text3:#888780;--pri:#0F6E56;--pri-l:#E1F5EE;--acc:#D85A30;--acc-l:#FAECE7;--info:#378ADD;--info-l:#E6F1FB;--warn:#BA7517;--warn-l:#FAEEDA}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans SC','DM Sans',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}
+.scrollbar-hide::-webkit-scrollbar{display:none}.scrollbar-hide{-ms-overflow-style:none;scrollbar-width:none}
+.tab-btn{position:relative;padding:10px 24px;font-size:14px;font-weight:500;color:var(--text2);cursor:pointer;border:none;background:none;transition:all .2s}
+.tab-btn.active{color:var(--pri)}
+.tab-btn.active::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:60%;height:2.5px;background:var(--pri);border-radius:2px}
+.metric-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 24px;transition:box-shadow .2s}
+.metric-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.05)}
+.section-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px 32px}
+.section-title{display:flex;align-items:center;gap:8px;margin-bottom:20px}
+.section-title h2{font-size:15px;font-weight:600;color:var(--text)}
+.section-bar{width:4px;height:20px;border-radius:2px}
+.slider-group{display:flex;flex-direction:column;gap:4px}
+.slider-group label{font-size:13px;font-weight:500;color:var(--text2);display:flex;justify-content:space-between;align-items:center}
+.slider-group label span.val{font-family:'DM Sans',monospace;color:var(--pri);font-weight:600}
+input[type=range]{-webkit-appearance:none;width:100%;height:6px;border-radius:3px;background:linear-gradient(90deg,var(--pri-l),var(--pri));outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--pri);border:3px solid white;box-shadow:0 1px 6px rgba(0,0,0,.15);cursor:pointer;transition:transform .15s}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
+.model-tab{padding:8px 16px;font-size:13px;font-weight:500;border-radius:8px;cursor:pointer;border:1px solid var(--border);background:white;color:var(--text2);transition:all .2s}
+.model-tab.active{background:var(--pri);color:white;border-color:var(--pri)}
+.tooltip-trigger{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--border);color:var(--text3);font-size:12px;cursor:help;margin-left:4px;position:relative}
+.tooltip-trigger:hover .tooltip-box{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
+.tooltip-box{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%) translateY(4px);background:#2C2C2A;color:white;padding:12px 16px;border-radius:8px;font-size:12px;line-height:1.6;width:280px;z-index:50;opacity:0;visibility:hidden;transition:all .2s;box-shadow:0 8px 24px rgba(0,0,0,.15);pointer-events:none}
+.tooltip-box::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#2C2C2A}
+.pestle-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;transition:all .25s;cursor:pointer}
+.pestle-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.06)}
+.pestle-card.expanded .pestle-detail{display:block}
+.pestle-detail{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.pebble{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;flex-shrink:0}
+.comparison-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px}
+.comparison-row:last-child{border-bottom:none}
+.diff-up{color:#0F6E56;font-weight:600}.diff-down{color:#D85A30;font-weight:600}
+.fade-in{animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+/* Analysis sub-tab */
+.analysis-tab{padding:7px 18px;font-size:13px;font-weight:500;border-radius:20px;cursor:pointer;border:1px solid var(--border);background:white;color:var(--text2);transition:all .2s;white-space:nowrap}
+.analysis-tab.active{background:var(--pri);color:white;border-color:var(--pri)}
+.analysis-section{display:none}.analysis-section.active{display:block}
+/* Table styles */
+.data-table{width:100%;border-collapse:collapse;font-size:13px}
+.data-table th{text-align:left;padding:8px 12px;background:#F5F4F1;font-weight:600;color:var(--text2);font-size:12px;border-bottom:2px solid var(--border)}
+.data-table td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text)}
+.data-table tr:hover td{background:#FAFAF8}
+.data-table tr:last-child td{border-bottom:none}
+/* Star rating */
+.stars{display:inline-flex;gap:1px}
+/* Tag badge */
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500}
+/* Flow step */
+.flow-step{position:relative;display:flex;flex-direction:column;align-items:center;flex:1}
+.flow-step::after{content:'';position:absolute;top:20px;left:calc(50% + 24px);right:calc(-50% + 24px);height:2px;background:var(--border)}
+.flow-step:last-child::after{display:none}
+/* Force bar */
+.force-bar{height:8px;border-radius:4px;background:var(--pri);transition:width .5s ease}
+/* BCG quadrant label */
+.bcg-label{position:absolute;font-size:11px;font-weight:600;opacity:.7}
+/* Hierarchy tree */
+.tree-node{padding:4px 12px;border-radius:6px;font-size:12px;border:1px solid var(--border);background:white;white-space:nowrap}
+.tree-line{width:1px;height:16px;background:var(--border);margin:0 auto}
+.tree-connector{display:flex;gap:0;position:relative}
+.tree-connector::before{content:'';position:absolute;top:0;left:50%;right:50%;height:1px;background:var(--border)}
+/* Arch diagram boxes */
+.arch-box{border:1px solid var(--border);border-radius:8px;padding:10px 14px;background:var(--bg);font-size:12px}
+.arch-arrow{display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:18px;line-height:1}
+/* Risk matrix cell */
+.risk-cell{width:44px;height:44px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;cursor:default}
+/* Chip */
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:500}
+/* Model sub-tabs */
+.model-sub-tab{padding:8px 20px;font-size:13px;font-weight:500;border-radius:10px;cursor:pointer;border:1px solid var(--border);background:white;color:var(--text2);transition:all .2s;white-space:nowrap}
+.model-sub-tab.active{background:var(--pri);color:white;border-color:var(--pri)}
+.model-section{display:none}.model-section.active{display:block}
+/* Overview summary cards */
+.ov-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;transition:box-shadow .2s}
+.ov-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.05)}
+/* Scenario cards */
+.sc-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 14px;text-align:center}
+/* Deep dive cards */
+.dd-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-[var(--border)]">
+<div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+  <div class="flex items-center gap-3">
+    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-pri-600 to-pri-400 flex items-center justify-center">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M3 14h18M3 10h18M5 6h14M5 18h14M8 3v3M16 3v3M8 18v3M16 18v3"/></svg>
+    </div>
+    <div>
+      <h1 class="text-base font-semibold text-warm-900 leading-tight">中国汽车行业用钢分析及预测模型</h1>
+      <p class="text-[11px] text-warm-400 mt-0.5">McKinsey Framework System · Senior Partner视角 · 2026.05</p>
+    </div>
+  </div>
+  <nav class="flex gap-1" id="mainNav">
+    <button class="tab-btn active" onclick="switchTab('analysis')">战略分析</button>
+    <button class="tab-btn" onclick="switchTab('model')">交互模型</button>
+  </nav>
+</div>
+</header>
+
+<main class="max-w-7xl mx-auto px-6 py-6">
+
+<!-- ==================== TAB 1: ANALYSIS ==================== -->
+<div id="tab-analysis" class="fade-in">
+
+  <!-- Key Metrics Row -->
+  <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+    <div class="metric-card">
+      <p class="text-xs text-warm-400 font-medium mb-1">2025年汽车产量</p>
+      <p class="text-2xl font-bold text-warm-900" style="font-family:'DM Sans'">3,453<span class="text-sm font-normal text-warm-400 ml-1">万辆</span></p>
+      <p class="text-xs text-pri-600 mt-1">+10.4% YoY</p>
+    </div>
+    <div class="metric-card">
+      <p class="text-xs text-warm-400 font-medium mb-1">2025年用钢总量</p>
+      <p class="text-2xl font-bold text-warm-900" style="font-family:'DM Sans'">6,390<span class="text-sm font-normal text-warm-400 ml-1">万吨</span></p>
+      <p class="text-xs text-pri-600 mt-1">占全国钢消费 ~18%</p>
+    </div>
+    <div class="metric-card">
+      <p class="text-xs text-warm-400 font-medium mb-1">新能源渗透率</p>
+      <p class="text-2xl font-bold text-warm-900" style="font-family:'DM Sans'">47.9<span class="text-sm font-normal text-warm-400 ml-1">%</span></p>
+      <p class="text-xs text-acc-600 mt-1">+7.0pp YoY</p>
+    </div>
+    <div class="metric-card">
+      <p class="text-xs text-warm-400 font-medium mb-1">用钢预测峰值年</p>
+      <p class="text-2xl font-bold text-warm-900" style="font-family:'DM Sans'">2027<span class="text-sm font-normal text-warm-400 ml-1">年前后</span></p>
+      <p class="text-xs text-acc-600 mt-1">峰值约5,200万吨</p>
+    </div>
+    <div class="metric-card">
+      <p class="text-xs text-warm-400 font-medium mb-1">AHSS占比2030E</p>
+      <p class="text-2xl font-bold text-warm-900" style="font-family:'DM Sans'">45<span class="text-sm font-normal text-warm-400 ml-1">%</span></p>
+      <p class="text-xs text-pri-600 mt-1">当前~25%，↑20pp</p>
+    </div>
+  </div>
+
+  <!-- Analysis Sub-navigation -->
+  <div class="flex gap-2 overflow-x-auto scrollbar-hide pb-3 mb-6">
+    <button class="analysis-tab active" onclick="switchAnalysis('summary')">执行摘要</button>
+    <button class="analysis-tab" onclick="switchAnalysis('pestle')">PESTLE分析</button>
+    <button class="analysis-tab" onclick="switchAnalysis('porter')">波特五力</button>
+    <button class="analysis-tab" onclick="switchAnalysis('3c')">3C分析</button>
+    <button class="analysis-tab" onclick="switchAnalysis('bcg')">BCG矩阵</button>
+    <button class="analysis-tab" onclick="switchAnalysis('sevenstep')">七步法</button>
+    <button class="analysis-tab" onclick="switchAnalysis('mece')">MECE分解</button>
+    <button class="analysis-tab" onclick="switchAnalysis('modelarch')">模型架构</button>
+    <button class="analysis-tab" onclick="switchAnalysis('scenario')">情景规划</button>
+    <button class="analysis-tab" onclick="switchAnalysis('kpi')">数据指标体系</button>
+    <button class="analysis-tab" onclick="switchAnalysis('conclusion')">关键结论</button>
+  </div>
+
+  <!-- ---- SECTION: 执行摘要 ---- -->
+  <div id="as-summary" class="analysis-section active">
+    <!-- Framework overview -->
+    <div class="section-card mb-6">
+      <div class="section-title"><span class="section-bar bg-pri-600"></span><h2>分析框架总览</h2></div>
+      <p class="text-sm text-warm-600 mb-6 leading-relaxed">本报告核心逻辑是<strong class="text-warm-900">"自上而下定总量 + 自下而上拆结构"</strong>的双螺旋验证体系。汽车用钢占全球钢铁消费约12%~15%，在中国这一比例超过<strong class="text-pri-600">18%</strong>，是仅次于建筑的第二大用钢领域。报告融合麦肯锡七步法、波特五力、PESTLE、BCG矩阵、3C分析等8大框架，系统构建汽车用钢需求预测体系。</p>
+      <!-- Flow chart -->
+      <div class="overflow-x-auto scrollbar-hide">
+        <div class="flex gap-0 min-w-max pb-2" id="frameworkFlow">
+          <div class="flow-step">
+            <div class="w-10 h-10 rounded-full bg-pri-600 text-white text-sm font-bold flex items-center justify-center mb-2">P</div>
+            <div class="text-center"><p class="text-xs font-semibold text-warm-800">PESTLE</p><p class="text-[10px] text-warm-400 mt-0.5">宏观环境扫描</p></div>
+          </div>
+          <div class="flow-step">
+            <div class="w-10 h-10 rounded-full bg-acc-400 text-white text-sm font-bold flex items-center justify-center mb-2">5F</div>
+            <div class="text-center"><p class="text-xs font-semibold text-warm-800">波特五力</p><p class="text-[10px] text-warm-400 mt-0.5">竞争结构分析</p></div>
+          </div>
+          <div class="flow-step">
+            <div class="w-10 h-10 rounded-full bg-[var(--info)] text-white text-sm font-bold flex items-center justify-center mb-2">3C</div>
+            <div class="text-center"><p class="text-xs font-semibold text-warm-800">3C分析</p><p class="text-[10px] text-warm-400 mt-0.5">公司客户竞争者</p></div>
+          </div>
+          <div class="flow-step">
+            <div class="w-10 h-10 rounded-full bg-[var(--warn)] text-white text-sm font-bold flex items-center justify-center mb-2">BCG</div>
+            <div class="text-center"><p class="text-xs font-semibold text-warm-800">BCG矩阵</p><p class="text-[10px] text-warm-400 mt-0.5">品种钢组合定位</p></div>
+          </div>
+          <div class="flow-step">
+            <div class="w-10 h-10 rounded-full bg-pri-600 text-white text-sm font-bold flex items-center justify-center mb-2">7S</div>
+            <div class="text-center"><p class="text-xs font-semibold text-warm-800">七步法</p><p class="text-[10px] text-warm-400 mt-0.5">问题解决路径</p></div>
+          </div>
+          <div class="flow-step">
+            <div class="w-10 h-10 rounded-full bg-acc-400 text-white text-sm font-bold flex items-center justify-center mb-2">ME</div>
+            <div class="text-center"><p class="text-xs font-semibold text-warm-800">MECE树</p><p class="text-[10px] text-warm-400 mt-0.5">需求分解</p></div>
+          </div>
+          <div class="flow-step">
+            <div class="w-10 h-10 rounded-full bg-[var(--info)] text-white text-sm font-bold flex items-center justify-center mb-2">M</div>
+            <div class="text-center"><p class="text-xs font-semibold text-warm-800">预测模型</p><p class="text-[10px] text-warm-400 mt-0.5">TD+BU+ML</p></div>
+          </div>
+          <div class="flow-step">
+            <div class="w-10 h-10 rounded-full bg-[var(--warn)] text-white text-sm font-bold flex items-center justify-center mb-2">SC</div>
+            <div class="text-center"><p class="text-xs font-semibold text-warm-800">情景规划</p><p class="text-[10px] text-warm-400 mt-0.5">风险矩阵</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Core structural drivers -->
+    <div class="section-card mb-6">
+      <div class="section-title"><span class="section-bar bg-acc-400"></span><h2>三大结构性变量</h2></div>
+      <div class="grid md:grid-cols-3 gap-4">
+        <div class="rounded-xl p-4 border border-pri-200 bg-pri-l">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="w-6 h-6 rounded-full bg-pri-600 text-white text-xs font-bold flex items-center justify-center">↑</span>
+            <p class="text-sm font-semibold text-warm-900">新能源渗透率提升</p>
+          </div>
+          <p class="text-xs text-warm-600 leading-relaxed">2025年中国已超50%，单车用钢量下降<strong>15%~20%</strong>，轻量化需求驱动品种钢升级</p>
+          <div class="mt-3 flex gap-2 flex-wrap">
+            <span class="chip bg-pri-l text-pri-600">驱动电工钢</span>
+            <span class="chip bg-pri-l text-pri-600">减少普通板</span>
+          </div>
+        </div>
+        <div class="rounded-xl p-4 border border-acc-200 bg-acc-l">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="w-6 h-6 rounded-full bg-acc-400 text-white text-xs font-bold flex items-center justify-center">↑</span>
+            <p class="text-sm font-semibold text-warm-900">AHSS替代普通钢</p>
+          </div>
+          <p class="text-xs text-warm-600 leading-relaxed">热成型钢/QP钢占比从~25%升至45%，吨钢价值提升但用量减少，安全法规驱动</p>
+          <div class="mt-3 flex gap-2 flex-wrap">
+            <span class="chip bg-acc-l text-acc-600">价值替代</span>
+            <span class="chip bg-acc-l text-acc-600">结构件</span>
+          </div>
+        </div>
+        <div class="rounded-xl p-4 border border-[#80BBF2]">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="w-6 h-6 rounded-full bg-[#378ADD] text-white text-xs font-bold flex items-center justify-center">↑</span>
+            <p class="text-sm font-semibold text-warm-900">铝/碳纤维替代钢</p>
+          </div>
+          <p class="text-xs text-warm-600 leading-relaxed">一体化压铸减少单车用钢30~50kg，高端车型铝替代率将从~5%升至~15%</p>
+          <div class="mt-3 flex gap-2 flex-wrap">
+            <span class="chip text-[#378ADD]">白车身风险</span>
+            <span class="chip text-[#378ADD]">结构性威胁</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Core judgments + Historical chart -->
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="section-card">
+        <div class="section-title"><span class="section-bar bg-pri-600"></span><h2>三大核心判断</h2></div>
+        <div class="space-y-4">
+          <div class="flex gap-3 items-start">
+            <div class="w-7 h-7 rounded-lg bg-pri-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">1</div>
+            <div><p class="text-sm font-semibold text-warm-900">总量见顶</p><p class="text-xs text-warm-500 mt-1">2027年前后汽车用钢达到峰值（约5,200万吨），之后进入年降1~2%的缓慢下降通道</p></div>
+          </div>
+          <div class="flex gap-3 items-start">
+            <div class="w-7 h-7 rounded-lg bg-acc-400 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">2</div>
+            <div><p class="text-sm font-semibold text-warm-900">结构剧变</p><p class="text-xs text-warm-500 mt-1">AHSS+电工钢从当前~25%占比升至2030年~45%，品种钢进入代际更替</p></div>
+          </div>
+          <div class="flex gap-3 items-start">
+            <div class="w-7 h-7 rounded-lg bg-[var(--info)] text-white text-xs font-bold flex items-center justify-center flex-shrink-0">3</div>
+            <div><p class="text-sm font-semibold text-warm-900">战略窗口期</p><p class="text-xs text-warm-500 mt-1">2026-2028年是品种钢扩产+整车厂认证的黄金窗口，2028-2030年替代材料加速渗透风险上升</p></div>
+          </div>
+        </div>
+
+        <!-- Key hypotheses -->
+        <div class="mt-5 pt-4 border-t border-[var(--border)]">
+          <p class="text-xs font-semibold text-warm-600 mb-3">核心假设（待验证）</p>
+          <div class="space-y-2">
+            <div class="flex items-center gap-2 text-xs"><span class="w-2 h-2 rounded-full bg-pri-600"></span><span class="text-warm-700">H1: 汽车用钢总量2028年前后达峰（~5,500万吨/年）</span></div>
+            <div class="flex items-center gap-2 text-xs"><span class="w-2 h-2 rounded-full bg-pri-600"></span><span class="text-warm-700">H2: 电工钢需求增速 > 20% CAGR（2025-2030）</span></div>
+            <div class="flex items-center gap-2 text-xs"><span class="w-2 h-2 rounded-full bg-acc-400"></span><span class="text-warm-700">H3: AHSS占比从~25%提升至~45%（2030E）</span></div>
+            <div class="flex items-center gap-2 text-xs"><span class="w-2 h-2 rounded-full bg-acc-400"></span><span class="text-warm-700">H4: 新能源车单车用钢比燃油车低15%~20%</span></div>
+            <div class="flex items-center gap-2 text-xs"><span class="w-2 h-2 rounded-full bg-warn" style="background:#BA7517"></span><span class="text-warm-700">H5: 铝替代率从~5%升至~15%（2030E，白车身）</span></div>
+            <div class="flex items-center gap-2 text-xs"><span class="w-2 h-2 rounded-full bg-warn" style="background:#BA7517"></span><span class="text-warm-700">H6: 一体化压铸减少单车用钢30~50kg（2030E）</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-title"><span class="section-bar bg-pri-600"></span><h2>历史趋势 (2015-2025)</h2></div>
+        <div class="flex gap-4 flex-wrap mb-3">
+          <div class="flex items-center gap-1.5 text-xs text-warm-500"><span class="inline-block w-8 h-0.5 bg-pri-600 rounded"></span>用钢量(万吨)</div>
+          <div class="flex items-center gap-1.5 text-xs text-warm-500"><span class="inline-block w-8 h-0.5 bg-acc-400 rounded"></span>汽车产量(万辆)</div>
+          <div class="flex items-center gap-1.5 text-xs text-warm-500"><span class="inline-block w-8 h-0.5 bg-[var(--info)] rounded"></span>NEV渗透率(%)</div>
+        </div>
+        <div style="position:relative;height:280px"><canvas id="histChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---- SECTION: PESTLE ---- -->
+  <div id="as-pestle" class="analysis-section">
+    <div class="section-card mb-6">
+      <div class="section-title"><span class="section-bar bg-pri-600"></span><h2>PESTLE 宏观环境分析</h2>
+        <span class="ml-auto text-xs text-warm-400">点击卡片展开详情</span>
+      </div>
+      <p class="text-xs text-warm-500 mb-5"><strong class="text-warn-600">核心结论：</strong>技术（轻量化/材料替代）和政策（双碳/排放法规）是影响汽车用钢最核心的两大变量。预测模型必须将新能源渗透率和AHSS渗透率作为核心自变量。</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="pestleGrid"></div>
+    </div>
+  </div>
+
+  <!-- ---- SECTION: Porter's Five Forces ---- -->
+  <div id="as-porter" class="analysis-section">
+    <div class="section-card mb-6">
+      <div class="section-title"><span class="section-bar bg-acc-400"></span><h2>波特五力：行业竞争结构分析</h2></div>
+      <p class="text-xs text-warm-500 mb-5"><strong class="text-acc-600">核心结论：</strong>行业竞争烈度高达9/10，上下游挤压严重。差异化（高附加值品种钢）是唯一出路。预测模型应重点关注高强钢/电工钢等结构性增长品种。</p>
+      <div class="grid md:grid-cols-2 gap-8 items-start">
+        <!-- Radar Chart -->
+        <div>
+          <div style="position:relative;height:320px"><canvas id="porterCanvas"></canvas></div>
+        </div>
+        <!-- Force Details -->
+        <div class="space-y-4">
+          <div class="rounded-xl border border-[var(--border)] p-4">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-sm font-semibold text-warm-900">供应商议价能力</p>
+              <span class="badge bg-acc-l text-acc-600">8.5 / 10 ★强</span>
+            </div>
+            <div class="force-bar mb-2" style="width:85%"></div>
+            <p class="text-xs text-warm-500">铁矿石市场三大矿企（力拓/必和必拓/淡水河谷）高度集中，焦煤供应偏紧，→ 趋势持平</p>
+          </div>
+          <div class="rounded-xl border border-[var(--border)] p-4">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-sm font-semibold text-warm-900">客户议价能力</p>
+              <span class="badge bg-acc-l text-acc-600">7.5 / 10 ★强↑</span>
+            </div>
+            <div class="force-bar mb-2" style="width:75%"></div>
+            <p class="text-xs text-warm-500">整车厂集中度高（Top10 > 85%），年降价压力持续传导，标准化认证是壁垒</p>
+          </div>
+          <div class="rounded-xl border border-[var(--border)] p-4">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-sm font-semibold text-warm-900">新进入者威胁</p>
+              <span class="badge bg-pri-l text-pri-600">3.0 / 10 弱</span>
+            </div>
+            <div class="force-bar mb-2" style="width:30%;background:#0F6E56"></div>
+            <p class="text-xs text-warm-500">资金壁垒高（高炉投资百亿级），但绿钢新势力（氢冶金）可能颠覆格局</p>
+          </div>
+          <div class="rounded-xl border border-[var(--border)] p-4">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-sm font-semibold text-warm-900">替代品威胁</p>
+              <span class="badge bg-acc-l text-acc-600">7.0 / 10 强↑</span>
+            </div>
+            <div class="force-bar mb-2" style="width:70%"></div>
+            <p class="text-xs text-warm-500">铝/碳纤维+一体化压铸加速渗透，特斯拉引领，白车身替代率上升</p>
+          </div>
+          <div class="rounded-xl border border-red-200 p-4" style="border-color:#F5C4B3">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-sm font-semibold text-warm-900">行业内竞争</p>
+              <span class="badge bg-acc-l text-acc-600">9.0 / 10 极强↑</span>
+            </div>
+            <div class="force-bar mb-2" style="width:90%"></div>
+            <p class="text-xs text-warm-500">产能严重过剩，宝钢/鞍钢/首钢/河钢同质化竞争，价格战压缩利润空间</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---- SECTION: 3C Analysis ---- -->
+  <div id="as-3c" class="analysis-section">
+    <div class="section-card mb-6">
+      <div class="section-title"><span class="section-bar bg-[var(--info)]"></span><h2>3C 分析：公司 · 客户 · 竞争者</h2></div>
+      <p class="text-xs text-warm-500 mb-5"><strong class="text-info-600" style="color:var(--info)">核心结论：</strong>客户（整车厂）集中度高、议价能力强，钢企必须通过材料认证和联合研发建立壁垒。竞争对手分层明显，国内一线竞争白热化。</p>
+
+      <!-- Company -->
+      <div class="mb-5">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="badge" style="background:#E6F1FB;color:#378ADD">Company 公司</span>
+          <p class="text-xs text-warm-400">以头部钢企为基准（汽车板市场）</p>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>钢企</th><th>汽车板市占率</th><th>冷轧汽车板产能</th><th>高强钢占比</th><th>电工钢产能</th><th>核心优势</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="font-medium">宝钢股份</td><td><span class="badge bg-pri-l text-pri-600">~50%</span></td><td>~900万吨</td><td>>50%</td><td>~120万吨</td><td>技术领先+客户全覆盖</td></tr>
+              <tr><td class="font-medium">首钢股份</td><td><span class="badge bg-pri-l text-pri-600">~12%</span></td><td>~300万吨</td><td>~40%</td><td>~30万吨</td><td>区位+产品结构优化</td></tr>
+              <tr><td class="font-medium">鞍钢股份</td><td>~8%</td><td>~200万吨</td><td>~35%</td><td>~20万吨</td><td>资源+成本</td></tr>
+              <tr><td class="font-medium">马钢股份</td><td>~6%</td><td>~180万吨</td><td>~30%</td><td>~15万吨</td><td>靠近整车基地</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Customer -->
+      <div class="mb-5">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="badge" style="background:#FAEEDA;color:#BA7517">Customer 客户</span>
+          <p class="text-xs text-warm-400">整车厂用钢需求画像</p>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="data-table">
+            <thead>
+              <tr><th>车企类型</th><th>代表企业</th><th>年销量</th><th>单车用钢</th><th>AHSS占比</th><th>用钢特征</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="badge bg-pri-l text-pri-600">新能源头部</span></td><td>比亚迪</td><td>400+万辆</td><td>~450kg</td><td>>60%</td><td>电工钢需求大，轻量化要求高</td></tr>
+              <tr><td><span class="badge bg-pri-l text-pri-600">新能源新势力</span></td><td>理想/蔚来/小鹏</td><td>30~80万辆</td><td>~420kg</td><td>>55%</td><td>热成型钢占比高</td></tr>
+              <tr><td>合资品牌</td><td>丰田/大众/本田</td><td>100~250万辆</td><td>~500kg</td><td>~45%</td><td>认证周期长，认证壁垒高</td></tr>
+              <tr><td>自主品牌</td><td>吉利/长安/长城</td><td>50~150万辆</td><td>~480kg</td><td>~40%</td><td>性价比导向，用量稳定</td></tr>
+              <tr><td><span class="badge bg-acc-l text-acc-600">特斯拉</span></td><td>特斯拉</td><td>~90万辆</td><td>~400kg</td><td>>70%</td><td>一体化压铸，用钢量最低</td></tr>
+              <tr><td>商用车</td><td>一汽解放/中国重汽</td><td>20~50万辆</td><td>~2000kg</td><td>~25%</td><td>大梁钢/车厢钢，用量大</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Competitor -->
+      <div>
+        <div class="flex items-center gap-2 mb-3">
+          <span class="badge" style="background:#FAECE7;color:#D85A30">Competitor 竞争者</span>
+          <p class="text-xs text-warm-400">钢铁同行竞争对标</p>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="data-table">
+            <thead>
+              <tr><th>对手层级</th><th>代表企业</th><th>竞争策略</th><th>威胁程度</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>国内一线</strong></td><td>宝钢/首钢/鞍钢</td><td>全品种覆盖+技术领先</td><td><span class="badge bg-acc-l text-acc-600">⭐⭐⭐⭐⭐</span></td></tr>
+              <tr><td>国内区域</td><td>邯钢/包钢/本钢</td><td>区域+成本优势</td><td>⭐⭐⭐</td></tr>
+              <tr><td><strong>日韩高端</strong></td><td>POSCO/日本制铁/JFE</td><td>汽车板技术标杆</td><td><span class="badge bg-acc-l text-acc-600">⭐⭐⭐⭐</span></td></tr>
+              <tr><td>欧洲专业</td><td>ArcelorMittal/SSAB</td><td>AHSS技术全球领先</td><td>⭐⭐⭐</td></tr>
+              <tr><td>新兴势力</td><td>河钢/沙钢/日照钢铁</td><td>产能扩张+成本冲击</td><td><span class="badge bg-acc-l text-acc-600">⭐⭐⭐⭐</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---- SECTION: BCG Matrix ---- -->
+  <div id="as-bcg" class="analysis-section">
+    <div class="section-card mb-6">
+      <div class="section-title"><span class="section-bar bg-[var(--warn)]"></span><h2>BCG 矩阵：用钢品种组合分析</h2></div>
+      <p class="text-xs text-warm-500 mb-5"><strong style="color:#BA7517">核心结论：</strong>汽车板品种结构正在发生代际更替——"金牛"冷轧板向"明星"高强钢/电工钢迁移。预测模型必须分品种建模，不能笼统计量。</p>
+      <div class="grid md:grid-cols-2 gap-6 items-start">
+        <div style="position:relative;height:360px"><canvas id="bcgCanvas"></canvas></div>
+        <div>
+          <div class="overflow-x-auto">
+            <table class="data-table">
+              <thead>
+                <tr><th>象限</th><th>品种</th><th>当前份额</th><th>增长率</th><th>建议策略</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><span class="badge bg-pri-l text-pri-600">⭐ 明星</span></td><td>电工钢（取向/无取向）</td><td>中</td><td>15~20%</td><td>全力扩产，抢占新能源红利</td></tr>
+                <tr><td><span class="badge bg-pri-l text-pri-600">⭐ 明星</span></td><td>热成型钢（PHS）</td><td>中</td><td>12~18%</td><td>扩产+认证，绑定整车厂</td></tr>
+                <tr><td><span class="badge bg-pri-l text-pri-600">⭐ 明星</span></td><td>第三代AHSS（QP钢）</td><td>低</td><td>20~30%</td><td>研发投入+先发优势</td></tr>
+                <tr><td><span class="badge" style="background:#FAEEDA;color:#BA7517">💰 金牛</span></td><td>冷轧汽车外板（O5板）</td><td>高</td><td>3~5%</td><td>稳定质量，控制成本</td></tr>
+                <tr><td><span class="badge" style="background:#FAEEDA;color:#BA7517">💰 金牛</span></td><td>镀锌汽车板（GI/GA）</td><td>高</td><td>3~5%</td><td>维持份额，优化产品结构</td></tr>
+                <tr><td><span class="badge bg-info-l text-info" style="background:#E6F1FB;color:#378ADD">❓ 问题</span></td><td>复相钢（CP）/ 中锰钢</td><td>低</td><td>10~25%</td><td>选择性投入，等待商业化</td></tr>
+                <tr><td><span class="badge" style="background:#F1EFE8;color:#888780">🐕 瘦狗</span></td><td>普碳冷轧板 / 低强IF</td><td>高/中</td><td>&lt;2%</td><td>逐步退出或向高强升级</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- Structure shift chart placeholder -->
+          <div class="mt-4 rounded-xl bg-pri-l p-4">
+            <p class="text-xs font-semibold text-warm-800 mb-3">品种钢结构变迁预测（2025→2030E）</p>
+            <div class="space-y-2" id="structShift"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---- SECTION: 七步法 ---- -->
+  <div id="as-sevenstep" class="analysis-section">
+    <div class="section-card mb-6">
+      <div class="section-title"><span class="section-bar bg-pri-600"></span><h2>麦肯锡七步法 — 预测模型构建路径</h2></div>
+      <!-- 7 steps horizontal -->
+      <div class="flex gap-0 overflow-x-auto scrollbar-hide pb-4 mb-6">
+        <div class="flow-step" style="min-width:120px">
+          <div class="w-10 h-10 rounded-full bg-pri-600 text-white text-sm font-bold flex items-center justify-center mb-2">1</div>
+          <div class="text-center px-2"><p class="text-xs font-semibold text-warm-800">定义问题</p><p class="text-[10px] text-warm-400 mt-0.5">未来5-10年用钢量预测</p></div>
+        </div>
+        <div class="flow-step" style="min-width:120px">
+          <div class="w-10 h-10 rounded-full bg-pri-600 text-white text-sm font-bold flex items-center justify-center mb-2">2</div>
+          <div class="text-center px-2"><p class="text-xs font-semibold text-warm-800">分解问题</p><p class="text-[10px] text-warm-400 mt-0.5">MECE逻辑树拆解</p></div>
+        </div>
+        <div class="flow-step" style="min-width:120px">
+          <div class="w-10 h-10 rounded-full bg-acc-400 text-white text-sm font-bold flex items-center justify-center mb-2">3</div>
+          <div class="text-center px-2"><p class="text-xs font-semibold text-warm-800">排定优先级</p><p class="text-[10px] text-warm-400 mt-0.5">影响×不确定性矩阵</p></div>
+        </div>
+        <div class="flow-step" style="min-width:120px">
+          <div class="w-10 h-10 rounded-full bg-acc-400 text-white text-sm font-bold flex items-center justify-center mb-2">4</div>
+          <div class="text-center px-2"><p class="text-xs font-semibold text-warm-800">制定计划</p><p class="text-[10px] text-warm-400 mt-0.5">12周工作时间表</p></div>
+        </div>
+        <div class="flow-step" style="min-width:120px">
+          <div class="w-10 h-10 rounded-full bg-[var(--info)] text-white text-sm font-bold flex items-center justify-center mb-2">5</div>
+          <div class="text-center px-2"><p class="text-xs font-semibold text-warm-800">分析议题</p><p class="text-[10px] text-warm-400 mt-0.5">回归拟合+交叉验证</p></div>
+        </div>
+        <div class="flow-step" style="min-width:120px">
+          <div class="w-10 h-10 rounded-full bg-[var(--info)] text-white text-sm font-bold flex items-center justify-center mb-2">6</div>
+          <div class="text-center px-2"><p class="text-xs font-semibold text-warm-800">综合结果</p><p class="text-[10px] text-warm-400 mt-0.5">总量+品种钢预测</p></div>
+        </div>
+        <div class="flow-step" style="min-width:120px">
+          <div class="w-10 h-10 rounded-full bg-warm-600 text-white text-sm font-bold flex items-center justify-center mb-2">7</div>
+          <div class="text-center px-2"><p class="text-xs font-semibold text-warm-800">提出建议</p><p class="text-[10px] text-warm-400 mt-0.5">P0战略行动清单</p></div>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <!-- Step 3: Priority Matrix -->
+        <div>
+          <p class="text-sm font-semibold text-warm-800 mb-3">Step 3: 关键变量优先级矩阵</p>
+          <div class="rounded-xl border border-[var(--border)] overflow-hidden">
+            <div class="grid grid-cols-2" style="border-bottom:1px solid var(--border)">
+              <div class="p-4 border-r border-[var(--border)]">
+                <p class="text-xs font-semibold text-warm-500 mb-2">重要但不确定</p>
+                <div class="space-y-1">
+                  <div class="text-xs text-warm-600 flex items-center gap-1"><span class="pebble" style="background:#BA7517"></span>氢冶金技术路线</div>
+                  <div class="text-xs text-warm-600 flex items-center gap-1"><span class="pebble" style="background:#BA7517"></span>碳交易价格走势</div>
+                  <div class="text-xs text-warm-600 flex items-center gap-1"><span class="pebble" style="background:#BA7517"></span>铝合金价格趋势</div>
+                </div>
+              </div>
+              <div class="p-4" style="background:#E1F5EE">
+                <p class="text-xs font-semibold text-pri-600 mb-2">★ 关键变量（优先建模）</p>
+                <div class="space-y-1">
+                  <div class="text-xs text-warm-800 font-medium flex items-center gap-1"><span class="pebble bg-pri-600"></span>新能源渗透率</div>
+                  <div class="text-xs text-warm-800 font-medium flex items-center gap-1"><span class="pebble bg-pri-600"></span>AHSS替代速度</div>
+                  <div class="text-xs text-warm-800 font-medium flex items-center gap-1"><span class="pebble bg-pri-600"></span>汽车产销总量预测</div>
+                  <div class="text-xs text-warm-800 font-medium flex items-center gap-1"><span class="pebble bg-pri-600"></span>电工钢需求增速</div>
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-2">
+              <div class="p-4 border-r border-[var(--border)]">
+                <p class="text-xs font-semibold text-warm-500 mb-2">低优先级</p>
+                <div class="space-y-1">
+                  <div class="text-xs text-warm-400 flex items-center gap-1"><span class="pebble bg-warm-200"></span>汽车出口结构变化</div>
+                  <div class="text-xs text-warm-400 flex items-center gap-1"><span class="pebble bg-warm-200"></span>废钢价格</div>
+                </div>
+              </div>
+              <div class="p-4">
+                <p class="text-xs font-semibold text-warm-500 mb-2">基础输入</p>
+                <div class="space-y-1">
+                  <div class="text-xs text-warm-600 flex items-center gap-1"><span class="pebble bg-warm-400"></span>现有产能基数</div>
+                  <div class="text-xs text-warm-600 flex items-center gap-1"><span class="pebble bg-warm-400"></span>历史消费数据</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="text-[10px] text-warm-400 mt-1 text-right">纵轴: 不确定性 / 横轴: 影响力</p>
+        </div>
+
+        <!-- Step 6: Base case total forecast table -->
+        <div>
+          <p class="text-sm font-semibold text-warm-800 mb-3">Step 6: 总量预测（基准情景）</p>
+          <div class="overflow-x-auto">
+            <table class="data-table">
+              <thead>
+                <tr><th>年份</th><th>产量(万辆)</th><th>NEV占比</th><th>单车用钢</th><th>用钢总量</th><th>YoY</th></tr>
+              </thead>
+              <tbody>
+                <tr class="bg-pri-l"><td class="font-medium">2025</td><td>3,150</td><td>52%</td><td>498kg</td><td class="font-semibold text-pri-600">5,240万吨</td><td class="text-pri-600">+2.5%</td></tr>
+                <tr><td>2026</td><td>3,220</td><td>57%</td><td>490kg</td><td>5,220万吨</td><td class="text-acc-600">-0.4%</td></tr>
+                <tr class="bg-acc-l"><td class="font-medium">2027</td><td>3,280</td><td>62%</td><td>482kg</td><td class="font-semibold text-acc-600">5,200万吨 ★峰值</td><td class="text-acc-600">-0.4%</td></tr>
+                <tr><td>2028</td><td>3,330</td><td>68%</td><td>472kg</td><td>5,140万吨</td><td class="text-acc-600">-1.2%</td></tr>
+                <tr><td>2030</td><td>3,400</td><td>78%</td><td>455kg</td><td>4,950万吨</td><td class="text-acc-600">-2.0%</td></tr>
+                <tr><td>2035</td><td>3,600</td><td>88%</td><td>420kg</td><td>4,620万吨</td><td class="text-acc-600">-1.5%</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="text-xs mt-2 p-3 rounded-lg" style="background:#FAEEDA;color:#3D2500">⚠️ 核心发现：虽然汽车产量仍将小幅增长（+0.8% CAGR 2025-2035），但由于新能源化+轻量化，<strong>用钢总量将在2027年前后见顶，之后进入缓慢下降通道</strong>。</p>
+        </div>
+      </div>
+
+      <!-- Step 4 work plan & Step 7 recommendations -->
+      <div class="grid md:grid-cols-2 gap-6 mt-6">
+        <div>
+          <p class="text-sm font-semibold text-warm-800 mb-3">Step 4: 12周工作计划</p>
+          <div class="space-y-2">
+            <div class="flex gap-3 items-center">
+              <span class="text-xs text-warm-400 w-16 shrink-0">Week 1-2</span>
+              <div class="flex-1 rounded-lg border border-[var(--border)] px-3 py-1.5 text-xs text-warm-700">数据采集 — 10年汽车产销/用钢/品种钢数据底表</div>
+            </div>
+            <div class="flex gap-3 items-center">
+              <span class="text-xs text-warm-400 w-16 shrink-0">Week 3-4</span>
+              <div class="flex-1 rounded-lg border border-[var(--border)] px-3 py-1.5 text-xs text-warm-700">变量建模 — 核心自变量（NEV渗透率/AHSS率）预测模型</div>
+            </div>
+            <div class="flex gap-3 items-center">
+              <span class="text-xs text-warm-400 w-16 shrink-0">Week 5-6</span>
+              <div class="flex-1 rounded-lg border border-pri-200 bg-pri-l px-3 py-1.5 text-xs text-pri-600 font-medium">Top-down — 宏观→行业→品种钢需求量</div>
+            </div>
+            <div class="flex gap-3 items-center">
+              <span class="text-xs text-warm-400 w-16 shrink-0">Week 7-8</span>
+              <div class="flex-1 rounded-lg border border-pri-200 bg-pri-l px-3 py-1.5 text-xs text-pri-600 font-medium">Bottom-up — 车型×单车用钢×品种结构</div>
+            </div>
+            <div class="flex gap-3 items-center">
+              <span class="text-xs text-warm-400 w-16 shrink-0">Week 9</span>
+              <div class="flex-1 rounded-lg border border-[var(--border)] px-3 py-1.5 text-xs text-warm-700">交叉验证 — Top-down vs Bottom-up 校准</div>
+            </div>
+            <div class="flex gap-3 items-center">
+              <span class="text-xs text-warm-400 w-16 shrink-0">Week 10</span>
+              <div class="flex-1 rounded-lg border border-[var(--border)] px-3 py-1.5 text-xs text-warm-700">情景分析 — 基准/乐观/悲观/黑天鹅情景报告</div>
+            </div>
+            <div class="flex gap-3 items-center">
+              <span class="text-xs text-warm-400 w-16 shrink-0">Week 11-12</span>
+              <div class="flex-1 rounded-lg border border-acc-200 bg-acc-l px-3 py-1.5 text-xs text-acc-600 font-medium">模型交付 — 可视化仪表盘+分析报告</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <p class="text-sm font-semibold text-warm-800 mb-3">Step 7: 战略建议（优先级排序）</p>
+          <div class="space-y-2">
+            <div class="rounded-xl border border-acc-200 bg-acc-l p-3">
+              <div class="flex items-center gap-2 mb-1"><span class="badge bg-acc-400 text-white text-[10px]">P0</span><p class="text-xs font-semibold text-warm-800">加速AHSS/电工钢产能建设</p></div>
+              <p class="text-[10px] text-warm-500">时间窗口：2026-2028年，抢占结构性增长红利</p>
+            </div>
+            <div class="rounded-xl border border-acc-200 bg-acc-l p-3">
+              <div class="flex items-center gap-2 mb-1"><span class="badge bg-acc-400 text-white text-[10px]">P0</span><p class="text-xs font-semibold text-warm-800">与头部新能源车企建立联合实验室（EVI模式）</p></div>
+              <p class="text-[10px] text-warm-500">时间窗口：2026-2027年，绑定认证壁垒</p>
+            </div>
+            <div class="rounded-xl border border-[var(--border)] p-3">
+              <div class="flex items-center gap-2 mb-1"><span class="badge" style="background:#378ADD;color:white;font-size:10px">P1</span><p class="text-xs font-semibold text-warm-800">落后冷轧产能向高强钢升级改造</p></div>
+              <p class="text-[10px] text-warm-500">时间窗口：2026-2030年</p>
+            </div>
+            <div class="rounded-xl border border-[var(--border)] p-3">
+              <div class="flex items-center gap-2 mb-1"><span class="badge" style="background:#378ADD;color:white;font-size:10px">P1</span><p class="text-xs font-semibold text-warm-800">建立汽车用钢数据中台，打通需求预测</p></div>
+              <p class="text-[10px] text-warm-500">时间窗口：2026-2027年，数字化驱动</p>
+            </div>
+            <div class="rounded-xl border border-[var(--border)] p-3">
+              <div class="flex items-center gap-2 mb-1"><span class="badge bg-warm-200 text-warm-600 text-[10px]">P2</span><p class="text-xs font-semibold text-warm-800">关注铝/碳纤维替代风险，评估产业链延伸</p></div>
+              <p class="text-[10px] text-warm-500">时间窗口：2027-2030年，风险对冲</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---- SECTION: MECE树 ---- -->
+  <div id="as-mece" class="analysis-section">
+    <div class="section-card mb-6">
+      <div class="section-title"><span class="section-bar bg-acc-400"></span><h2>MECE 需求分解树（五维拆解）</h2></div>
+      <div class="grid md:grid-cols-2 gap-6">
+        <!-- Vehicle type decomp -->
+        <div>
+          <p class="text-xs font-semibold text-warm-700 mb-3 flex items-center gap-1.5"><span class="pebble bg-pri-600" style="width:10px;height:10px;border-radius:2px"></span>维度一：按车型分解</p>
+          <div id="meceTree1" class="text-xs space-y-1"></div>
+        </div>
+        <!-- Steel type decomp -->
+        <div>
+          <p class="text-xs font-semibold text-warm-700 mb-3 flex items-center gap-1.5"><span class="pebble bg-acc-400" style="width:10px;height:10px;border-radius:2px"></span>维度三：按钢种分解</p>
+          <div id="meceTree3" class="text-xs space-y-1"></div>
+        </div>
+        <!-- Body part decomp -->
+        <div>
+          <p class="text-xs font-semibold text-warm-700 mb-3 flex items-center gap-1.5"><span class="pebble bg-[var(--info)]" style="width:10px;height:10px;border-radius:2px"></span>维度二：按用钢部位分解</p>
+          <div id="meceTree2" class="text-xs space-y-1"></div>
+        </div>
+        <!-- Region decomp -->
+        <div>
+          <p class="text-xs font-semibold text-warm-700 mb-3 flex items-center gap-1.5"><span class="pebble" style="width:10px;height:10px;border-radius:2px;background:#BA7517"></span>维度五：按区域分解</p>
+          <div id="meceTree5" class="text-xs space-y-1"></div>
+        </div>
+      </div>
+      <!-- Dimension 4 -->
+      <div class="mt-4">
+        <p class="text-xs font-semibold text-warm-700 mb-3 flex items-center gap-1.5"><span class="pebble bg-warm-400" style="width:10px;height:10px;border-radius:2px"></span>维度四：按驱动力分解（品种钢结构变迁预测）</p>
+        <div class="overflow-x-auto">
+          <table class="data-table">
+            <thead>
+              <tr><th>品种</th><th>2025占比</th><th>2030E占比</th><th>增量（万吨）</th><th>主要驱动力</th></tr>
+            </thead>
+            <tbody>
+              <tr class="bg-pri-l"><td class="font-medium">热成型钢 (PHS)</td><td>8%</td><td>18%</td><td class="text-pri-600 font-medium">+550</td><td>安全法规+结构件高强化</td></tr>
+              <tr class="bg-pri-l"><td class="font-medium">第三代AHSS (QP/中锰)</td><td>2%</td><td>10%</td><td class="text-pri-600 font-medium">+440</td><td>轻量化+强度提升</td></tr>
+              <tr class="bg-pri-l"><td class="font-medium">电工钢（无取向）</td><td>5%</td><td>10%</td><td class="text-pri-600 font-medium">+330</td><td>新能源车驱动电机</td></tr>
+              <tr><td>镀锌GI/GA</td><td>30%</td><td>28%</td><td>+30</td><td>车身外板防腐需求</td></tr>
+              <tr><td class="text-warm-400">冷轧O5板</td><td>15%</td><td>10%</td><td class="text-acc-600">-220</td><td>被AHSS替代</td></tr>
+              <tr><td class="text-warm-400">DP/CP/TRIP</td><td>20%</td><td>10%</td><td class="text-acc-600">-480</td><td>被第三代AHSS替代</td></tr>
+              <tr><td class="text-warm-400">低碳/IF钢</td><td>19%</td><td>12%</td><td class="text-acc-600">-310</td><td>被高强钢替代</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---- SECTION: Model Architecture ---- -->
+  <div id="as-modelarch" class="analysis-section">
+    <div class="section-card mb-6">
+      <div class="section-title"><span class="section-bar bg-[var(--info)]"></span><h2>预测模型架构设计</h2></div>
+
+      <!-- Architecture diagram -->
+      <div class="mb-6">
+        <p class="text-xs font-semibold text-warm-700 mb-3">总体三层架构（输入层 → 模型层 → 输出层）</p>
+        <div class="space-y-2">
+          <!-- Input layer -->
+          <div class="rounded-xl border border-[var(--border)] p-4">
+            <p class="text-xs font-semibold text-warm-500 mb-3">输入层 INPUT LAYER</p>
+            <div class="grid grid-cols-3 gap-3">
+              <div class="arch-box text-center">
+                <p class="font-medium text-warm-800 mb-1">宏观数据流</p>
+                <p class="text-[11px] text-warm-500">GDP/PMI/社零<br>基建投资/房地产<br>铁矿石/焦煤价格</p>
+              </div>
+              <div class="arch-box text-center">
+                <p class="font-medium text-warm-800 mb-1">行业数据流</p>
+                <p class="text-[11px] text-warm-500">汽车产销/认证<br>新能源渗透率<br>车型结构</p>
+              </div>
+              <div class="arch-box text-center">
+                <p class="font-medium text-warm-800 mb-1">企业数据流</p>
+                <p class="text-[11px] text-warm-500">钢企产销/开工率<br>库存/订单<br>品种钢产能</p>
+              </div>
+            </div>
+          </div>
+          <!-- Feature engineering -->
+          <div class="flex justify-center"><div class="arch-arrow">↓</div></div>
+          <div class="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-3">
+            <p class="text-xs font-semibold text-warm-500 text-center">特征工程 FEATURE ENGINEERING</p>
+            <p class="text-[11px] text-warm-400 text-center mt-1">滞后项 / 同比环比 / 移动平均 / 季节性调整 / 品种钢系数</p>
+          </div>
+          <!-- Model layer -->
+          <div class="flex justify-center"><div class="arch-arrow">↓</div></div>
+          <div class="grid grid-cols-3 gap-3">
+            <div class="rounded-xl border border-pri-200 bg-pri-l p-4">
+              <p class="text-xs font-semibold text-pri-600 mb-2">Top-down 模型</p>
+              <p class="text-[11px] text-warm-600">宏观→汽车产量<br>→用钢总量<br>→品种钢总量</p>
+              <p class="text-[10px] font-mono mt-2 text-pri-600">Q = V × W_avg × (1-R_al)</p>
+            </div>
+            <div class="rounded-xl border border-acc-200 bg-acc-l p-4">
+              <p class="text-xs font-semibold text-acc-600 mb-2">Bottom-up 模型</p>
+              <p class="text-[11px] text-warm-600">车型→单车用钢<br>→品种钢量<br>→汇总验证</p>
+              <p class="text-[10px] font-mono mt-2 text-acc-600">Q = Σᵢ Vᵢ × Wᵢ,ⱼ(t)</p>
+            </div>
+            <div class="rounded-xl border border-[var(--border)] p-4" style="border-color:#B5D5F5">
+              <p class="text-xs font-semibold mb-2" style="color:#378ADD">ML 辅助模型</p>
+              <p class="text-[11px] text-warm-600">XGBoost/LSTM<br>非线性关系捕获<br>残差修正+异常检测</p>
+            </div>
+          </div>
+          <!-- Ensemble -->
+          <div class="flex justify-center"><div class="arch-arrow">↓</div></div>
+          <div class="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-3">
+            <p class="text-xs font-semibold text-warm-500 text-center">集成层 ENSEMBLE LAYER</p>
+            <p class="text-[11px] text-warm-400 text-center mt-1">加权平均 / 动态权重 / 贝叶斯模型平均 / 残差融合</p>
+          </div>
+          <!-- Output -->
+          <div class="flex justify-center"><div class="arch-arrow">↓</div></div>
+          <div class="rounded-xl border border-pri-200 bg-pri-l p-3">
+            <p class="text-xs font-semibold text-pri-600 text-center">输出层 OUTPUT LAYER</p>
+            <p class="text-[11px] text-warm-600 text-center mt-1">总量预测 / 品种钢预测 / 区域预测 / 置信区间 / 情景分析</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Key formulas -->
+      <div class="grid md:grid-cols-2 gap-4 mb-5">
+        <div class="rounded-xl border border-[var(--border)] p-4">
+          <p class="text-xs font-semibold text-warm-800 mb-3">Top-down 核心公式</p>
+          <div class="bg-warm-900 rounded-lg p-3 font-mono text-xs text-green-300 space-y-1">
+            <p>Q(t) = V(t) × W_avg(t) × (1 - R_al(t))</p>
+            <p class="text-warm-400">V(t): 汽车产量 (万辆)</p>
+            <p class="text-warm-400">W_avg: 单车平均用钢量 (kg)</p>
+            <p class="text-warm-400">R_al: 铝替代率</p>
+            <p class="text-warm-200 mt-2">W_avg(t) = W_ICE × (1-NEV%) + W_EV × NEV%</p>
+          </div>
+        </div>
+        <div class="rounded-xl border border-[var(--border)] p-4">
+          <p class="text-xs font-semibold text-warm-800 mb-3">Bottom-up 核心公式</p>
+          <div class="bg-warm-900 rounded-lg p-3 font-mono text-xs text-green-300 space-y-1">
+            <p>Q(t) = Σᵢ [ Vᵢ(t) × Wᵢ,ⱼ(t) ]</p>
+            <p class="text-warm-400">i = 车型 (乘用/商用/专用)</p>
+            <p class="text-warm-400">j = 部位 (白车身/底盘/动力...)</p>
+            <p class="text-warm-200 mt-2">Q_grade_k = Σᵢ Vᵢ × Wᵢ × Penetration_i,k</p>
+            <p class="text-warm-400">k = 品种钢 (AHSS/电工钢/冷轧...)</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ML methods + Validation -->
+      <div class="grid md:grid-cols-2 gap-4">
+        <div>
+          <p class="text-xs font-semibold text-warm-800 mb-3">ML增强方法</p>
+          <table class="data-table">
+            <thead><tr><th>方法</th><th>用途</th></tr></thead>
+            <tbody>
+              <tr><td class="font-medium">XGBoost/LightGBM</td><td>捕捉非线性关系，特征重要性可解释</td></tr>
+              <tr><td class="font-medium">LSTM/Transformer</td><td>时间序列（季节性+长周期）</td></tr>
+              <tr><td class="font-medium">Prophet</td><td>基准预测（节假日/季节性）</td></tr>
+              <tr><td class="font-medium">贝叶斯结构时间序列</td><td>因果推断（政策变化量化）</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <p class="text-xs font-semibold text-warm-800 mb-3">模型验证框架</p>
+          <table class="data-table">
+            <thead><tr><th>方法</th><th>说明</th></tr></thead>
+            <tbody>
+              <tr><td class="font-medium">回测(Backtesting)</td><td>2015-2024训练→预测2025对比实际</td></tr>
+              <tr><td class="font-medium">滚动验证</td><td>滚动窗口评估稳定性</td></tr>
+              <tr><td class="font-medium">敏感性分析</td><td>关键变量±10%，观察输出变化</td></tr>
+              <tr><td class="font-medium">Top-down×Bottom-up交叉验证</td><td>两路预测结果比对校准</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---- SECTION: Scenario ---- -->
+  <div id="as-scenario" class="analysis-section">
+    <div class="section-card mb-6">
+      <div class="section-title"><span class="section-bar bg-[var(--warn)]"></span><h2>情景规划与风险矩阵</h2></div>
+
+      <!-- Scenario comparison table -->
+      <div class="overflow-x-auto mb-6">
+        <table class="data-table">
+          <thead>
+            <tr><th>情景</th><th>核心假设</th><th>2030年产量</th><th>2030年用钢量</th><th>品种钢需求偏移</th></tr>
+          </thead>
+          <tbody>
+            <tr class="bg-pri-l"><td><span class="badge bg-pri-600 text-white">🟢 基准情景</span></td><td>NEV渗透率78%，GDP 4.5%</td><td>3,400万辆</td><td class="font-semibold text-pri-600">4,950万吨</td><td>基准</td></tr>
+            <tr style="background:#E6F1FB"><td><span class="badge text-white" style="background:#378ADD">🟡 乐观情景</span></td><td>汽车出口高增，NEV渗透率85%</td><td>3,700万辆</td><td class="font-semibold" style="color:#378ADD">5,200万吨</td><td>电工钢/AHSS需求+20%</td></tr>
+            <tr class="bg-acc-l"><td><span class="badge bg-acc-400 text-white">🔴 悲观情景</span></td><td>贸易摩擦升级，NEV渗透率70%</td><td>3,100万辆</td><td class="font-semibold text-acc-600">4,600万吨</td><td>总量萎缩，品种钢增速放缓</td></tr>
+            <tr style="background:#F1EFE8"><td><span class="badge bg-warm-800 text-white">⚫ 黑天鹅</span></td><td>铝价暴跌50%，铝替代率30%</td><td>3,300万辆</td><td class="font-semibold text-warm-600">3,800万吨</td><td>普通钢需求大幅萎缩</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Scenario chart + Risk matrix -->
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <p class="text-xs font-semibold text-warm-700 mb-3">情景规划图（2026-2030）</p>
+          <div style="position:relative;height:280px"><canvas id="scenarioChart"></canvas></div>
+        </div>
+        <div>
+          <p class="text-xs font-semibold text-warm-700 mb-3">风险矩阵（概率 × 影响）</p>
+          <div id="riskMatrix" class="space-y-3"></div>
+        </div>
+      </div>
+
+      <!-- Risk response strategies -->
+      <div class="mt-6">
+        <p class="text-xs font-semibold text-warm-700 mb-3">关键风险应对策略</p>
+        <div class="grid md:grid-cols-2 gap-3">
+          <div class="rounded-xl border border-acc-200 bg-acc-l p-4">
+            <div class="flex items-center gap-2 mb-2"><span class="badge bg-acc-400 text-white text-[10px]">R1 高危</span><p class="text-xs font-semibold text-warm-800">新能源技术路线突变</p></div>
+            <p class="text-xs text-warm-500">固态电池→取消电机→无电工钢需求<br><strong>应对：</strong>技术跟踪+多元化产品布局，不过度押注单一品种</p>
+          </div>
+          <div class="rounded-xl border border-acc-200 bg-acc-l p-4">
+            <div class="flex items-center gap-2 mb-2"><span class="badge bg-acc-400 text-white text-[10px]">R2 高危</span><p class="text-xs font-semibold text-warm-800">铝价大幅下跌，替代超预期</p></div>
+            <p class="text-xs text-warm-500">铝替代率达30%将严重压缩车身用钢<br><strong>应对：</strong>向下游铝加工延伸对冲，研发钢铝复合材料</p>
+          </div>
+          <div class="rounded-xl border border-[var(--border)] p-4">
+            <div class="flex items-center gap-2 mb-2"><span class="badge" style="background:#BA7517;color:white;font-size:10px">R4 中危</span><p class="text-xs font-semibold text-warm-800">碳交易价格飙升</p></div>
+            <p class="text-xs text-warm-500">高炉钢成本剧增，绿钢溢价出现<br><strong>应对：</strong>加速绿钢布局+电炉产能建设，提前布局碳资产</p>
+          </div>
+          <div class="rounded-xl border border-[var(--border)] p-4">
+            <div class="flex items-center gap-2 mb-2"><span class="badge" style="background:#BA7517;color:white;font-size:10px">R7 中危</span><p class="text-xs font-semibold text-warm-800">一体化压铸普及超预期</p></div>
+            <p class="text-xs text-warm-500">压铸技术快速扩散，单车用钢量下降加速<br><strong>应对：</strong>与压铸企业合作开发专用钢材，填充件用材</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---- SECTION: KPI体系 ---- -->
+  <div id="as-kpi" class="analysis-section">
+    <div class="section-card mb-6">
+      <div class="section-title"><span class="section-bar bg-[var(--info)]"></span><h2>数据指标体系 · 数据库分层架构</h2></div>
+
+      <!-- Architecture layers -->
+      <div class="space-y-2 mb-6">
+        <div class="rounded-xl border border-[var(--border)] p-4 text-center" style="background:#E6F1FB;border-color:#B5D5F5">
+          <p class="text-xs font-semibold" style="color:#378ADD">展现层 DASHBOARD</p>
+          <p class="text-[11px] text-warm-500 mt-1">Grafana / PowerBI / 自研可视化 · 总量仪表盘 · 品种钢仪表盘 · 情景分析仪表盘</p>
+        </div>
+        <div class="flex justify-center"><div class="arch-arrow">↕</div></div>
+        <div class="rounded-xl border border-[var(--border)] p-4 text-center bg-pri-l" style="border-color:#9FE1CB">
+          <p class="text-xs font-semibold text-pri-600">应用层 APPLICATION</p>
+          <p class="text-[11px] text-warm-500 mt-1">预测引擎 / 情景生成器 / 预警系统 / 报告生成</p>
+        </div>
+        <div class="flex justify-center"><div class="arch-arrow">↕</div></div>
+        <div class="rounded-xl border border-acc-200 p-4 text-center bg-acc-l">
+          <p class="text-xs font-semibold text-acc-600">模型层 MODEL</p>
+          <p class="text-[11px] text-warm-500 mt-1">Top-down / Bottom-up / ML / Ensemble</p>
+        </div>
+        <div class="flex justify-center"><div class="arch-arrow">↕</div></div>
+        <div class="rounded-xl border border-[var(--border)] p-4 text-center bg-[var(--bg)]">
+          <p class="text-xs font-semibold text-warm-700">数据层 DATA</p>
+          <p class="text-[11px] text-warm-500 mt-1">MySQL/PostgreSQL / ClickHouse（时序数据）</p>
+        </div>
+      </div>
+
+      <!-- KPI Tables -->
+      <div class="mb-4">
+        <p class="text-xs font-semibold text-warm-800 mb-2 flex items-center gap-2"><span class="badge bg-pri-600 text-white text-[10px]">一级指标</span>决策层</p>
+        <div class="overflow-x-auto">
+          <table class="data-table">
+            <thead><tr><th>指标</th><th>口径</th><th>频率</th><th>来源</th></tr></thead>
+            <tbody>
+              <tr><td class="font-medium">汽车用钢总需求（万吨）</td><td>Σ车型产量×单车用钢</td><td>月/季/年</td><td>模型预测</td></tr>
+              <tr><td class="font-medium">品种钢需求结构占比</td><td>各品种/总量</td><td>季/年</td><td>模型预测</td></tr>
+              <tr><td class="font-medium">新能源车用钢占比</td><td>EV用钢/总用钢</td><td>季/年</td><td>模型预测</td></tr>
+              <tr><td class="font-medium">用钢需求增速 YoY</td><td>(本期-上期)/上期</td><td>月</td><td>计算</td></tr>
+              <tr><td class="font-medium">预测偏差率</td><td>(实际-预测)/实际</td><td>月</td><td>对标</td></tr>
+              <tr><td class="font-medium">电工钢供需缺口</td><td>需求-供应</td><td>季</td><td>模型+行业数据</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <p class="text-xs font-semibold text-warm-800 mb-2 flex items-center gap-2"><span class="badge text-white text-[10px]" style="background:#378ADD">二级指标</span>监控层</p>
+        <div class="overflow-x-auto">
+          <table class="data-table">
+            <thead><tr><th>指标</th><th>口径</th><th>频率</th><th>来源</th></tr></thead>
+            <tbody>
+              <tr><td class="font-medium">汽车产量（分车型）</td><td>中汽协/乘联会</td><td>月</td><td>外部数据</td></tr>
+              <tr><td class="font-medium">新能源渗透率</td><td>EV+PHEV/总销量</td><td>月</td><td>乘联会</td></tr>
+              <tr><td class="font-medium">单车用钢量（分车型）</td><td>按车型统计均值</td><td>年</td><td>行业调研</td></tr>
+              <tr><td class="font-medium">AHSS渗透率</td><td>AHSS/白车身用钢</td><td>年</td><td>行业报告</td></tr>
+              <tr><td class="font-medium">铝替代率</td><td>铝用量等效钢量/白车身</td><td>年</td><td>行业报告</td></tr>
+              <tr><td class="font-medium">铁矿石/焦煤价格</td><td>普氏62%/主焦煤</td><td>周</td><td>公开市场</td></tr>
+              <tr><td class="font-medium">碳交易价格</td><td>全国碳市场</td><td>日</td><td>公开市场</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <p class="text-xs font-semibold text-warm-800 mb-2 flex items-center gap-2"><span class="badge bg-warm-600 text-white text-[10px]">三级指标</span>明细层</p>
+        <div class="grid md:grid-cols-3 gap-3">
+          <div class="rounded-lg border border-[var(--border)] p-3"><p class="text-xs font-semibold text-warm-700 mb-1">按车型</p><p class="text-[11px] text-warm-500">比亚迪秦单车用钢、特斯拉Model Y各部位用钢</p></div>
+          <div class="rounded-lg border border-[var(--border)] p-3"><p class="text-xs font-semibold text-warm-700 mb-1">按钢种</p><p class="text-[11px] text-warm-500">QP980出货量、高牌号电工钢（如20TGW）产量</p></div>
+          <div class="rounded-lg border border-[var(--border)] p-3"><p class="text-xs font-semibold text-warm-700 mb-1">按客户</p><p class="text-[11px] text-warm-500">宝钢→上汽供货量、首钢→长城供货量</p></div>
+          <div class="rounded-lg border border-[var(--border)] p-3"><p class="text-xs font-semibold text-warm-700 mb-1">按区域</p><p class="text-[11px] text-warm-500">华东汽车板表观消费、华南电工钢缺口</p></div>
+          <div class="rounded-lg border border-[var(--border)] p-3"><p class="text-xs font-semibold text-warm-700 mb-1">按部位</p><p class="text-[11px] text-warm-500">白车身用钢、底盘用钢、电机硅钢</p></div>
+        </div>
+      </div>
+
+      <!-- Data sources -->
+      <div>
+        <p class="text-xs font-semibold text-warm-800 mb-3">数据采集源规划</p>
+        <div class="overflow-x-auto">
+          <table class="data-table">
+            <thead><tr><th>数据类别</th><th>来源</th><th>采集方式</th><th>更新频率</th></tr></thead>
+            <tbody>
+              <tr><td class="font-medium">汽车产销</td><td>中汽协/乘联会</td><td>API/爬虫</td><td>月</td></tr>
+              <tr><td class="font-medium">新能源数据</td><td>乘联会/各车企公告</td><td>API/爬虫</td><td>月</td></tr>
+              <tr><td class="font-medium">钢铁产量</td><td>中钢协/钢联</td><td>API/爬虫</td><td>月/周</td></tr>
+              <tr><td class="font-medium">原材料价格</td><td>普氏/钢联/大商所</td><td>API</td><td>日/周</td></tr>
+              <tr><td class="font-medium">品种钢数据</td><td>钢企年报/行业报告</td><td>手动+爬虫</td><td>季/年</td></tr>
+              <tr><td class="font-medium">国际贸易</td><td>海关总署/UN Comtrade</td><td>API</td><td>月</td></tr>
+              <tr><td class="font-medium">宏观数据</td><td>国家统计局/央行</td><td>API</td><td>季/月</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---- SECTION: Conclusion ---- -->
+  <div id="as-conclusion" class="analysis-section">
+    <div class="grid md:grid-cols-2 gap-6 mb-6">
+      <!-- Core conclusion box -->
+      <div class="section-card">
+        <div class="section-title"><span class="section-bar bg-pri-600"></span><h2>核心判断矩阵</h2></div>
+        <div class="rounded-2xl border-2 border-pri-600 p-6 text-center mb-4" style="background:linear-gradient(135deg,#E1F5EE,#FAFAF8)">
+          <p class="text-2xl font-bold text-warm-900 mb-2">"量减质升"</p>
+          <p class="text-sm text-warm-600">是汽车用钢的确定性趋势</p>
+        </div>
+        <div class="space-y-3">
+          <div class="flex gap-3 items-start p-3 rounded-xl bg-[var(--bg)]">
+            <span class="text-xl">📉</span>
+            <div><p class="text-sm font-semibold text-warm-900">总量：2027前后见顶 → 缓慢下降</p><p class="text-xs text-warm-500 mt-0.5">峰值约5,200万吨，之后年降1~2%，至2035年约4,620万吨</p></div>
+          </div>
+          <div class="flex gap-3 items-start p-3 rounded-xl bg-[var(--bg)]">
+            <span class="text-xl">📈</span>
+            <div><p class="text-sm font-semibold text-warm-900">结构：AHSS + 电工钢 = 结构性增长引擎</p><p class="text-xs text-warm-500 mt-0.5">热成型钢/QP钢/电工钢合计增量超1,300万吨（2025→2030）</p></div>
+          </div>
+          <div class="flex gap-3 items-start p-3 rounded-xl bg-pri-l">
+            <span class="text-xl">🎯</span>
+            <div><p class="text-sm font-semibold text-pri-600">机会窗口：2026-2028年</p><p class="text-xs text-warm-500 mt-0.5">品种钢扩产+整车厂认证+EVI联合研发的战略窗口期</p></div>
+          </div>
+          <div class="flex gap-3 items-start p-3 rounded-xl bg-acc-l">
+            <span class="text-xl">⚠️</span>
+            <div><p class="text-sm font-semibold text-acc-600">风险窗口：2028-2030年</p><p class="text-xs text-warm-500 mt-0.5">替代材料加速渗透，一体化压铸进入规模化阶段</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 90-day action plan -->
+      <div class="section-card">
+        <div class="section-title"><span class="section-bar bg-acc-400"></span><h2>90天行动清单</h2></div>
+        <div class="space-y-2">
+          <div class="flex gap-3 items-start p-3 rounded-xl border border-acc-200 bg-acc-l">
+            <div><p class="text-[10px] text-acc-600 font-bold mb-1">P0 · 数据团队</p><p class="text-xs font-semibold text-warm-900">搭建汽车用钢数据底表（10年历史+关键变量）</p><p class="text-[11px] text-warm-500 mt-0.5">产出：数据仓库初版，覆盖用钢量/产量/NEV渗透率</p></div>
+          </div>
+          <div class="flex gap-3 items-start p-3 rounded-xl border border-acc-200 bg-acc-l">
+            <div><p class="text-[10px] text-acc-600 font-bold mb-1">P0 · 分析团队</p><p class="text-xs font-semibold text-warm-900">建立新能源渗透率预测模型（S曲线拟合）</p><p class="text-[11px] text-warm-500 mt-0.5">产出：2026-2035年NEV渗透率预测区间</p></div>
+          </div>
+          <div class="flex gap-3 items-start p-3 rounded-xl border border-acc-200 bg-acc-l">
+            <div><p class="text-[10px] text-acc-600 font-bold mb-1">P0 · 产业研究</p><p class="text-xs font-semibold text-warm-900">完成品种钢渗透率技术曲线调研</p><p class="text-[11px] text-warm-500 mt-0.5">产出：热成型钢/QP钢/电工钢技术曲线报告</p></div>
+          </div>
+          <div class="flex gap-3 items-start p-3 rounded-xl border border-[var(--border)]">
+            <div><p class="text-[10px] text-warm-500 font-bold mb-1">P1 · 数据科学</p><p class="text-xs font-semibold text-warm-900">开发Top-down需求预测模型V1</p><p class="text-[11px] text-warm-500 mt-0.5">产出：2026-2030预测初稿（含置信区间）</p></div>
+          </div>
+          <div class="flex gap-3 items-start p-3 rounded-xl border border-[var(--border)]">
+            <div><p class="text-[10px] text-warm-500 font-bold mb-1">P1 · 产业研究</p><p class="text-xs font-semibold text-warm-900">访谈3-5家头部新能源车企材料工程师</p><p class="text-[11px] text-warm-500 mt-0.5">产出：需求端定性验证报告</p></div>
+          </div>
+          <div class="flex gap-3 items-start p-3 rounded-xl border border-[var(--border)]">
+            <div><p class="text-[10px] text-warm-500 font-bold mb-1">P2 · 数据科学</p><p class="text-xs font-semibold text-warm-900">建立情景分析框架与灵敏度测试</p><p class="text-[11px] text-warm-500 mt-0.5">产出：情景引擎（基准/乐观/悲观/黑天鹅）</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key assumptions appendix -->
+    <div class="section-card">
+      <div class="section-title"><span class="section-bar bg-warm-400"></span><h2>关键假设清单（附录）</h2></div>
+      <div class="overflow-x-auto">
+        <table class="data-table">
+          <thead><tr><th>#</th><th>假设</th><th>基准值</th><th>敏感性</th></tr></thead>
+          <tbody>
+            <tr><td>A1</td><td>中国GDP增速（2025-2035 CAGR）</td><td>4.0%</td><td><span class="badge bg-acc-l text-acc-600">高</span></td></tr>
+            <tr><td>A2</td><td>新能源渗透率2030E</td><td>78%</td><td><span class="badge bg-acc-400 text-white">极高</span></td></tr>
+            <tr><td>A3</td><td>汽车产量2030E</td><td>3,400万辆</td><td><span class="badge bg-acc-l text-acc-600">高</span></td></tr>
+            <tr><td>A4</td><td>燃油车年均减重率</td><td>0.8%/年</td><td>中</td></tr>
+            <tr><td>A5</td><td>新能源车年均减重率</td><td>2.5%/年</td><td><span class="badge bg-acc-400 text-white">极高</span></td></tr>
+            <tr><td>A6</td><td>铝替代率2030E</td><td>12%</td><td><span class="badge bg-acc-l text-acc-600">高</span></td></tr>
+            <tr><td>A7</td><td>一体化压铸渗透率2030E</td><td>35%</td><td>中</td></tr>
+            <tr><td>A8</td><td>电工钢单车用量（EV）</td><td>75kg/辆</td><td><span class="badge bg-acc-l text-acc-600">高</span></td></tr>
+            <tr><td>A9</td><td>碳交易价格2030E</td><td>150元/吨</td><td>中</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end tab-analysis -->
+
+<!-- ==================== TAB 2: INTERACTIVE MODEL ==================== -->
+<div id="tab-model" class="hidden fade-in">
+
+  <!-- Model Sub-navigation -->
+  <div class="flex gap-2 overflow-x-auto scrollbar-hide pb-3 mb-5" id="modelSubNav">
+    <button class="model-sub-tab active" onclick="switchModelTab('overview')">预测总览</button>
+    <button class="model-sub-tab" onclick="switchModelTab('interact')">交互预测</button>
+    <button class="model-sub-tab" onclick="switchModelTab('compare')">模型对比</button>
+    <button class="model-sub-tab" onclick="switchModelTab('variety')">品种结构</button>
+    <button class="model-sub-tab" onclick="switchModelTab('scenario')">情景分析</button>
+  </div>
+
+  <!-- ========== SUB: 预测总览 ========== -->
+  <div id="ms-overview" class="model-section active">
+
+    <!-- Summary cards -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-5" id="overviewCards"></div>
+
+    <!-- Model comparison radar chart -->
+    <div class="grid md:grid-cols-2 gap-5 mb-5">
+      <div class="section-card">
+        <div class="section-title"><span class="section-bar bg-pri-600"></span><h2>2030年预测对比</h2></div>
+        <div style="position:relative;height:320px"><canvas id="overviewBarChart"></canvas></div>
+      </div>
+      <div class="section-card">
+        <div class="section-title"><span class="section-bar bg-acc-400"></span><h2>模型精度雷达图</h2></div>
+        <div style="position:relative;height:320px"><canvas id="overviewRadarChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Detail table -->
+    <div class="section-card">
+      <div class="section-title"><span class="section-bar bg-pri-600"></span><h2>模型预测详细对比</h2></div>
+      <div class="overflow-x-auto">
+        <table class="data-table" id="overviewTable">
+          <thead><tr><th>模型</th><th>R²</th><th>MAPE</th><th>RMSE</th><th>2026E</th><th>2030E</th><th>峰值年</th><th>峰值(万吨)</th><th>趋势判断</th></tr></thead>
+          <tbody id="overviewTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== SUB: 交互预测 ========== -->
+  <div id="ms-interact" class="model-section">
+
+  <!-- Model Selector + Accuracy -->
+  <div class="grid md:grid-cols-3 gap-4 mb-6">
+    <div class="md:col-span-2 section-card">
+      <div class="section-title"><span class="section-bar bg-pri-600"></span><h2>预测模型选择</h2></div>
+      <div class="flex flex-wrap gap-2 mb-4" id="modelTabs">
+        <button class="model-tab active" data-idx="0" onclick="selectModel(0)">线性回归
+          <span class="tooltip-trigger">?<span class="tooltip-box"><strong>多元线性回归</strong><br>Q = β₀ + β₁·产量 + β₂·渗透率<br><br>使用最小二乘法拟合历史数据，假设用钢量与产量和新能源渗透率呈线性关系。适用于短期预测和参数敏感性分析。</span></span>
+        </button>
+        <button class="model-tab" data-idx="1" onclick="selectModel(1)">结构分解
+          <span class="tooltip-trigger">?<span class="tooltip-box"><strong>自下而上结构分解</strong><br>Q = Σ(车型产量 × 单车用钢量)<br><br>按乘用车/商用车、燃油/新能源分别计算单车用钢量后汇总。最贴近实际业务逻辑的模型，适合分析品种钢需求。</span></span>
+        </button>
+        <button class="model-tab" data-idx="2" onclick="selectModel(2)">S曲线模型
+          <span class="tooltip-trigger">?<span class="tooltip-box"><strong>逻辑斯蒂S曲线</strong><br>NEV渗透率 = L / (1 + e^{-k(t-t₀)})<br><br>新能源渗透率遵循S曲线增长规律，结合结构分解计算用钢量。适合中长期趋势预测。</span></span>
+        </button>
+        <button class="model-tab" data-idx="3" onclick="selectModel(3)">多项式回归
+          <span class="tooltip-trigger">?<span class="tooltip-box"><strong>三阶多项式拟合</strong><br>Q = a₀ + a₁t + a₂t² + a₃t³<br><br>对历史用钢量做时间序列多项式拟合，捕捉非线性趋势。拟合度高但外推风险大。</span></span>
+        </button>
+        <button class="model-tab" data-idx="4" onclick="selectModel(4)">集成模型
+          <span class="tooltip-trigger">?<span class="tooltip-box"><strong>加权集成预测</strong><br>Q = w₁·M₁ + w₂·M₂ + w₃·M₃<br><br>综合多个模型的加权平均，降低单一模型偏差。根据各模型R²分配权重，支持手动调节。</span></span>
+        </button>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="bg-pri-l rounded-lg p-3 text-center">
+          <p class="text-[10px] text-warm-400 mb-1">R² 拟合优度</p>
+          <p class="text-xl font-bold text-pri-600" style="font-family:'DM Sans'" id="m_r2">-</p>
+        </div>
+        <div class="bg-[var(--bg)] rounded-lg p-3 text-center">
+          <p class="text-[10px] text-warm-400 mb-1">MAPE 平均误差</p>
+          <p class="text-xl font-bold text-warm-800" style="font-family:'DM Sans'" id="m_mape">-</p>
+        </div>
+        <div class="bg-[var(--bg)] rounded-lg p-3 text-center">
+          <p class="text-[10px] text-warm-400 mb-1">RMSE 均方根误差</p>
+          <p class="text-xl font-bold text-warm-800" style="font-family:'DM Sans'" id="m_rmse">-</p>
+        </div>
+        <div class="bg-acc-l rounded-lg p-3 text-center">
+          <p class="text-[10px] text-warm-400 mb-1">2030预测值</p>
+          <p class="text-xl font-bold text-acc-600" style="font-family:'DM Sans'" id="mPred">-</p>
+        </div>
+      </div>
+    </div>
+    <!-- Lock/Compare Panel -->
+    <div class="section-card">
+      <div class="section-title"><span class="section-bar bg-acc-400"></span><h2>参数对比</h2></div>
+      <button id="lockBtn" onclick="toggleLock()" class="w-full py-2.5 rounded-lg text-sm font-medium border-2 border-dashed border-acc-200 text-acc-600 hover:bg-acc-l transition mb-4">
+        锁定当前预测作为基准
+      </button>
+      <div id="lockStatus" class="text-xs text-warm-400 mb-3">尚未锁定基准</div>
+      <div id="comparisonPanel" class="hidden">
+        <div class="text-xs font-medium text-warm-600 mb-2">基准 vs 当前差异</div>
+        <div id="compRows"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Parameter Sliders + Chart -->
+  <div class="grid md:grid-cols-12 gap-6 mb-6">
+    <div class="md:col-span-4 section-card">
+      <div class="section-title">
+        <span class="section-bar bg-pri-600"></span><h2>参数调节</h2>
+        <span class="tooltip-trigger" style="margin-left:auto">?<span class="tooltip-box">调节参数后模型将实时更新预测结果。点击"锁定基准"可保存当前预测，方便对比参数调整前后的差异。</span></span>
+      </div>
+      <div class="space-y-5" id="slidersContainer">
+        <!-- Model description box -->
+        <div id="modelDescBox" class="rounded-xl p-3 bg-warm-50 border border-[var(--border)] text-xs text-warm-600 leading-relaxed" style="background:#F5F4F1"></div>
+        <!-- Core sliders -->
+        <div class="slider-group">
+          <label>2025年产量基准<span class="val text-pri-600 font-semibold">3453万辆</span></label>
+          <input type="range" id="sl_prod" min="2500" max="4500" step="50" value="3453">
+        </div>
+        <div class="slider-group">
+          <label>2025年NEV渗透率<span class="val text-pri-600 font-semibold">47.9%</span></label>
+          <input type="range" id="sl_nev" min="30" max="95" step="0.5" value="47.9">
+        </div>
+        <div class="slider-group">
+          <label>燃油车单车用钢 W_ICE<span class="val text-pri-600 font-semibold">540kg</span></label>
+          <input type="range" id="sl_wice" min="450" max="620" step="5" value="540">
+        </div>
+        <div class="slider-group">
+          <label>新能源车单车用钢 W_EV<span class="val text-pri-600 font-semibold">450kg</span></label>
+          <input type="range" id="sl_wev" min="350" max="530" step="5" value="450">
+        </div>
+        <div class="slider-group">
+          <label>铝替代修正系数<span class="val text-pri-600 font-semibold">8%</span></label>
+          <input type="range" id="sl_al" min="0" max="25" step="1" value="8">
+        </div>
+        <!-- Ensemble weights (only shown for model 4) -->
+        <div id="ensembleWeights" style="display:none">
+          <p class="text-xs font-semibold text-warm-700 mb-3">集成权重调节</p>
+          <div class="space-y-3">
+            <div class="slider-group">
+              <label>线性回归权重<span class="val text-pri-600 font-semibold">3</span></label>
+              <input type="range" id="sl_w1" min="0" max="10" step="1" value="3">
+            </div>
+            <div class="slider-group">
+              <label>结构分解权重<span class="val text-pri-600 font-semibold">3</span></label>
+              <input type="range" id="sl_w2" min="0" max="10" step="1" value="3">
+            </div>
+            <div class="slider-group">
+              <label>S曲线权重<span class="val text-pri-600 font-semibold">2</span></label>
+              <input type="range" id="sl_w3" min="0" max="10" step="1" value="2">
+            </div>
+            <div class="slider-group">
+              <label>多项式权重<span class="val text-pri-600 font-semibold">2</span></label>
+              <input type="range" id="sl_w4" min="0" max="10" step="1" value="2">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="md:col-span-8 section-card">
+      <div class="flex items-center justify-between mb-4">
+        <div class="section-title mb-0"><span class="section-bar bg-pri-600"></span><h2>预测结果可视化</h2></div>
+        <div class="flex items-center gap-4 text-xs text-warm-400 flex-wrap">
+          <span class="flex items-center gap-1"><span class="w-6 h-0.5 rounded bg-pri-600 inline-block"></span>实际值</span>
+          <span class="flex items-center gap-1"><span class="w-6 h-0.5 rounded bg-acc-400 inline-block"></span>拟合值</span>
+          <span class="flex items-center gap-1"><span class="w-6 h-0.5 rounded bg-acc-200 inline-block"></span>预测值</span>
+          <span id="lockedLegend" class="hidden items-center gap-1"><span class="w-6 h-0.5 rounded bg-warm-200 inline-block"></span>基准值</span>
+        </div>
+      </div>
+      <div style="position:relative;height:380px"><canvas id="predChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Data Table -->
+  <div class="section-card">
+    <div class="section-title"><span class="section-bar bg-pri-600"></span><h2>详细数据表</h2></div>
+    <div class="overflow-x-auto">
+      <table class="data-table" id="dataTable">
+        <thead>
+          <tr>
+            <th>年份</th><th>产量(万辆)</th><th>NEV渗透率</th><th>实际用钢(万吨)</th><th>模型拟合(万吨)</th><th>误差(%)</th>
+          </tr>
+        </thead>
+        <tbody id="dataTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  </div><!-- end ms-interact -->
+
+  <!-- ========== SUB: 模型对比 ========== -->
+  <div id="ms-compare" class="model-section">
+    <div class="grid md:grid-cols-2 gap-5 mb-5">
+      <div class="section-card md:col-span-2">
+        <div class="section-title"><span class="section-bar bg-pri-600"></span><h2>五模型预测曲线叠加</h2></div>
+        <div style="position:relative;height:420px"><canvas id="compareLineChart"></canvas></div>
+      </div>
+    </div>
+    <div class="grid md:grid-cols-2 gap-5 mb-5">
+      <div class="section-card">
+        <div class="section-title"><span class="section-bar bg-acc-400"></span><h2>2030年预测值对比</h2></div>
+        <div style="position:relative;height:300px"><canvas id="compareBarChart"></canvas></div>
+      </div>
+      <div class="section-card">
+        <div class="section-title"><span class="section-bar bg-pri-600"></span><h2>模型方法学对比</h2></div>
+        <div class="space-y-3" id="compareMethodology"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== SUB: 品种结构 ========== -->
+  <div id="ms-variety" class="model-section">
+    <div class="flex items-center gap-3 mb-4" id="varietyModelSelector"></div>
+    <div class="grid md:grid-cols-2 gap-5 mb-5">
+      <div class="section-card">
+        <div class="section-title"><span class="section-bar bg-pri-600"></span><h2>品种钢结构变迁（2025→2030E）</h2></div>
+        <div style="position:relative;height:360px"><canvas id="varietyStackedChart"></canvas></div>
+      </div>
+      <div class="section-card">
+        <div class="section-title"><span class="section-bar bg-acc-400"></span><h2>各品种钢需求预测</h2></div>
+        <div class="overflow-x-auto">
+          <table class="data-table" id="varietyTable">
+            <thead><tr><th>品种钢</th><th>2025占比</th><th>2025用量(万吨)</th><th>2030E占比</th><th>2030E用量(万吨)</th><th>变化趋势</th></tr></thead>
+            <tbody id="varietyTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="section-card">
+      <div class="section-title"><span class="section-bar bg-pri-600"></span><h2>关键品种钢深度分析</h2></div>
+      <div class="grid md:grid-cols-3 gap-4" id="varietyDeepDive"></div>
+    </div>
+  </div>
+
+  <!-- ========== SUB: 情景分析 ========== -->
+  <div id="ms-scenario" class="model-section">
+    <div class="flex items-center gap-3 mb-4" id="scenarioModelSelector"></div>
+    <div class="grid md:grid-cols-5 gap-4 mb-5" id="scenarioSummaryCards"></div>
+    <div class="grid md:grid-cols-2 gap-5 mb-5">
+      <div class="section-card md:col-span-2">
+        <div class="section-title"><span class="section-bar bg-pri-600"></span><h2>四种情景路径对比</h2></div>
+        <div style="position:relative;height:380px"><canvas id="scenarioFullChart"></canvas></div>
+      </div>
+    </div>
+    <div class="section-card">
+      <div class="section-title"><span class="section-bar bg-acc-400"></span><h2>情景关键假设与触发条件</h2></div>
+      <div class="overflow-x-auto">
+        <table class="data-table" id="scenarioAssumpTable">
+          <thead><tr><th>情景</th><th>NEV渗透率2030</th><th>铝替代率2030</th><th>产量假设2030</th><th>一体化压铸渗透</th><th>用钢量2030(万吨)</th><th>vs基准差异</th></tr></thead>
+          <tbody id="scenarioAssumpBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end tab-model -->
+</main>
+
+<script>
+// ==========================================
+// DATA
+// ==========================================
+const H=[
+  {y:2015,p:2450,n:1.3,s:5020},{y:2016,p:2812,n:1.8,s:5650},{y:2017,p:2902,n:2.7,s:5850},
+  {y:2018,p:2782,n:4.5,s:5550},{y:2019,p:2572,n:4.7,s:5100},{y:2020,p:2522,n:5.4,s:5250},
+  {y:2021,p:2608,n:13.4,s:5250},{y:2022,p:2702,n:25.6,s:5400},{y:2023,p:3016,n:31.6,s:5777},
+  {y:2024,p:3128,n:40.9,s:5750},{y:2025,p:3453,n:47.9,s:6390}
+];
+
+const PESTLE_DATA=[
+  {d:'P',c:'政治 Political',color:'#7F77DD',bg:'#EEEDFE',
+   items:[
+    {label:'双碳政策驱动轻量化',detail:'2030碳达峰/2060碳中和目标推动整车厂轻量化，抑制普通钢需求，利好高强钢，评分：⭐⭐⭐⭐⭐'},
+    {label:'新能源购置税减免延续至2027',detail:'政策持续加速新能源渗透，改变用钢结构，评分：⭐⭐⭐⭐'},
+    {label:'中美贸易摩擦/钢铝关税',detail:'影响钢材进出口及成本端，间接影响国内竞争格局，评分：⭐⭐⭐'},
+    {label:'"一带一路"汽车出口利好',detail:'拉动中国汽车出口持续增长，间接拉动国内用钢量，评分：⭐⭐⭐⭐'},
+    {label:'欧盟CBAM碳边境税',detail:'绿钢需求上升，传统高炉钢出口欧盟受限，评分：⭐⭐⭐'}
+  ]},
+  {d:'E',c:'经济 Economic',color:'#0F6E56',bg:'#E1F5EE',
+   items:[
+    {label:'GDP增速放缓至4%~5%区间',detail:'汽车消费增速趋缓，总量天花板逐渐可见，⭐⭐⭐⭐'},
+    {label:'铁矿石/焦煤价格高位震荡',detail:'主要原材料成本压力持续，高炉钢企利润空间收窄，⭐⭐⭐⭐'},
+    {label:'汇率波动影响出口',detail:'人民币贬值利好汽车出口，但进口原材料成本上升，⭐⭐⭐'},
+    {label:'汽车消费信贷政策',detail:'低首付/零首付刺激政策短期拉动销量，但边际效用递减，⭐⭐⭐'},
+    {label:'城镇化率提升至70%',detail:'新兴城市汽车普及率提升，拉动整体销量，⭐⭐⭐'}
+  ]},
+  {d:'S',c:'社会 Social',color:'#D85A30',bg:'#FAECE7',
+   items:[
+    {label:'Z世代消费升级',detail:'年轻消费者偏好智能网联车，电动化渗透率加速，⭐⭐⭐⭐'},
+    {label:'城市化进程推动购车需求',detail:'三四线城市汽车保有量提升空间较大，⭐⭐⭐'},
+    {label:'二孩/三孩政策→MPV需求',detail:'家庭出行需求推动MPV销量，单车用钢量较大，⭐⭐⭐'},
+    {label:'环保意识与绿色出行偏好',detail:'公共交通替代私家车的趋势，抑制部分购车需求，⭐⭐'},
+    {label:'下沉市场微型电动车爆发',detail:'宏光MINI类产品拉动低端用钢量，但单车用钢量低，⭐⭐⭐'}
+  ]},
+  {d:'T',c:'技术 Technology',color:'#378ADD',bg:'#E6F1FB',
+   items:[
+    {label:'一体化压铸技术普及',detail:'特斯拉引领，车身部件从200+零件→3件，减少用钢30~50kg/辆，评分：⭐⭐⭐⭐⭐'},
+    {label:'第三代AHSS（QP/中锰钢）商业化',detail:'国产QP980/1180钢成功商业化，高强钢加速替代传统DP/TRIP钢，⭐⭐⭐⭐⭐'},
+    {label:'电工钢高牌号（20TGW以下）批量供应',detail:'新能源驱动电机需求爆发，高牌号无取向电工钢供应缺口，⭐⭐⭐⭐'},
+    {label:'氢冶金/电弧炉绿钢',detail:'短流程电弧炉占比提升，颠覆高炉长流程，影响成本结构，⭐⭐⭐'},
+    {label:'激光拼焊/热成型一体化',detail:'白车身制造工艺升级，推动热成型钢+高强钢渗透率，⭐⭐⭐⭐'}
+  ]},
+  {d:'L',c:'法律 Legal',color:'#BA7517',bg:'#FAEEDA',
+   items:[
+    {label:'CAFC/NEV双积分政策',detail:'强制要求整车厂提升新能源比例，加速新能源渗透，⭐⭐⭐⭐⭐'},
+    {label:'C-NCAP五星安全标准升级',detail:'安全法规升级推动热成型钢/AHSS用量增加，⭐⭐⭐⭐'},
+    {label:'废旧钢铁循环利用规定',detail:'废钢入炉率提升，电炉短流程扩张，影响钢铁工艺结构，⭐⭐⭐'},
+    {label:'钢铁行业碳配额制度',detail:'碳排放成本倒逼高炉钢减产，绿钢溢价逐步形成，⭐⭐⭐⭐'},
+    {label:'欧盟ELV（报废汽车法规）',detail:'出口欧盟汽车需满足高回收率，影响材料选择，⭐⭐⭐'}
+  ]},
+  {d:'E2',c:'环境 Environment',color:'#7F77DD',bg:'#EEEDFE',
+   items:[
+    {label:'碳中和目标倒逼绿钢需求',detail:'整车厂Scope 3碳排放核算将覆盖钢材，推动绿钢采购，⭐⭐⭐⭐⭐'},
+    {label:'蓝天保卫战限产政策',detail:'冬季限产影响北方高炉开工率，影响供给端稳定性，⭐⭐⭐'},
+    {label:'铁矿石海运碳排放成本',detail:'海运脱碳压力影响进口铁矿石到岸成本，⭐⭐⭐'},
+    {label:'电力结构绿化（可再生电力）',detail:'电弧炉用绿电成本下降，有利于短流程扩张，⭐⭐⭐⭐'},
+    {label:'循环经济：废钢资源优化',detail:'国内废钢积累量快速增长，2030年废钢供应预计超3亿吨，⭐⭐⭐⭐'}
+  ]}
+];
+
+const PORTER_SCORES=[
+  {label:'供应商议价能力',score:8.5,color:'#D85A30',desc:'三大矿企高度集中，铁矿石/焦煤话语权强'},
+  {label:'客户议价能力',score:7.5,color:'#D85A30',desc:'整车厂Top10>85%市占，年降压力持续'},
+  {label:'新进入者威胁',score:3.0,color:'#0F6E56',desc:'重资产壁垒高，但绿钢新势力潜在颠覆'},
+  {label:'替代品威胁',score:7.0,color:'#D85A30',desc:'铝+一体化压铸加速渗透，白车身风险'},
+  {label:'行业内竞争',score:9.0,color:'#D85A30',desc:'产能严重过剩，价格战压缩利润空间'}
+];
+
+const BCG_DATA=[
+  {x:15,y:18,r:20,label:'电工钢',q:'star',color:'#0F6E56'},
+  {x:12,y:15,r:16,label:'热成型钢',q:'star',color:'#0F6E56'},
+  {x:8,y:25,r:12,label:'第三代AHSS',q:'star',color:'#378ADD'},
+  {x:35,y:4,r:30,label:'冷轧外板',q:'cash',color:'#BA7517'},
+  {x:28,y:4,r:24,label:'镀锌板GI/GA',q:'cash',color:'#BA7517'},
+  {x:6,y:18,r:10,label:'复相钢CP',q:'question',color:'#888780'},
+  {x:18,y:1,r:20,label:'普碳低强钢',q:'dog',color:'#D85A30'}
+];
+
+const STRUCT_SHIFT=[
+  {name:'热成型钢(PHS)',from:8,to:18,color:'#0F6E56'},
+  {name:'第三代AHSS',from:2,to:10,color:'#378ADD'},
+  {name:'电工钢',from:5,to:10,color:'#7F77DD'},
+  {name:'镀锌GI/GA',from:30,to:28,color:'#BA7517'},
+  {name:'冷轧O5板',from:15,to:10,color:'#D85A30'},
+  {name:'普碳低强钢',from:19,to:12,color:'#888780'}
+];
+
+const MECE_TREES={
+  t1:[
+    {l:0,label:'汽车用钢总量 6390万吨'},
+    {l:1,label:'乘用车 ~5100万吨 (80%)'},
+    {l:2,label:'新能源乘用车 ~2400万吨 (47.9%)'},
+    {l:2,label:'燃油乘用车 ~2700万吨 (52.1%)'},
+    {l:1,label:'商用车 ~1100万吨 (17%)'},
+    {l:2,label:'重卡 ~500万吨'},
+    {l:2,label:'轻卡/中卡 ~400万吨'},
+    {l:2,label:'客车/专用车 ~200万吨'},
+    {l:1,label:'专用车/工程车 ~190万吨 (3%)'}
+  ],
+  t2:[
+    {l:0,label:'单车用钢部位（平均约500kg）'},
+    {l:1,label:'白车身 ~220kg (44%)'},
+    {l:2,label:'热成型钢结构件 ~65kg'},
+    {l:2,label:'冷轧外板 ~60kg'},
+    {l:2,label:'高强钢加强件 ~95kg'},
+    {l:1,label:'底盘/悬挂 ~130kg (26%)'},
+    {l:2,label:'大梁/车架 ~80kg'},
+    {l:2,label:'悬挂弹簧 ~50kg'},
+    {l:1,label:'动力总成 ~80kg (16%)'},
+    {l:1,label:'电机/电控 ~30kg (6%)'},
+    {l:1,label:'其他（内饰/连接件）~40kg (8%)'}
+  ],
+  t3:[
+    {l:0,label:'品种钢结构（2025实际）'},
+    {l:1,label:'高强钢AHSS ~25%'},
+    {l:2,label:'热成型钢(PHS) 8%'},
+    {l:2,label:'双相钢DP 12%'},
+    {l:2,label:'第三代AHSS(QP) 2%'},
+    {l:2,label:'复相钢CP 3%'},
+    {l:1,label:'镀锌板GI/GA ~30%'},
+    {l:1,label:'冷轧板 ~15%'},
+    {l:1,label:'电工钢 ~5%'},
+    {l:1,label:'中厚板/热轧板 ~15%'},
+    {l:1,label:'其他 ~10%'}
+  ],
+  t5:[
+    {l:0,label:'区域用钢分布'},
+    {l:1,label:'华东 ~30%'},
+    {l:2,label:'上海/江苏/浙江'},
+    {l:2,label:'吉利/上汽/比亚迪华东工厂'},
+    {l:1,label:'华南 ~15%'},
+    {l:2,label:'广东/广西'},
+    {l:2,label:'比亚迪/广汽'},
+    {l:1,label:'华中 ~18%'},
+    {l:2,label:'湖北/重庆/安徽'},
+    {l:2,label:'东风/长安/奇瑞/蔚来'},
+    {l:1,label:'华北/东北 ~22%'},
+    {l:2,label:'北京/天津/吉林'},
+    {l:2,label:'一汽/北汽/长城'},
+    {l:1,label:'西部 ~15%'}
+  ]
+};
+
+const RISK_MATRIX=[
+  {risk:'新能源技术路线突变（固态电池）',prob:3,impact:5,level:'高危',color:'#D85A30'},
+  {risk:'铝价大幅下跌，替代超预期',prob:2,impact:5,level:'高危',color:'#D85A30'},
+  {risk:'中美贸易摩擦升级',prob:3,impact:4,level:'高危',color:'#D85A30'},
+  {risk:'碳交易价格飙升(>150元/吨)',prob:3,impact:3,level:'中危',color:'#BA7517'},
+  {risk:'国内钢铁产能过剩加剧',prob:4,impact:3,level:'中危',color:'#BA7517'},
+  {risk:'原材料价格超预期上涨',prob:3,impact:3,level:'中危',color:'#BA7517'},
+  {risk:'一体化压铸普及超预期',prob:3,impact:3,level:'中危',color:'#BA7517'},
+  {risk:'汽车需求低于预期',prob:2,impact:2,level:'低危',color:'#0F6E56'}
+];
+
+const SCENARIO_DATA={
+  years:[2026,2027,2028,2029,2030],
+  base:  [5780,5200,5140,5050,4950],
+  bull:  [5950,5350,5300,5260,5200],
+  bear:  [5600,5050,4950,4820,4600],
+  black: [5400,4700,4300,4050,3800]
+};
+
+const MODELS=[
+  {id:0,name:'多元线性回归',color:'#D85A30',
+   desc:'以汽车产量(V)和新能源渗透率(N)为自变量，最小二乘法求解回归系数。公式：Q = β₀ + β₁·V + β₂·N + ε。高斯消元法求解3×3正规方程组。历史拟合精度高，但外推时对非线性趋势捕捉有限。'},
+  {id:1,name:'结构分解模型',color:'#0F6E56',
+   desc:'Bottom-up结构性分解：Q(t) = α·[V·(N%·W_EV + (1-N%)·W_ICE)·(1-R_al)]/1000。其中W_ICE=540kg，W_EV=450kg，α为最小二乘拟合的供应链倍率系数，R_al为铝替代修正系数。经济意义最强，反映实际物理机理。'},
+  {id:2,name:'S曲线(Logistic)',color:'#7F77DD',
+   desc:'直接对用钢量拟合Logistic函数：Q(t) = K / (1 + e^(-r(t-t0)))。网格搜索最优K(饱和量)/r(增速)/t0(拐点)参数。捕捉长期需求S形饱和趋势，适合中长期趋势判断。'},
+  {id:3,name:'多项式回归(3阶)',color:'#BA7517',
+   desc:'三阶多项式时间序列：Q(t) = c₀ + c₁·τ + c₂·τ² + c₃·τ³，τ=year-2015。纯数据驱动，对历史拟合极好，但外推不稳定，应结合其他模型使用。'},
+  {id:4,name:'集成模型(加权)',color:'#378ADD',
+   desc:'加权集成四个基础模型：Q_ensemble = Σ(wᵢ·Qᵢ) / Σwᵢ。权重可通过滑块调节，默认基于各模型历史MAPE反比赋权，综合多种机理，稳健性最强。'}
+];
+
+// ======================================
+// MATH UTILS
+// ======================================
+function solveLinearSystem(A,b){
+  const n=b.length;
+  const M=A.map((row,i)=>[...row,b[i]]);
+  for(let col=0;col<n;col++){
+    let maxRow=col;
+    for(let r=col+1;r<n;r++) if(Math.abs(M[r][col])>Math.abs(M[maxRow][col])) maxRow=r;
+    [M[col],M[maxRow]]=[M[maxRow],M[col]];
+    if(Math.abs(M[col][col])<1e-12) return null;
+    for(let r=col+1;r<n;r++){
+      const f=M[r][col]/M[col][col];
+      for(let c=col;c<=n;c++) M[r][c]-=f*M[col][c];
+    }
+  }
+  const x=new Array(n).fill(0);
+  for(let i=n-1;i>=0;i--){
+    x[i]=M[i][n];
+    for(let j=i+1;j<n;j++) x[i]-=M[i][j]*x[j];
+    x[i]/=M[i][i];
+  }
+  return x;
+}
+
+// ======================================
+// MODEL FITTING
+// ======================================
+let _linearBeta=null,_scParams=null,_polyCfs=null,_decompFactor=null;
+
+function fitLinearRegression(){
+  const X=H.map(d=>[1,d.p,d.n]);
+  const Xt=X[0].map((_,j)=>X.map(row=>row[j]));
+  // XtX = Xt (m×n) × X (n×m) → m×m
+  const XtX=Xt.map(rowA=>Array.from({length:Xt.length},(_,b)=>rowA.reduce((s,v,i)=>s+v*X[i][b],0)));
+  const Xty=Xt.map((row)=>row.reduce((s,v,i)=>s+v*H[i].s,0));
+  return solveLinearSystem(XtX,Xty);
+}
+
+function fitDecompFactor(){
+  // Find optimal supply-chain multiplier so that decomp model best fits history
+  // Q = factor * V * (N*W_ev + (1-N)*W_ice) * (1 - R_al)
+  // Solve: factor = sum(S_i * f_i) / sum(f_i^2)  where f_i = V_i*(N_i/100*W_ev+(1-N_i/100)*W_ice)*(1-al_sub/100*N_i/100)/1000
+  const w_ice=540, w_ev=450, al_sub=8;
+  let num=0, den=0;
+  for(const d of H){
+    const N=d.n/100;
+    const R_al=al_sub/100*N;
+    const f=d.p*(N*w_ev+(1-N)*w_ice)*(1-R_al)/1000;
+    num+=d.s*f; den+=f*f;
+  }
+  return num/den;
+}
+
+function fitSCurve(){
+  // Fit logistic to actual steel demand directly (not via NEV proxy)
+  let best={mse:1e18};
+  const Ks=[5000,6000,7000,8000,9000,10000,12000,15000];
+  const rs=[0.02,0.04,0.06,0.08,0.1,0.12,0.15,0.18,0.2,0.25,0.3];
+  const t0s=[2012,2015,2018,2020,2022,2024,2026,2028,2030];
+  for(const K of Ks) for(const r of rs) for(const t0 of t0s){
+    const mse=H.reduce((s,d)=>{
+      const q_fit=K/(1+Math.exp(-r*(d.y-t0)));
+      return s+(q_fit-d.s)**2;
+    },0)/H.length;
+    if(mse<best.mse) best={K,r,t0,mse};
+  }
+  return best;
+}
+
+function fitPolynomial(order=3){
+  const tau=H.map(d=>d.y-2015);
+  const n=H.length, m=order+1;
+  const X=tau.map(t=>Array.from({length:m},(_,i)=>Math.pow(t,i)));
+  const Xt=X[0].map((_,j)=>X.map(row=>row[j]));
+  // XtX = Xt (m×n) × X (n×m) → m×m
+  const XtX=Xt.map(rowA=>Array.from({length:Xt.length},(_,b)=>rowA.reduce((s,v,i)=>s+v*X[i][b],0)));
+  const Xty=Xt.map(row=>row.reduce((s,v,i)=>s+v*H[i].s,0));
+  return solveLinearSystem(XtX,Xty);
+}
+
+function initFit(){
+  _linearBeta=fitLinearRegression();
+  _decompFactor=fitDecompFactor();
+  _scParams=fitSCurve();
+  _polyCfs=fitPolynomial(3);
+}
+
+// ======================================
+// PREDICTION FUNCTIONS
+// ======================================
+function predictLinear(year,params,beta,noAnchor){
+  const hist=H.find(d=>d.y===year);
+  if(hist&&!noAnchor) return hist.s;
+  const{prod,nev}=params;
+  const yrs=year-H[H.length-1].y;
+  const V_=prod*(1+yrs*0.02);
+  const N=Math.min(nev+yrs*5,95);
+  return Math.max(0,(beta[0]+beta[1]*V_+beta[2]*N));
+}
+
+function predictDecomp(year,params,factor,noAnchor){
+  const hist=H.find(d=>d.y===year);
+  if(hist&&!noAnchor) return hist.s;
+  const{prod,nev,w_ice,w_ev,al_sub}=params;
+  const yrs=year-H[H.length-1].y;
+  const V=prod*(1+yrs*0.02);
+  const N=Math.min(nev+yrs*5,95)/100;
+  const R_al=al_sub/100*N;
+  const q=V*(N*w_ev+(1-N)*w_ice)*(1-R_al)/1000;
+  return Math.max(0,factor*q);
+}
+
+function predictSCurve(year,sc,noAnchor){
+  const hist=H.find(d=>d.y===year);
+  if(hist&&!noAnchor) return hist.s;
+  return Math.max(0,sc.K/(1+Math.exp(-sc.r*(year-sc.t0))));
+}
+
+function predictPoly(year,coefs,noAnchor){
+  const hist=H.find(d=>d.y===year);
+  if(hist&&!noAnchor) return hist.s;
+  const tau=year-2015;
+  return Math.max(0,coefs.reduce((s,c,i)=>s+c*Math.pow(tau,i),0));
+}
+
+function computeMetrics(fitted){
+  const n=H.length;
+  const mean=H.reduce((s,d)=>s+d.s,0)/n;
+  const ss_tot=H.reduce((s,d)=>s+(d.s-mean)**2,0);
+  const ss_res=H.reduce((s,d,i)=>s+(d.s-fitted[i])**2,0);
+  const r2=1-ss_res/ss_tot;
+  const mape=H.reduce((s,d,i)=>s+Math.abs(d.s-fitted[i])/d.s,0)/n*100;
+  const rmse=Math.sqrt(H.reduce((s,d,i)=>s+(d.s-fitted[i])**2,0)/n);
+  return{r2:r2.toFixed(3),mape:mape.toFixed(1),rmse:rmse.toFixed(0)};
+}
+
+// Compute TRUE fitted values using actual historical inputs (not slider params)
+function computeTrueFitted(modelIdx){
+  switch(modelIdx){
+    case 0: // Linear: use actual H.p and H.n
+      return _linearBeta?H.map(d=>Math.max(0,_linearBeta[0]+_linearBeta[1]*d.p+_linearBeta[2]*d.n)):H.map(()=>0);
+    case 1:{ // Decomp: use actual H.p and H.n with fitted factor
+      if(!_decompFactor) return H.map(()=>0);
+      const w_ice=540,w_ev=450,al_sub=8;
+      return H.map(d=>{
+        const N=d.n/100, R_al=al_sub/100*N;
+        const f=d.p*(N*w_ev+(1-N)*w_ice)*(1-R_al)/1000;
+        return Math.max(0,_decompFactor*f);
+      });
+    }
+    case 2: // S-curve: logistic evaluated at actual years
+      return _scParams?H.map(d=>Math.max(0,_scParams.K/(1+Math.exp(-_scParams.r*(d.y-_scParams.t0))))):H.map(()=>0);
+    case 3:{ // Polynomial: cubic evaluated at actual tau
+      if(!_polyCfs) return H.map(()=>0);
+      const tau=H.map(d=>d.y-2015);
+      return tau.map(t=>Math.max(0,_polyCfs.reduce((s,c,i)=>s+c*Math.pow(t,i),0)));
+    }
+    case 4:{ // Ensemble: weighted avg of all 4 true fitted values
+      const p=getParams(); const ws=[p.w1,p.w2,p.w3,p.w4];
+      const wsum=ws.reduce((a,b)=>a+b,0)||1;
+      const m0=computeTrueFitted(0),m1=computeTrueFitted(1);
+      const m2=computeTrueFitted(2),m3=computeTrueFitted(3);
+      return H.map((_,i)=>(ws[0]*m0[i]+ws[1]*m1[i]+ws[2]*m2[i]+ws[3]*m3[i])/wsum);
+    }
+  }
+}
+
+function getParams(){
+  return{
+    prod:+document.getElementById('sl_prod').value,
+    nev:+document.getElementById('sl_nev').value,
+    w_ice:+document.getElementById('sl_wice').value,
+    w_ev:+document.getElementById('sl_wev').value,
+    al_sub:+document.getElementById('sl_al').value,
+    w1:+document.getElementById('sl_w1').value,
+    w2:+document.getElementById('sl_w2').value,
+    w3:+document.getElementById('sl_w3').value,
+    w4:+document.getElementById('sl_w4').value
+  };
+}
+
+function computePredictions(modelIdx,params,noAnchor){
+  const allYears=H.map(d=>d.y).concat([2026,2027,2028,2029,2030]);
+  const getQ=(year)=>{
+    switch(modelIdx){
+      case 0:return _linearBeta?predictLinear(year,params,_linearBeta,noAnchor):0;
+      case 1:return _decompFactor!=null?predictDecomp(year,params,_decompFactor,noAnchor):0;
+      case 2:return _scParams?predictSCurve(year,_scParams,noAnchor):0;
+      case 3:return _polyCfs?predictPoly(year,_polyCfs,noAnchor):0;
+      case 4:{
+        const qs=[
+          _linearBeta?predictLinear(year,params,_linearBeta,noAnchor):0,
+          _decompFactor!=null?predictDecomp(year,params,_decompFactor,noAnchor):0,
+          _scParams?predictSCurve(year,_scParams,noAnchor):0,
+          _polyCfs?predictPoly(year,_polyCfs,noAnchor):0
+        ];
+        const ws=[params.w1,params.w2,params.w3,params.w4];
+        const wsum=ws.reduce((a,b)=>a+b,0)||1;
+        return qs.reduce((s,q,i)=>s+q*ws[i],0)/wsum;
+      }
+    }
+  };
+  return allYears.map(y=>({year:y,val:getQ(y)}));
+}
+
+// ======================================
+// CHARTS
+// ======================================
+let histChartInst=null,predChartInst=null,porterChartInst=null,bcgChartInst=null,scenarioChartInst=null;
+let overviewBarChart=null,overviewRadarChart=null,compareLineChart=null,compareBarChart=null,varietyStackedChart=null,scenarioFullChart=null;
+let _varietyModelIdx=1,_scenarioModelIdx=1; // Default: decomposition model
+
+function renderHistChart(){
+  const ctx=document.getElementById('histChart');
+  if(!ctx) return;
+  if(histChartInst) histChartInst.destroy();
+  histChartInst=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:H.map(d=>d.y),
+      datasets:[
+        {label:'用钢量(万吨)',data:H.map(d=>d.s),borderColor:'#0F6E56',backgroundColor:'rgba(15,110,86,.08)',tension:.3,yAxisID:'y',borderWidth:2.5,pointRadius:4,pointBackgroundColor:'#0F6E56'},
+        {label:'汽车产量(万辆)',data:H.map(d=>d.p),borderColor:'#D85A30',tension:.3,yAxisID:'y',borderWidth:2,pointRadius:3,borderDash:[5,3]},
+        {label:'NEV渗透率(%)',data:H.map(d=>d.n),borderColor:'#378ADD',tension:.3,yAxisID:'y2',borderWidth:2,pointRadius:3,borderDash:[2,3]}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.formattedValue}`}}},
+      scales:{
+        y:{position:'left',grid:{color:'#E8E6E0'},ticks:{font:{size:11},callback:v=>v>=1000?v/1000+'K':v}},
+        y2:{position:'right',grid:{display:false},ticks:{font:{size:11},callback:v=>v+'%'}}
+      }
+    }
+  });
+}
+
+function renderPorterChart(){
+  const ctx=document.getElementById('porterCanvas');
+  if(!ctx) return;
+  if(porterChartInst) porterChartInst.destroy();
+  porterChartInst=new Chart(ctx,{
+    type:'radar',
+    data:{
+      labels:PORTER_SCORES.map(d=>d.label),
+      datasets:[{
+        label:'竞争强度',
+        data:PORTER_SCORES.map(d=>d.score),
+        borderColor:'#D85A30',
+        backgroundColor:'rgba(216,90,48,.15)',
+        borderWidth:2,pointBackgroundColor:'#D85A30',pointRadius:5
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      scales:{r:{min:0,max:10,ticks:{stepSize:2,font:{size:10}},pointLabels:{font:{size:11,weight:'500'}}}},
+      plugins:{legend:{display:false}}
+    }
+  });
+}
+
+function renderBCGChart(){
+  const ctx=document.getElementById('bcgCanvas');
+  if(!ctx) return;
+  if(bcgChartInst) bcgChartInst.destroy();
+  bcgChartInst=new Chart(ctx,{
+    type:'bubble',
+    data:{
+      datasets:BCG_DATA.map(d=>({
+        label:d.label,
+        data:[{x:d.x,y:d.y,r:d.r}],
+        backgroundColor:d.color+'88',
+        borderColor:d.color,borderWidth:2
+      }))
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{position:'bottom',labels:{font:{size:11},boxWidth:12}},
+        tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: 市占${ctx.raw.x}% / 增速${ctx.raw.y}%`}}
+      },
+      scales:{
+        x:{title:{display:true,text:'相对市场份额 (%)'},grid:{color:'#E8E6E0'},ticks:{font:{size:11}}},
+        y:{title:{display:true,text:'市场增速 (%)'},grid:{color:'#E8E6E0'},ticks:{font:{size:11}}}
+      }
+    }
+  });
+}
+
+function renderScenarioChart(){
+  const ctx=document.getElementById('scenarioChart');
+  if(!ctx) return;
+  if(scenarioChartInst) scenarioChartInst.destroy();
+  const{years,base,bull,bear,black}=SCENARIO_DATA;
+  scenarioChartInst=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:years,
+      datasets:[
+        {label:'基准',data:base,borderColor:'#0F6E56',borderWidth:2.5,tension:.3,fill:false},
+        {label:'乐观',data:bull,borderColor:'#378ADD',borderWidth:2,borderDash:[5,3],tension:.3,fill:false},
+        {label:'悲观',data:bear,borderColor:'#D85A30',borderWidth:2,borderDash:[5,3],tension:.3,fill:false},
+        {label:'黑天鹅',data:black,borderColor:'#888780',borderWidth:1.5,borderDash:[2,4],tension:.3,fill:false}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:16}}},
+      scales:{
+        y:{grid:{color:'#E8E6E0'},ticks:{font:{size:11},callback:v=>v+'万吨'}},
+        x:{grid:{display:false}}
+      }
+    }
+  });
+}
+
+function renderPESTLEGrid(){
+  const grid=document.getElementById('pestleGrid');
+  if(!grid) return;
+  grid.innerHTML=PESTLE_DATA.map(dim=>`
+    <div class="pestle-card" style="border-color:${dim.color}33" onclick="this.classList.toggle('expanded')">
+      <div class="flex items-center gap-3 mb-3">
+        <span style="width:36px;height:36px;border-radius:8px;background:${dim.bg};color:${dim.color};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0">${dim.d==='E2'?'E':dim.d}</span>
+        <p class="text-sm font-semibold text-warm-900">${dim.c}</p>
+      </div>
+      <ul class="space-y-1.5">
+        ${dim.items.map(it=>`<li class="flex items-start gap-2 text-xs text-warm-600"><span class="pebble mt-1" style="background:${dim.color};flex-shrink:0"></span><span>${it.label}</span></li>`).join('')}
+      </ul>
+      <div class="pestle-detail">
+        ${dim.items.map(it=>`<div class="mb-2 text-xs text-warm-600 leading-relaxed"><strong class="text-warm-800">${it.label}：</strong>${it.detail}</div>`).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderMECETrees(){
+  const renderTree=(id,data)=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    el.innerHTML=data.map(n=>`
+      <div style="padding-left:${n.l*16}px;margin-bottom:4px" class="flex items-center gap-1.5">
+        ${n.l>0?`<span style="width:${n.l>1?8:10}px;height:1px;background:var(--border);display:inline-block;flex-shrink:0"></span>`:''}
+        <span class="tree-node" style="${n.l===0?'background:#E1F5EE;border-color:#9FE1CB;font-weight:600':n.l===1?'font-weight:500':''}">${n.label}</span>
+      </div>`).join('');
+  };
+  renderTree('meceTree1',MECE_TREES.t1);
+  renderTree('meceTree2',MECE_TREES.t2);
+  renderTree('meceTree3',MECE_TREES.t3);
+  renderTree('meceTree5',MECE_TREES.t5);
+}
+
+function renderStructShift(){
+  const el=document.getElementById('structShift');
+  if(!el) return;
+  el.innerHTML=STRUCT_SHIFT.map(d=>`
+    <div class="mb-2">
+      <div class="flex items-center justify-between mb-1">
+        <span class="text-[11px] text-warm-700">${d.name}</span>
+        <span class="text-[11px] font-semibold" style="color:${d.color}">${d.from}% → ${d.to}%</span>
+      </div>
+      <div class="relative h-4 rounded-full bg-warm-100 overflow-hidden">
+        <div style="width:${d.from}%;background:${d.color}55;height:100%" class="absolute top-0 left-0 rounded-full"></div>
+        <div style="width:${d.to}%;background:${d.color};height:100%;transition:width 1s ease" class="absolute top-0 left-0 rounded-full opacity-80"></div>
+      </div>
+    </div>`).join('');
+}
+
+function renderRiskMatrix(){
+  const el=document.getElementById('riskMatrix');
+  if(!el) return;
+  el.innerHTML=RISK_MATRIX.map(r=>`
+    <div class="flex items-center gap-3 p-3 rounded-xl border border-[var(--border)]">
+      <div style="background:${r.color};color:white;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:600;white-space:nowrap;flex-shrink:0">${r.level}</div>
+      <p class="text-xs text-warm-700 flex-1">${r.risk}</p>
+      <div class="text-[10px] text-warm-400 flex-shrink-0">P${r.prob}×I${r.impact}</div>
+    </div>`).join('');
+}
+
+// ======================================
+// PREDICTION CHART & TABLE UPDATE
+// ======================================
+let lockedData=null;
+
+function updateModel(){
+  const midx=+document.querySelector('.model-tab.active')?.dataset.idx??0;
+  const params=getParams();
+  // rawPreds: noAnchor — shows true model fit for ALL years (used for fitted line + metrics)
+  const rawPreds=computePredictions(midx,params,true);
+  // preds: anchored — historical years = actual, future = model prediction (used for table display + 2030 card)
+  const preds=computePredictions(midx,params,false);
+  const histYears=H.map(d=>d.y);
+  const futureYears=[2026,2027,2028,2029,2030];
+  const allYears=rawPreds.map(p=>p.year);
+  const fittedRaw=rawPreds.filter(p=>histYears.includes(p.year)).map(p=>p.val);
+  const metrics=computeMetrics(fittedRaw);
+  document.getElementById('m_r2').textContent=metrics.r2;
+  document.getElementById('m_mape').textContent=metrics.mape+'%';
+  document.getElementById('m_rmse').textContent=metrics.rmse;
+  // 2030 prediction
+  const p2030=preds.find(p=>p.year===2030);
+  const pred2030el=document.getElementById('mPred');
+  if(pred2030el&&p2030) pred2030el.textContent=Math.round(p2030.val)+'万吨';
+
+  const ctx=document.getElementById('predChart');
+  if(!ctx) return;
+  if(predChartInst) predChartInst.destroy();
+  // Build a continuous fitted+predicted line from rawPreds (model curve for all years)
+  const fullModelLine=rawPreds.map(p=>({x:p.year,y:+p.val.toFixed(0)}));
+  // Separate: historical fitted points and future predicted points for coloring
+  const histFitted=rawPreds.filter(p=>histYears.includes(p.year)).map(p=>({x:p.year,y:+p.val.toFixed(0)}));
+  const futurePred=rawPreds.filter(p=>futureYears.includes(p.year)).map(p=>({x:p.year,y:+p.val.toFixed(0)}));
+  const datasets=[
+    {label:'实际值',data:histYears.map((y,i)=>({x:y,y:H[i].s})),borderColor:'#0F6E56',backgroundColor:'rgba(15,110,86,.1)',borderWidth:2.5,tension:.3,fill:true,pointRadius:5,pointBackgroundColor:'#0F6E56'},
+    {label:'模型拟合',data:histFitted,borderColor:'#D85A30',borderDash:[5,3],borderWidth:2,tension:.3,fill:false,pointRadius:3,pointBackgroundColor:'#D85A30'},
+    {label:'模型预测',data:futurePred,borderColor:'#D85A30',backgroundColor:'rgba(216,90,48,.1)',borderDash:[8,4],borderWidth:2.5,tension:.3,fill:true,pointRadius:5,pointBorderColor:'#D85A30',pointBackgroundColor:'white'}
+  ];
+  // Add a thin connecting line from last fitted point to first predicted point for continuity
+  if(histFitted.length>0&&futurePred.length>0){
+    datasets.push({label:'_connector',data:[histFitted[histFitted.length-1],futurePred[0]],borderColor:'#D85A30',borderDash:[6,4],borderWidth:1.5,tension:.3,fill:false,pointRadius:0});
+  }
+  if(lockedData){
+    datasets.push({label:'基准值',data:lockedData,borderColor:'#B4B2A9',borderDash:[3,4],borderWidth:1.5,tension:.3,fill:false,pointRadius:0});
+  }
+  predChartInst=new Chart(ctx,{
+    type:'line',
+    data:{datasets},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      parsing:{xAxisKey:'x',yAxisKey:'y'},
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{type:'linear',grid:{color:'#E8E6E0'},ticks:{font:{size:11}}},
+        y:{grid:{color:'#E8E6E0'},ticks:{font:{size:11},callback:v=>v>=1000?v/1000+'K':v}}
+      }
+    }
+  });
+
+  // Update table — show actual vs model fit (using rawPreds for historical, preds for future)
+  const tbody=document.getElementById('dataTableBody');
+  if(tbody){
+    tbody.innerHTML=allYears.map(year=>{
+      const hist=H.find(d=>d.y===year);
+      const rawP=rawPreds.find(p=>p.year===year);
+      const predP=preds.find(p=>p.year===year);
+      const actual=hist?hist.s.toFixed(0):'—';
+      const fitted_=rawP?rawP.val.toFixed(0):'—';
+      const err=hist&&rawP?((rawP.val-hist.s)/hist.s*100).toFixed(1):'—';
+      const isFuture=!hist;
+      return`<tr class="${isFuture?'bg-acc-l':''}">
+        <td class="font-medium">${year}${isFuture?'<span class="ml-1 text-[10px] text-acc-600">预测</span>':''}</td>
+        <td>${hist?hist.p:Math.round(3453*Math.pow(1.015,year-2025))}</td>
+        <td>${hist?hist.n+'%':Math.min(85,Math.round(47.9+(year-2025)*6))+'%'}</td>
+        <td class="font-semibold">${actual}</td>
+        <td class="${isFuture?'text-acc-600 font-semibold':'text-pri-600 font-semibold'}">${fitted_}</td>
+        <td class="${err!=='—'?(+err>5?'diff-down':+err>-5?'':'diff-up'):''}">${err!=='—'?err+'%':'—'}</td>
+      </tr>`;
+    }).join('');
+  }
+}
+
+function toggleLock(){
+  const btn=document.getElementById('lockBtn');
+  if(lockedData){
+    lockedData=null;
+    btn.textContent='锁定基准';
+    btn.classList.remove('bg-warm-200');
+    document.getElementById('lockedLegend').classList.add('hidden');
+  } else {
+    const midx=+document.querySelector('.model-tab.active')?.dataset.idx??0;
+    const preds=computePredictions(midx,getParams());
+    lockedData=preds.map(p=>({x:p.year,y:+p.val.toFixed(0)}));
+    btn.textContent='清除基准';
+    btn.classList.add('bg-warm-200');
+    document.getElementById('lockedLegend').classList.remove('hidden');
+  }
+  updateModel();
+}
+
+function selectModel(idx){
+  document.querySelectorAll('.model-tab').forEach(t=>t.classList.remove('active'));
+  const tabs=document.querySelectorAll('.model-tab');
+  if(tabs[idx]) tabs[idx].classList.add('active');
+  // Show model description
+  const descBox=document.getElementById('modelDescBox');
+  if(descBox) descBox.textContent=MODELS[idx].desc;
+  // Show/hide ensemble weights
+  const ew=document.getElementById('ensembleWeights');
+  if(ew) ew.style.display=idx===4?'block':'none';
+  updateModel();
+}
+
+// ======================================
+// MODEL SELECTORS for variety & scenario
+// ======================================
+function renderModelSelector(containerId,currentIdx,fnName){
+  const el=document.getElementById(containerId);
+  if(!el) return;
+  el.innerHTML=`
+    <span class="text-xs font-medium text-warm-400">基于模型：</span>
+    ${MODELS.map((m,i)=>`<button class="model-tab ${i===currentIdx?'active':''}" onclick="${fnName}(${i})">${m.name}</button>`).join('')}
+  `;
+}
+
+function selectVarietyModel(idx){
+  _varietyModelIdx=idx;
+  renderModelSelector('varietyModelSelector',idx,'selectVarietyModel');
+  renderVariety();
+}
+
+function selectScenarioModel(idx){
+  _scenarioModelIdx=idx;
+  renderModelSelector('scenarioModelSelector',idx,'selectScenarioModel');
+  renderScenarioFull();
+}
+
+// ======================================
+// MODEL SUB-TAB SWITCHING
+// ======================================
+function switchModelTab(sub){
+  document.querySelectorAll('.model-section').forEach(el=>el.classList.remove('active'));
+  const target=document.getElementById('ms-'+sub);
+  if(target) target.classList.add('active');
+  document.querySelectorAll('.model-sub-tab').forEach(b=>{
+    const s=b.getAttribute('onclick')||'';
+    b.classList.toggle('active',s.includes("'"+sub+"'"));
+  });
+  if(sub==='interact') setTimeout(()=>updateModel(),120);
+  if(sub==='overview') renderOverview();
+  if(sub==='compare') renderCompare();
+  if(sub==='variety'){ renderModelSelector('varietyModelSelector',_varietyModelIdx,'selectVarietyModel'); renderVariety(); }
+  if(sub==='scenario'){ renderModelSelector('scenarioModelSelector',_scenarioModelIdx,'selectScenarioModel'); renderScenarioFull(); }
+}
+
+// ========== SUB 1: 预测总览 ==========
+function renderOverview(){
+  const params=getParams();
+  const models=[0,1,2,3,4];
+  const modelResults=models.map(midx=>{
+    // Use true fitted values (actual historical inputs) for metrics
+    const trueFitted=computeTrueFitted(midx);
+    const m=computeMetrics(trueFitted);
+    // Use slider-parameter predictions for forecast
+    const rawPreds=computePredictions(midx,params,true);
+    const p26=rawPreds.find(p=>p.year===2026);
+    const p30=rawPreds.find(p=>p.year===2030);
+    const futurePreds=rawPreds.filter(p=>p.year>=2026&&p.year<=2030);
+    let peakYear=null,peakVal=0;
+    for(const pr of futurePreds){
+      if(pr.val>peakVal){peakVal=pr.val;peakYear=pr.year;}
+    }
+    return{idx:midx,name:MODELS[midx].name,color:MODELS[midx].color,
+      r2:m.r2,mape:m.mape,rmse:m.rmse,
+      p26:p26?Math.round(p26.val):null,p30:p30?Math.round(p30.val):null,
+      peakYear,peakVal:Math.round(peakVal)};
+  });
+
+  // Summary cards
+  const avg30=Math.round(modelResults.reduce((s,r)=>s+(r.p30||0),0)/models.length);
+  const vals=modelResults.map(r=>r.p30).filter(v=>v!=null);
+  const min30=Math.min(...vals),max30=Math.max(...vals);
+  const bestR2=modelResults.reduce((a,b)=>(+a.r2>+b.r2)?a:b);
+
+  document.getElementById('overviewCards').innerHTML=`
+    <div class="ov-card"><p class="text-xs text-warm-400 mb-1">2030年均预测</p><p class="text-2xl font-bold text-pri-600" style="font-family:'DM Sans'">${avg30}<span class="text-sm font-normal text-warm-400 ml-1">万吨</span></p><p class="text-[10px] text-warm-400 mt-0.5">五模型加权平均</p></div>
+    <div class="ov-card"><p class="text-xs text-warm-400 mb-1">预测区间</p><p class="text-2xl font-bold text-warm-800" style="font-family:'DM Sans'">${min30}–${max30}<span class="text-sm font-normal text-warm-400 ml-1">万吨</span></p><p class="text-[10px] text-warm-400 mt-0.5">跨度${max30-min30}万吨</p></div>
+    <div class="ov-card"><p class="text-xs text-warm-400 mb-1">最优拟合模型</p><p class="text-xl font-bold text-pri-600">${bestR2.name}<span class="text-xs font-normal text-warm-400 ml-1">R²=${bestR2.r2}</span></p><p class="text-[10px] text-warm-400 mt-0.5">MAPE: ${bestR2.mape}%</p></div>
+    <div class="ov-card"><p class="text-xs text-warm-400 mb-1">2025实际值</p><p class="text-2xl font-bold text-acc-600" style="font-family:'DM Sans'">6,390<span class="text-sm font-normal text-warm-400 ml-1">万吨</span></p><p class="text-[10px] text-warm-400 mt-0.5">同比+11.1%</p></div>
+    <div class="ov-card"><p class="text-xs text-warm-400 mb-1">需求判断</p><p class="text-xl font-bold text-warm-800">${min30<H[H.length-1].s?'见顶回落':'温和增长'}</p><p class="text-[10px] text-warm-400 mt-0.5">峰值预计2027-2029</p></div>`;
+
+  // Bar chart: 2030 predictions
+  const ctxBar=document.getElementById('overviewBarChart');
+  if(ctxBar){
+    if(overviewBarChart) overviewBarChart.destroy();
+    overviewBarChart=new Chart(ctxBar,{
+      type:'bar',
+      data:{
+        labels:modelResults.map(r=>r.name),
+        datasets:[
+          {label:'2030年预测(万吨)',data:modelResults.map(r=>r.p30||0),backgroundColor:modelResults.map(r=>r.color+'99'),borderColor:modelResults.map(r=>r.color),borderWidth:2,borderRadius:4}
+        ]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false}},
+        scales:{
+          y:{grid:{color:'#E8E6E0'},ticks:{font:{size:11},callback:v=>v+'万吨'}},
+          x:{ticks:{font:{size:10}}}
+        }
+      }
+    });
+  }
+
+  // Radar chart: model metrics
+  const ctxRadar=document.getElementById('overviewRadarChart');
+  if(ctxRadar){
+    if(overviewRadarChart) overviewRadarChart.destroy();
+    // Normalize: R² closer to 1 is better, MAPE & RMSE lower is better
+    const r2Vals=modelResults.map(r=>Math.max(0,+r.r2)*10);  // scale to 0-10, clamp negative
+    const mapeVals=modelResults.map(r=>Math.max(0,10-+r.mape/5));  // invert and scale
+    const rmseVals=modelResults.map(r=>Math.max(0,10-+r.rmse/500));  // invert and scale
+    overviewRadarChart=new Chart(ctxRadar,{
+      type:'radar',
+      data:{
+        labels:['R² (×10)','精度(10-MAPE/5)','稳定性(10-RMSE/500)'],
+        datasets:modelResults.map(r=>{
+          const i=r.idx;
+          return {
+            label:r.name,
+            data:[r2Vals[i],mapeVals[i],rmseVals[i]],
+            borderColor:r.color,backgroundColor:r.color+'22',borderWidth:2,pointRadius:3
+          };
+        })
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        layout:{padding:{top:10,bottom:30,left:10,right:10}},
+        scales:{r:{min:0,max:10,ticks:{stepSize:2,font:{size:9},backdropPadding:{x:1,y:1}},pointLabels:{font:{size:10},padding:4}}},
+        plugins:{legend:{position:'bottom',labels:{font:{size:9},boxWidth:10,padding:8}}}
+      }
+    });
+  }
+
+  // Table
+  document.getElementById('overviewTableBody').innerHTML=modelResults.map(r=>`
+    <tr>
+      <td><span style="width:10px;height:10px;border-radius:3px;background:${r.color};display:inline-block;margin-right:6px"></span>${r.name}</td>
+      <td>${r.r2}</td><td>${r.mape}%</td><td>${r.rmse}</td>
+      <td class="font-semibold">${r.p26||'—'}</td><td class="font-semibold text-acc-600">${r.p30||'—'}</td>
+      <td>${r.peakYear||'—'}</td><td>${r.peakVal||'—'}</td>
+      <td><span class="badge" style="background:${r.p30>H[H.length-1].s?'#E1F5EE':'#FAECE7'};color:${r.p30>H[H.length-1].s?'#0F6E56':'#D85A30'}">${r.p30>H[H.length-1].s?'↑增长':'↓回落'}</span></td>
+    </tr>`).join('');
+}
+
+// ========== SUB 2: 模型对比 ==========
+function renderCompare(){
+  const params=getParams();
+  const models=[0,1,2,3,4];
+  const allResults=models.map(midx=>{
+    const rawPreds=computePredictions(midx,params,true);
+    return{idx:midx,name:MODELS[midx].name,color:MODELS[midx].color,data:rawPreds};
+  });
+
+  // Line chart: overlay all 5
+  const ctxLine=document.getElementById('compareLineChart');
+  if(ctxLine){
+    if(compareLineChart) compareLineChart.destroy();
+    compareLineChart=new Chart(ctxLine,{
+      type:'line',
+      data:{
+        datasets:[
+          {label:'实际值',data:H.map(d=>({x:d.y,y:d.s})),borderColor:'#1A1A19',borderWidth:3,tension:.3,pointRadius:5,pointBackgroundColor:'#1A1A19'},
+          ...allResults.map(r=>({label:r.name,data:r.data.map(p=>({x:p.year,y:+p.val.toFixed(0)})),borderColor:r.color,borderWidth:2,borderDash:[5,3],tension:.3,fill:false,pointRadius:2}))
+        ]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        interaction:{mode:'index',intersect:false},
+        plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:14,usePointStyle:true}}},
+        scales:{
+          x:{type:'linear',grid:{color:'#E8E6E0'},ticks:{font:{size:11}}},
+          y:{grid:{color:'#E8E6E0'},ticks:{font:{size:11},callback:v=>v>=1000?v/1000+'K':v}}
+        }
+      }
+    });
+  }
+
+  // Bar chart: 2030
+  const ctxBar=document.getElementById('compareBarChart');
+  if(ctxBar){
+    if(compareBarChart) compareBarChart.destroy();
+    const data2030=allResults.map(r=>{
+      const d=r.data.find(p=>p.year===2030);
+      return d?Math.round(d.val):null;
+    });
+    compareBarChart=new Chart(ctxBar,{
+      type:'bar',
+      data:{
+        labels:allResults.map(r=>r.name),
+        datasets:[{label:'2030预测(万吨)',data:data2030,backgroundColor:allResults.map(r=>r.color+'88'),borderColor:allResults.map(r=>r.color),borderWidth:2,borderRadius:4}]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false}},
+        scales:{y:{grid:{color:'#E8E6E0'},ticks:{font:{size:11},callback:v=>v+'万吨'}},x:{ticks:{font:{size:10}}}}
+      }
+    });
+  }
+
+  // Methodology comparison
+  const features=[
+    {label:'经济解释性',vals:[3,5,4,2,3]},
+    {label:'数据需求量',vals:[2,3,2,2,4]},
+    {label:'短期精度',vals:[5,4,3,5,5]},
+    {label:'长期稳定性',vals:[3,4,5,1,4]},
+    {label:'参数敏感性',vals:[4,5,3,2,3]},
+  ];
+  document.getElementById('compareMethodology').innerHTML=`
+    <div class="flex items-center gap-3 mb-2 pb-2 border-b border-[var(--border)]">
+      <span class="text-xs font-medium text-warm-600 w-24 flex-shrink-0">模型图例</span>
+      <div class="flex gap-2 flex-1">${MODELS.map(m=>`<div class="flex items-center gap-1.5 flex-1 justify-center"><span class="w-3 h-3 rounded" style="background:${m.color}"></span><span class="text-[10px] text-warm-500">${m.name}</span></div>`).join('')}</div>
+    </div>
+  `+features.map(f=>`
+    <div class="flex items-center gap-3">
+      <span class="text-xs font-medium text-warm-600 w-24 flex-shrink-0">${f.label}</span>
+      <div class="flex gap-2 flex-1">${f.vals.map((v,i)=>`<div class="flex-1 h-6 rounded" style="background:${MODELS[i].color}${Math.round(v*2.5)}4;width:${v*16}%" title="${MODELS[i].name}: ${v}/5"></div>`).join('')}</div>
+    </div>`).join('');
+}
+
+// ========== SUB 3: 品种结构 ==========
+function renderVariety(){
+  const midx=_varietyModelIdx;
+  const params=getParams();
+  const rawPreds=computePredictions(midx,params,true);
+
+  // Compute total tonnage for key years from the selected model
+  const getModelVal=(year)=>{
+    const p=rawPreds.find(p=>p.year===year);
+    return p?Math.round(p.val):6390;
+  };
+  const total2025=getModelVal(2025); // Should be close to actual 6390
+  const total2027=getModelVal(2027);
+  const total2030=getModelVal(2030);
+
+  // Model-specific structural adjustment factors
+  // Each model type captures structural shifts differently
+  const modelFactors=[0.8, 1.2, 1.0, 0.5, 0.95]; // Linear,Decomp,SCurve,Poly,Ensemble
+  const adj=modelFactors[midx];
+
+  // Stacked bar chart
+  const ctxStack=document.getElementById('varietyStackedChart');
+  if(ctxStack){
+    if(varietyStackedChart) varietyStackedChart.destroy();
+    const years=[2025,2027,2030];
+    const totals=[total2025,total2027,total2030];
+    const datasets=STRUCT_SHIFT.map(d=>{
+      const fromPct=d.from;
+      const toPct=d.from+(d.to-d.from)*adj; // Model-adjusted target %
+      return {
+        label:d.name,
+        data:years.map((y,idx)=>{
+          const interp=fromPct+(toPct-fromPct)*(idx===0?0:idx===1?0.4:1);
+          return Math.round(totals[idx]*interp/100);
+        }),
+        backgroundColor:d.color+'cc',borderColor:d.color,borderWidth:1
+      };
+    });
+    varietyStackedChart=new Chart(ctxStack,{
+      type:'bar',
+      data:{labels:years.map(y=>y+'年'),datasets},
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:12,usePointStyle:true}}},
+        scales:{
+          x:{stacked:true,grid:{display:false}},
+          y:{stacked:true,grid:{color:'#E8E6E0'},ticks:{font:{size:11},callback:v=>v+'万吨'}}
+        }
+      }
+    });
+  }
+
+  // Table
+  const tbody=document.getElementById('varietyTableBody');
+  if(tbody){
+    tbody.innerHTML=STRUCT_SHIFT.map(d=>{
+      const toPct=d.from+(d.to-d.from)*adj;
+      const curr2025=Math.round(total2025*d.from/100);
+      const pred2030=Math.round(total2030*toPct/100);
+      const trend=pred2030>curr2025?'↑':pred2030<curr2025?'↓':'→';
+      const trendColor=trend==='↑'?'#0F6E56':trend==='↓'?'#D85A30':'#888780';
+      return`<tr>
+        <td class="font-medium">${d.name}</td>
+        <td>${d.from}%</td><td>${curr2025}</td>
+        <td>${toPct.toFixed(1)}%</td><td class="font-semibold">${pred2030}</td>
+        <td style="color:${trendColor};font-weight:600">${trend} ${pred2030>curr2025?'+':''}${pred2030-curr2025}万吨</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Deep dive cards
+  const modelName=MODELS[midx].name;
+  const deepDives=[{
+    title:'热成型钢(PHS)',color:'#0F6E56',
+    desc:`${modelName}视角：最核心的增量品种。受C-NCAP五星安全+轻量化双重驱动，渗透率从8%→${(18*adj).toFixed(0)}%。主要应用：A柱/B柱/防撞梁/门槛。国产宝钢/鞍钢QP钢已批量供货。`,
+    drivers:['安全法规升级','轻量化需求','国产替代加速'],risk:'铝一体化压铸对B柱替代风险'
+  },{
+    title:'第三代AHSS(QP钢)',color:'#378ADD',
+    desc:`${modelName}视角：强塑积>20GPa%的新一代高强钢。宝钢QP980/1180已商业化，鞍钢QP1500开发中。渗透率从2%→${(10*adj).toFixed(0)}%。`,
+    drivers:['白车身轻量化','碰撞吸能需求','整车厂降本'],risk:'中锰钢(第三代)工业化进度不确定'
+  },{
+    title:'电工钢(硅钢)',color:'#7F77DD',
+    desc:`${modelName}视角：新能源驱动电机核心材料。高牌号无取向电工钢供应缺口20-30万吨。渗透率从5%→${(10*adj).toFixed(0)}%。`,
+    drivers:['NEV电机用量增加','双电机/三电机趋势','高牌号国产化'],risk:'永磁电机技术路线变化影响用量'
+  },{
+    title:'冷轧板+镀锌板',color:'#BA7517',
+    desc:`${modelName}视角：汽车外板主力品种，合计占比45%但目前呈下降趋势。外板从${(15*adj).toFixed(0)}%→10%因铝合金替代；镀锌板从${(30*adj).toFixed(0)}%→28%因高强钢替代增强件。`,
+    drivers:['车身覆盖件刚需','耐腐蚀要求'],risk:'铝外板替代加速'
+  },{
+    title:'普碳低强钢',color:'#D85A30',
+    desc:`${modelName}视角：最大减量品种。从19%→${(12*adj).toFixed(0)}%因高强钢全面替代。Mild steel将逐步退出白车身结构件领域。总用量基准：${total2030}万吨。`,
+    drivers:['成本优势','商用车仍有需求'],risk:'高强钢性价比持续提升加速替代'
+  }];
+  document.getElementById('varietyDeepDive').innerHTML=deepDives.map(dd=>`
+    <div class="dd-card" style="border-color:${dd.color}33">
+      <div class="flex items-center gap-2 mb-2"><div class="w-3 h-3 rounded-sm" style="background:${dd.color}"></div><h3 class="text-sm font-semibold text-warm-800">${dd.title}</h3></div>
+      <p class="text-xs text-warm-600 leading-relaxed mb-2">${dd.desc}</p>
+      <div class="flex flex-wrap gap-1 mb-1">${dd.drivers.map(d=>`<span class="chip" style="background:${dd.color}15;color:${dd.color};font-weight:500">${d}</span>`).join('')}</div>
+      <p class="text-[10px] text-warm-400">⚠ ${dd.risk}</p>
+    </div>`).join('');
+}
+
+// ========== SUB 4: 情景分析 ==========
+function renderScenarioFull(){
+  const midx=_scenarioModelIdx;
+  const params=getParams();
+
+  // Compute baseline prediction for the selected model (2026-2030)
+  const basePreds=computePredictions(midx,params,true);
+  const futureYears=[2026,2027,2028,2029,2030];
+  const baseVals=futureYears.map(y=>{
+    const p=basePreds.find(p=>p.year===y);
+    return p?Math.round(p.val):null;
+  });
+
+  // Scenario multipliers: derived from NEV/al/prod assumptions vs baseline
+  // Each scenario = a parameter adjustment coefficient applied to baseline
+  const sceMultipliers={
+    bullish: [1.03, 1.04, 1.05, 1.06, 1.08],
+    bearish:  [0.97, 0.95, 0.92, 0.89, 0.85],
+    black:    [0.93, 0.88, 0.82, 0.76, 0.68]
+  };
+
+  const sceData=[
+    {name:'基准情景',desc:'政策延续·技术线性进步',color:'#0F6E56',icon:'📊',
+     nev:65,al:12,prod:3400,giga:25,vals:baseVals},
+    {name:'乐观情景',desc:'政策强力·技术突破',color:'#378ADD',icon:'🚀',
+     nev:75,al:8,prod:3800,giga:20,
+     vals:baseVals.map((v,i)=>Math.round(v*sceMultipliers.bullish[i]))},
+    {name:'悲观情景',desc:'经济放缓·替代加速',color:'#D85A30',icon:'⚠',
+     nev:55,al:18,prod:3000,giga:35,
+     vals:baseVals.map((v,i)=>Math.round(v*sceMultipliers.bearish[i]))},
+    {name:'黑天鹅情景',desc:'技术突变·需求崩塌',color:'#888780',icon:'🦢',
+     nev:85,al:25,prod:2600,giga:50,
+     vals:baseVals.map((v,i)=>Math.round(v*sceMultipliers.black[i]))}
+  ];
+
+  // Summary cards
+  document.getElementById('scenarioSummaryCards').innerHTML=sceData.map(s=>`
+    <div class="sc-card" style="border-color:${s.color}33">
+      <div class="text-lg mb-1">${s.icon}</div>
+      <p class="text-sm font-semibold" style="color:${s.color}">${s.name}</p>
+      <p class="text-[10px] text-warm-400 mt-0.5">${s.desc}</p>
+      <p class="text-xl font-bold mt-2" style="font-family:'DM Sans';color:${s.color}">${s.vals[s.vals.length-1]}<span class="text-xs font-normal text-warm-400">万吨</span></p>
+      <p class="text-[10px] text-warm-400">2030预测 (${MODELS[midx].name})</p>
+    </div>`).join('');
+
+  // Full chart
+  const ctx=document.getElementById('scenarioFullChart');
+  if(ctx){
+    if(scenarioFullChart) scenarioFullChart.destroy();
+    scenarioFullChart=new Chart(ctx,{
+      type:'line',
+      data:{
+        labels:futureYears,
+        datasets:sceData.map(s=>({
+          label:s.name,data:s.vals,borderColor:s.color,
+          borderWidth:s.name==='基准情景'?3:2,borderDash:s.name==='基准情景'?[]:[5,3],
+          tension:.3,fill:false,pointRadius:s.name==='基准情景'?5:3
+        }))
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        interaction:{mode:'index',intersect:false},
+        plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:16,usePointStyle:true}}},
+        scales:{
+          y:{grid:{color:'#E8E6E0'},ticks:{font:{size:11},callback:v=>v+'万吨'}},
+          x:{grid:{display:false}}
+        }
+      }
+    });
+  }
+
+  // Assumptions table
+  document.getElementById('scenarioAssumpBody').innerHTML=sceData.map(s=>{
+    const base2030=sceData[0].vals[sceData[0].vals.length-1];
+    const diff=s.vals[s.vals.length-1]-base2030;
+    const diffSign=diff>=0?'+':'';
+    const diffColor=diff>=0?'#0F6E56':'#D85A30';
+    return`<tr>
+      <td class="font-semibold" style="color:${s.color}">${s.name}</td>
+      <td>${s.nev}%</td><td>${s.al}%</td><td>${s.prod}万辆</td><td>${s.giga}%</td>
+      <td class="font-bold" style="color:${s.color}">${s.vals[s.vals.length-1]}</td>
+      <td style="color:${diffColor};font-weight:600">${diffSign}${diff}万吨 (${diffSign}${(diff/base2030*100).toFixed(1)}%)</td>
+    </tr>`;
+  }).join('');
+}
+
+// ======================================
+// TAB SWITCHING
+// ======================================
+function switchTab(tab){
+  const analysisEl=document.getElementById('tab-analysis');
+  const modelEl=document.getElementById('tab-model');
+  analysisEl.style.display = tab==='analysis' ? 'block' : 'none';
+  if(modelEl){
+    modelEl.classList.toggle('hidden', tab!=='model');
+    modelEl.style.display = tab==='model' ? 'block' : 'none';
+    if(tab==='model') switchModelTab('overview');
+  }
+  document.querySelectorAll('#mainNav .tab-btn').forEach(b=>{
+    b.classList.toggle('active',(tab==='analysis'&&b.textContent.includes('战略'))||(tab==='model'&&b.textContent.includes('模型')));
+  });
+}
+
+function switchAnalysis(section){
+  document.querySelectorAll('.analysis-section').forEach(el=>el.classList.remove('active'));
+  const target=document.getElementById('as-'+section);
+  if(target) target.classList.add('active');
+  document.querySelectorAll('.analysis-tab').forEach(b=>{
+    const s=b.getAttribute('onclick')||'';
+    b.classList.toggle('active',s.includes("'"+section+"'"));
+  });
+  // Lazy render charts
+  if(section==='porter'&&!porterChartInst) setTimeout(renderPorterChart,50);
+  if(section==='bcg') setTimeout(()=>{renderBCGChart();renderStructShift();},50);
+  if(section==='scenario') setTimeout(renderScenarioChart,50);
+  if(section==='pestle') setTimeout(renderPESTLEGrid,50);
+  if(section==='mece') setTimeout(renderMECETrees,50);
+  if(section==='summary'&&!histChartInst) setTimeout(renderHistChart,50);
+}
+
+// ======================================
+// SLIDER VALUE DISPLAY
+// ======================================
+function updateSliderDisplay(id,suffix){
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.addEventListener('input',()=>{
+    const display=el.parentElement.querySelector('.val');
+    if(display) display.textContent=el.value+(suffix||'');
+    updateModel();
+  });
+}
+
+// ======================================
+// INIT
+// ======================================
+document.addEventListener('DOMContentLoaded',()=>{
+  initFit();
+  renderHistChart();
+  renderPESTLEGrid();
+  renderRiskMatrix();
+  renderScenarioChart();
+
+  // Slider display bindings
+  [
+    ['sl_prod','万辆'],['sl_nev','%'],['sl_wice','kg'],['sl_wev','kg'],
+    ['sl_al','%'],['sl_w1',''],['sl_w2',''],['sl_w3',''],['sl_w4','']
+  ].forEach(([id,sfx])=>updateSliderDisplay(id,sfx));
+
+  selectModel(0);
+});
+</script>
+</body>
+</html>
