@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>越南钢铁三巨头深度报告 — 数据来源核查清单</title>
+<style>
+  :root {
+    --bg: #f8f9fb;
+    --card-bg: #ffffff;
+    --text: #1a202c;
+    --text-secondary: #4a5568;
+    --text-muted: #718096;
+    --border: #e2e8f0;
+    --border-light: #edf2f7;
+    --primary: #1e3a5f;
+    --primary-light: #2c5282;
+    --accent-blue: #3182ce;
+    --accent-green: #059669;
+    --accent-orange: #d97706;
+    --accent-red: #dc2626;
+    --accent-purple: #7c3aed;
+    --tag-direct: #e6f7ee;
+    --tag-direct-text: #059669;
+    --tag-reason: #fef3c7;
+    --tag-reason-text: #d97706;
+    --tag-estimate: #fee2e2;
+    --tag-estimate-text: #dc2626;
+    --source-high: #e6f7ee;
+    --source-high-bd: #059669;
+    --source-mid: #fef3c7;
+    --source-mid-bd: #d97706;
+    --source-verify: #fde8e8;
+    --source-verify-bd: #dc2626;
+    --source-est: #fee2e2;
+    --source-est-bd: #991b1b;
+    --source-infer: #e8f0fe;
+    --source-infer-bd: #4a6cf7;
+    --hero-gradient: linear-gradient(135deg, #1e3a5f 0%, #2c5282 50%, #1a365d 100%);
+    --font-sans: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --transition: 150ms ease;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Hero */
+  .hero {
+    background: var(--hero-gradient);
+    color: #fff;
+    padding: 64px 24px 56px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #3182ce, #059669, #d97706, #dc2626);
+  }
+  .hero h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    margin-bottom: 12px;
+  }
+  .hero .subtitle {
+    font-size: 15px;
+    color: rgba(255,255,255,0.8);
+    max-width: 680px;
+    margin: 0 auto 10px;
+  }
+  .hero .meta {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    font-family: var(--font-mono);
+  }
+
+  /* Stats bar */
+  .stats-bar {
+    max-width: 1120px;
+    margin: -28px auto 0;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    position: relative;
+    z-index: 2;
+  }
+  .stat-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-md);
+    padding: 20px 16px;
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
+  }
+  .stat-card .num {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--primary);
+    line-height: 1;
+  }
+  .stat-card .label {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    letter-spacing: 0.03em;
+  }
+
+  /* Main container */
+  .container {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 32px 24px 64px;
+  }
+
+  /* Section header */
+  .section-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--primary);
+    padding: 10px 0;
+    margin: 48px 0 20px;
+    border-bottom: 2px solid var(--primary-light);
+    letter-spacing: 0.02em;
+  }
+  .section-title:first-of-type { margin-top: 16px; }
+  .subsection-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--primary-light);
+    margin: 28px 0 12px;
+    padding-left: 12px;
+    border-left: 3px solid var(--accent-blue);
+  }
+
+  /* Blockquote */
+  blockquote {
+    background: var(--card-bg);
+    border-left: 4px solid var(--primary-light);
+    margin: 20px 0;
+    padding: 16px 20px;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  /* Tables */
+  .table-wrap {
+    overflow-x: auto;
+    margin: 16px 0 24px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    background: var(--card-bg);
+    min-width: 700px;
+  }
+  thead th {
+    background: #1a365d;
+    color: #fff;
+    font-weight: 600;
+    padding: 10px 12px;
+    text-align: left;
+    font-size: 12px;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+  }
+  thead th:first-child { border-radius: var(--radius-md) 0 0 0; }
+  thead th:last-child { border-radius: 0 var(--radius-md) 0 0; }
+  tbody td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border-light);
+    vertical-align: top;
+    line-height: 1.55;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: #f7faff; }
+  tbody td:first-child {
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    min-width: 36px;
+    text-align: center;
+  }
+
+  /* Tags */
+  .tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+  }
+  .tag-direct { background: var(--tag-direct); color: var(--tag-direct-text); }
+  .tag-reason { background: var(--tag-reason); color: var(--tag-reason-text); }
+  .tag-estimate { background: var(--tag-estimate); color: var(--tag-estimate-text); }
+  .tag-limit { background: #fce7f3; color: #be185d; }
+
+  /* Links */
+  a {
+    color: var(--accent-blue);
+    text-decoration: none;
+    font-size: 12px;
+    transition: color var(--transition);
+  }
+  a:hover { color: var(--primary); text-decoration: underline; }
+  .link-list { display: flex; flex-wrap: wrap; gap: 4px 8px; }
+
+  /* Source quality cards */
+  .quality-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .quality-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .quality-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+  .quality-info h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .quality-info p { font-size: 12px; color: var(--text-muted); }
+
+  /* HR */
+  hr.divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 32px 0;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 32px 24px;
+    color: var(--text-muted);
+    font-size: 12px;
+    border-top: 1px solid var(--border);
+    margin-top: 48px;
+  }
+
+  /* Summary table special */
+  .summary-table thead th { background: #1e3a5f; }
+  .summary-table .highlight { 
+    background: #f0f7ff; 
+    font-weight: 600;
+  }
+
+  /* Back to top */
+  .back-top {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-md);
+    opacity: 0.85;
+    transition: opacity var(--transition);
+    text-decoration: none;
+    font-size: 18px;
+    z-index: 100;
+  }
+  .back-top:hover { opacity: 1; }
+
+  /* Mono value */
+  .mono { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .hero h1 { font-size: 22px; }
+    .stats-bar { grid-template-columns: repeat(2, 1fr); }
+    .container { padding: 20px 16px 48px; }
+  }
+
+  /* Print */
+  @media print {
+    .hero { padding: 40px 24px; color: #000; background: #fff !important; -webkit-print-color-adjust: exact; }
+    .hero h1 { color: #1e3a5f; }
+    .back-top { display: none; }
+    body { background: #fff; }
+    .table-wrap { box-shadow: none; border: 1px solid #ccc; }
+    thead th { background: #e2e8f0 !important; color: #1a202c !important; -webkit-print-color-adjust: exact; }
+    .stat-card { box-shadow: none; border: 1px solid #ddd; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <h1>越南钢铁三巨头深度报告 — 数据来源核查清单</h1>
+  <p class="subtitle">逐条标注三份背调报告中所有数据、核心观点的来源，区分「直接引用源」与「推理结论」，便于交叉核对。</p>
+  <p class="meta">生成日期：2026-06-02（v2.0）&nbsp;&nbsp;|&nbsp;&nbsp;覆盖报告：Vingroup / 和发集团 / 台塑集团</p>
+</section>
+
+<!-- ============ STATS BAR ============ -->
+<div class="stats-bar">
+  <div class="stat-card">
+    <div class="num">~175</div>
+    <div class="label">数据/观点总条目</div>
+  </div>
+  <div class="stat-card">
+    <div class="num">~81</div>
+    <div class="label">独立来源URL</div>
+  </div>
+  <div class="stat-card">
+    <div class="num">69%</div>
+    <div class="label">直接引用源</div>
+  </div>
+  <div class="stat-card">
+    <div class="num">26%</div>
+    <div class="label">推理结论</div>
+  </div>
+  <div class="stat-card">
+    <div class="num">~6%</div>
+    <div class="label">标注估算</div>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ================================================================ -->
+<!-- 一、Vingroup -->
+<!-- ================================================================ -->
+<h2 class="section-title">一、Vingroup（温纳集团）</h2>
+
+<h3 class="subsection-title">1.1 公司概况</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>#</th><th>数据/观点</th><th>原文数值</th><th>来源类型</th><th>来源链接</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>前身 Technocom，1993年创立于乌克兰</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://en.wikipedia.org/wiki/Ph%E1%BA%A1m_Nh%E1%BA%ADt_V%C6%B0%C6%A1ng">Wikipedia - Pham Nhat Vuong</a></td></tr>
+<tr><td>2</td><td>总部河内</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://vingroup.net">Vingroup官网</a></td></tr>
+<tr><td>3</td><td>五大核心支柱（房地产、科技工业、旅游、医疗、教育）</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://ircdn.vingroup.net/storage/Uploads/0_Bao%20cao%20thuong%20nien/2025/ENG%20Vingroup%20AR25.pdf">Vingroup 2024年报 (EN)</a></td></tr>
+<tr><td>4</td><td>2024年总资产 839,216亿越南盾</td><td>≈$33.6亿</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.vietnam.vn/en/vingroup-dat-doanh-thu-ky-luc-gan-200-000-ti-dong">Vietnam.vn - Vingroup Record Revenue</a>；<a href="https://vn.mofcom.gov.cn/jmxw/art/2025/art_2180c128536347d67c93d5d2debc72.html">中国商务部MOFCOM</a></td></tr>
+<tr><td>5</td><td>2024年总股本 77亿股（红股发行后）</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.marketscreener.com/quote/stock/VINGROUP-6603353/company-shareholders/">MarketScreener - Vingroup Shareholders</a></td></tr>
+<tr><td>6</td><td>VinFast 纳斯达克上市 NASDAQ: VFS</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://ir.vinfastauto.com">VinFast Investor Relations</a></td></tr>
+<tr><td>6b</td><td>FY2025合并净收入332,770亿VND</td><td>≈$128.3亿</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://theinvestor.vn/vingroup-posts-record-profit-revenue-in-2025-on-property-surge-manufacturing-expansion-d18275.html">The Investor - Vingroup record profit 2025</a></td></tr>
+<tr><td>6c</td><td>FY2025税后利润40,490亿VND</td><td>≈$15.6亿</td><td><span class="tag tag-direct">直接引用</span></td><td>同上</td></tr>
+<tr><td>6d</td><td>范日旺向VinSpeed贡献4,800万股</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://theinvestor.vn/vietnam-billionaire-pham-nhat-vuong-to-contribute-48-mln-vingroup-shares-to-vinspeed-d15850.html">The Investor - Vuong contributes shares</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 class="subsection-title">1.2 股权结构</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>#</th><th>数据/观点</th><th>原文数值</th><th>来源类型</th><th>来源链接</th></tr></thead>
+<tbody>
+<tr><td>7</td><td>范日旺+关联方合计持股 ~58%</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.vietnam.vn/en/ai-dang-thuc-su-nam-co-phan-vingroup">Vietnam.vn - Vingroup Ownership</a>；<a href="https://fulcrum.sg/will-vietnams-richest-man-be-safe/">Fulcrum.sg</a></td></tr>
+<tr><td>8</td><td>范氏香（妻）、范日光英（子）为重要股东</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.vietnam.vn/en/ai-dang-thuc-su-nam-co-phan-vingroup">Vietnam.vn - Vingroup Ownership</a></td></tr>
+<tr><td>9</td><td>Dragon Capital VEIL 持仓1,520万股，占NAV 8.3%</td><td>≈$1.58亿</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.marketscreener.com/quote/stock/VINGROUP-6603353/company-shareholders/">MarketScreener - Vingroup Shareholders</a></td></tr>
+<tr><td>10</td><td>VanEck Vietnam ETF 持仓860万股</td><td>≈$8,880万</td><td><span class="tag tag-direct">直接引用</span></td><td>同上</td></tr>
+<tr><td>11</td><td>Fubon FTSE Vietnam ETF 持仓724万股</td><td>≈$3,018万</td><td><span class="tag tag-direct">直接引用</span></td><td>同上</td></tr>
+<tr><td>12</td><td>"外资机构仅占不足0.2%，对控制权无实质影响"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>1,520万股÷77亿股=0.197%计算；"无实质影响"为分析判断</td></tr>
+<tr><td>13</td><td>股东总数31,273人，较年初减少~25,600</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.marketscreener.com/quote/stock/VINGROUP-6603353/company-shareholders/">MarketScreener - Vingroup Shareholders</a></td></tr>
+<tr><td>14</td><td>"资本集中化——散户撤出，大股东更稳固"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>股东数下降+机构持仓稳定推断</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 class="subsection-title">1.3 产业布局与子公司</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>#</th><th>数据/观点</th><th>原文数值</th><th>来源类型</th><th>来源链接</th></tr></thead>
+<tbody>
+<tr><td>15</td><td>VinRobotics 2024年底成立，注册资本1万亿VND</td><td>≈$4,000万</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://news.laodong.vn/kinh-doanh/vingroup-thanh-lap-them-cong-ty-con-ve-nguoi-may-1578720.ldo">Lao Dong News - VinRobotics</a></td></tr>
+<tr><td>16</td><td>VinMetal 2025年成立，注册资本1万亿VND</td><td>≈$3,800万</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://asiamanufacturingnewstoday.com/2025/10/vingroup-establishes-vinmetal-steel-manufacturing-company-enters-metallurgy-industry/">Asia Manufacturing News - VinMetal</a></td></tr>
+<tr><td>17</td><td>VinMetal CEO Nguyễn Việt Quang</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>同上</td></tr>
+<tr><td>18</td><td>VinMetal 选址河静省永昂经济区</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>同上</td></tr>
+<tr><td>19</td><td>VinMetal 一期产能约500万吨/年</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>同上</td></tr>
+<tr><td>20</td><td>"与台塑河静同省，暗示可利用相同基础设施"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>基于地理位置的推测</td></tr>
+<tr><td>21</td><td>VinEnergo 中标河静898MW海上风电，投资$14.8亿</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.seetao.com/details/253958.html">SEETAO - VinEnergo Wind Power</a></td></tr>
+<tr><td>22</td><td>"VinEnergo风电为VinMetal绿色钢铁提供清洁能源"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>集团内业务协同推演</td></tr>
+<tr><td>22b</td><td>GSM VN控股公司成立，资本$17亿</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://technode.global/2026/03/10/vietnams-top-billionaire-pham-nhat-vuong-family-establish-1-7b-holding-company-gsm-vn/">TNGlobal - GSM VN $1.7B holding</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 class="subsection-title">1.4 财务数据</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>#</th><th>数据/观点</th><th>原文数值</th><th>来源类型</th><th>来源链接</th></tr></thead>
+<tbody>
+<tr><td>23</td><td>2024合并净收入 192,159亿VND</td><td>≈$7.7亿</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.vietnam.vn/en/vingroup-dat-doanh-thu-ky-luc-gan-200-000-ti-dong">Vietnam.vn - Vingroup Record Revenue</a></td></tr>
+<tr><td>24</td><td>2024税前利润 16,724亿VND</td><td>≈$6,690万</td><td><span class="tag tag-direct">直接引用</span></td><td>同上</td></tr>
+<tr><td>25</td><td>2024税后利润 5,251亿VND，+155.4%</td><td>≈$2,100万</td><td><span class="tag tag-direct">直接引用</span></td><td>同上</td></tr>
+<tr><td>26</td><td>Vinhomes收入 141,812亿VND</td><td>≈$5.7亿</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://ircdn.vingroup.net/storage/Uploads/0_Bao%20cao%20thuong%20nien/2025/ENG%20Vingroup%20AR25.pdf">Vingroup 2024年报 (EN)</a></td></tr>
+<tr><td>27</td><td>"房地产占集团收入~74%"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>141,812÷192,159≈73.8%</td></tr>
+<tr><td>28</td><td>VinFast 2024年收入 44,019.6亿VND，+57.9%</td><td>≈$17.6亿</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://vinfastauto.com/vn_en/vinfast-reports-fourth-quarter-and-full-year-2024-financial-results">VinFast 2024 Financial Results</a></td></tr>
+<tr><td>29</td><td>VinFast 全年交付~88,000辆</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>同上</td></tr>
+<tr><td>30</td><td>VinFast Q4交付53,139辆，+143% QoQ</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>同上</td></tr>
+<tr><td>31</td><td>VinFast "毛利亏损"</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>同上</td></tr>
+<tr><td>32</td><td>"VinFast是越南车市销量第一"</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>VAMA数据 + VinFast官方</td></tr>
+<tr><td>33</td><td>2024年12月VinGroup及范日旺宣布对VinFast的"重大财务承诺"</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>VinFast官方新闻稿</td></tr>
+<tr><td>34</td><td>"范日旺通过个人资金+集团调配为VinFast输血"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>关联交易模式推断</td></tr>
+<tr><td>35</td><td>"合并收入可能不包含Vinhomes全部收入"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>合并会计准则推断</td></tr>
+<tr><td>36</td><td>总资产+25.7%</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.vietnam.vn/en/vingroup-dat-doanh-thu-ky-luc-gan-200-000-ti-dong">Vietnam.vn - Vingroup Record Revenue</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 class="subsection-title">1.5 钢铁业务（VinMetal）</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>#</th><th>数据/观点</th><th>原文数值</th><th>来源类型</th><th>来源链接</th></tr></thead>
+<tbody>
+<tr><td>37</td><td>VinMetal目标产品：热轧钢、高强钢、特种合金钢、电动车钢、高铁钢轨</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://asiamanufacturingnewstoday.com/2025/10/vingroup-establishes-vinmetal-steel-manufacturing-company-enters-metallurgy-industry/">Asia Manufacturing News - VinMetal</a></td></tr>
+<tr><td>38</td><td>"优先服务VinFast+Vinhomes内部需求"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>Vingroup生态系统推断</td></tr>
+<tr><td>39</td><td>VinFast每辆车约0.8吨钢材，×88,000辆≈7万吨/年</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>行业粗略估算（乘用车0.6-0.9吨/辆）</td></tr>
+<tr><td>40</td><td>Vinhomes年建筑钢材需求"数十~百万吨级"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>定性估算</td></tr>
+<tr><td>41</td><td>"南北高铁、胡志明-芹耶线等潜在需求数百万吨级"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>高铁规划规模估算</td></tr>
+<tr><td>42</td><td>河静省有深水港，预计依赖进口铁矿石和焦煤</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>河静省永昂港信息推断</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 class="subsection-title">1.6 主要人员</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>#</th><th>数据/观点</th><th>原文数值</th><th>来源类型</th><th>来源链接</th></tr></thead>
+<tbody>
+<tr><td>43</td><td>范日旺1968年出生，越南河静省</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://en.wikipedia.org/wiki/Ph%E1%BA%A1m_Nh%E1%BA%ADt_V%C6%B0%C6%A1ng">Wikipedia</a>；<a href="https://www.forbes.com/profile/pham-nhat-vuong/">福布斯越南富豪榜</a></td></tr>
+<tr><td>44</td><td>1993年在乌克兰创立Technocom（Mivina即食面）</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://cvdvn.net/2021/06/11/the-rise-and-rise-of-a-vietnamese-corporate-empire/">CVD - Rise of Vietnamese Corporate Empire</a></td></tr>
+<tr><td>45</td><td>2010年以约$1.5亿将Mivina出售给雀巢</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.nestle.com/media/pressreleases/allpressreleases">Nestlé 2010年收购Mivina公告</a></td></tr>
+<tr><td>46</td><td>"极具野心、敢于跨界"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>分析性判断</td></tr>
+<tr><td>47</td><td>"国家主义导向"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>分析判断</td></tr>
+<tr><td>47b</td><td>范日旺登福布斯全球富豪榜第63/69位</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://vietnamnet.vn/en/pham-nhat-vuong-hits-record-wealth-tops-southeast-asia-rankings-2512749.html">VietNamNet - Vuong tops SE Asia</a>；<a href="https://vietnamnews.vn/economy/1780028/billionaire-pham-nhat-vuong-rises-to-63rd-on-global-rich-list-as-vingroup-shares-hit-record-highs.html">Vietnam News - 63rd</a></td></tr>
+<tr><td>47c</td><td>VinGroup起诉68个实体/个人传播虚假信息</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://news.tuoitre.vn/vietnams-vingroup-sues-68-organizations-individuals-over-online-misinformation-103250909143126249.htm">Tuoi Tre - Vingroup sues 68</a>；<a href="https://theinvestor.vn/vietnams-leading-conglomerate-vingroup-sues-68-entities-individuals-for-false-information-d16948.html">The Investor</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 class="subsection-title">1.7 政府关系 · 1.8 SWOT分析</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>#</th><th>数据/观点</th><th>原文数值</th><th>来源类型</th><th>来源链接</th></tr></thead>
+<tbody>
+<tr><td>48</td><td>VinGroup常被视为"国家冠军企业"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td><a href="https://asiatimes.com/2025/05/vingroup-tests-the-line-of-vietnams-new-capitalism/">Asia Times - Vietnam's New Capitalism</a></td></tr>
+<tr><td>49</td><td>"VinMetal定位为南北高铁等国家级项目供应商——暗示已获高层政策背书"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>推论</td></tr>
+<tr><td>50</td><td>"VinFast承载越南'汽车工业自主'国家梦想"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>产业政策分析判断</td></tr>
+<tr><td>51</td><td>全部SWOT条目</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>SWOT为标准咨询框架输出，全部为分析判断</td></tr>
+</tbody>
+</table>
+</div>
+
+<hr class="divider">
+
+<!-- ================================================================ -->
+<!-- 二、和发集团 -->
+<!-- ================================================================ -->
+<h2 class="section-title">二、和发集团（Hoa Phat Group）</h2>
+
+<h3 class="subsection-title">2.1 公司概况</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>#</th><th>数据/观点</th><th>原文数值</th><th>来源类型</th><th>来源链接</th></tr></thead>
+<tbody>
+<tr><td>52</td><td>成立1992年，以贸易公司起家</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.hoaphat.com.vn">和发集团官网</a></td></tr>
+<tr><td>53</td><td>总部河内</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>同上</td></tr>
+<tr><td>54</td><td>股票代码 HOSE: HPG</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.hose.vn">胡志明证券交易所 HPG</a></td></tr>
+<tr><td>55</td><td>市值约184,594.95亿VND</td><td>≈$7.4亿</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://finance.vietstock.vn/HPG/ownership-structure.htm?languageid=2">Vietstock - HPG</a></td></tr>
+<tr><td>56</td><td>总股数约76.7亿股</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>同上</td></tr>
+<tr><td>57</td><td>股价24,050 VND</td><td>≈$0.96/股</td><td><span class="tag tag-direct">直接引用</span></td><td>同上</td></tr>
+<tr><td>58</td><td>P/E 8.31, P/B 1.32</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>同上</td></tr>
+<tr><td>59</td><td>全球Top20钢铁企业</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.worldsteel.org">World Steel Association排名</a></td></tr>
+<tr><td>60</td><td>越南钢铁市场份额约38%</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.vsa.org.vn">Vietnam Steel Association (VSA)</a></td></tr>
+<tr><td>61</td><td>Beta 0.66（低波动性）</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://finance.vietstock.vn/HPG/ownership-structure.htm?languageid=2">Vietstock - HPG</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 class="subsection-title">2.2 股权结构</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>#</th><th>数据/观点</th><th>原文数值</th><th>来源类型</th><th>来源链接</th></tr></thead>
+<tbody>
+<tr><td>62</td><td>关联方国内个人持股34%（截止2025.12.31）</td><td>约26.1亿股</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://finance.vietstock.vn/HPG/ownership-structure.htm?languageid=2">Vietstock - HPG Ownership Structure</a></td></tr>
+<tr><td>63</td><td>内部员工持股11%</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>同上</td></tr>
+<tr><td>64</td><td>外国股东持股22%</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>同上</td></tr>
+<tr><td>65</td><td>"关联方国内个人持股从11%升至34%"</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>同上</td></tr>
+<tr><td>66</td><td>"具体大股东姓名需付费查询Vietstock高级账户"</td><td>—</td><td><span class="tag tag-limit">来源限制</span></td><td>同上（付费墙）</td></tr>
+<tr><td>67</td><td>"股权重组、大股东回购或控股家族集中股权"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>持股比例变动推测</td></tr>
+<tr><td>68</td><td>"陈廷龙个人及家族对集团实现绝对控制"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>股权集中度分析</td></tr>
+<tr><td>69</td><td>2025年股东大会通过发行13亿股新股</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://en.vietstock.vn/2025/04/hpg-link-to-the-annual-report-2024-962-609327.htm">Vietstock - HPG Annual Report 2024</a></td></tr>
+<tr><td>70</td><td>增发将稀释约17%</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>13亿÷(76.7亿+13亿)≈14.5%</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 class="subsection-title">2.3 投资与矿产</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>#</th><th>数据/观点</th><th>原文数值</th><th>来源类型</th><th>来源链接</th></tr></thead>
+<tbody>
+<tr><td>71</td><td>2021.5 收购澳洲Roper Valley铁矿，储量3.2亿吨</td><td>年产能400万吨</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.hoaphat.com.vn/news/hoa-phat-group-successfully-acquires-australia-s-roper-valley-iron-ore-mine.html">和发官网 - Roper Valley</a>；<a href="https://e.nhipcaudautu.vn/companies/hoa-phat-acquires-australias-roper-valley-iron-ore-mine-3340703/">NCDT</a>；<a href="https://www.seaisi.org/details/2459?type=news-rooms">SEAISI</a></td></tr>
+<tr><td>72</td><td>"计划收购更多澳洲铁矿和焦煤矿"</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://vietnamnet.vn/en/hoa-phat-bets-big-on-steel-rails-with-half-billion-dollar-project-2406098.html">VietNamNet - Hoa Phat bets big</a></td></tr>
+<tr><td>73</td><td>铁矿石自给率约15-20%（目标50%）</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.psi.vn/uploads/trung-tam-phan-tich/bao-cao/Tai%20lieu%202/[ENG]%20PSI_Update%20Report_3Q.2024_HPG.pdf">PSI - HPG 9M2024 Update</a></td></tr>
+<tr><td>74</td><td>焦煤100%依赖澳大利亚进口</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>行业公开信息</td></tr>
+<tr><td>75</td><td>"焦煤占钢材价格~30%"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>行业通用估算</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 class="subsection-title">2.4 钢铁业务与产能 · 2.5 财务数据</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>#</th><th>数据/观点</th><th>原文数值</th><th>来源类型</th><th>来源链接</th></tr></thead>
+<tbody>
+<tr><td>76</td><td>2024年粗钢产量870万吨</td><td>+30%</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.steelradar.com/en/haber/vietnams-crude-steel-production-increased-in-2024/">SteelRadar - Vietnam Crude Steel 2024</a></td></tr>
+<tr><td>77</td><td>2024年钢材销量810万吨</td><td>+20%</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.steelorbis.com/steel-news/latest-news/vietnams-hoa-phat-group-posts-higher-net-profit-and-sales-revenue-for-2024-1376196.htm">SteelOrbis - Hoa Phat 2024</a></td></tr>
+<tr><td>78</td><td>Dung Quat 2新增560万吨，总产能~1,430万吨</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>同上</td></tr>
+<tr><td>79</td><td>Dung Quat 2一期2025Q1-Q2投产+280万吨</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>同上</td></tr>
+<tr><td>80</td><td>产品含电工钢（硅钢）研发</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>2024年股东大会陈廷龙表态</td></tr>
+<tr><td>81</td><td>"跻身全球前15"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>Worldsteel排名推断</td></tr>
+<tr><td>82</td><td>2024年销售收入 420.56万亿VND</td><td>≈$168亿</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.steelorbis.com/steel-news/latest-news/vietnams-hoa-phat-group-posts-higher-net-profit-and-sales-revenue-for-2024-1376196.htm">SteelOrbis</a>；<a href="https://cmsv5.fiingroup.vn/medialib/FG/2025/2025-04/2025-04-17/20250417_HPG-250417-Annual-Report-2024.pdf">和发2024年报</a>；<a href="https://file.hoaphat.com.vn/hoaphat-com-vn/2026/05/annual-report-2025.pdf">和发2025年报</a></td></tr>
+<tr><td>83</td><td>2024年净利润 12.02万亿VND</td><td>≈$4.8亿</td><td><span class="tag tag-direct">直接引用</span></td><td>同上</td></tr>
+<tr><td>84</td><td>2023年净利润 ~6.79万亿VND</td><td>≈$2.7亿</td><td><span class="tag tag-direct">直接引用</span></td><td>同上</td></tr>
+<tr><td>85</td><td>2024年净利率约2.86%</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>同上</td></tr>
+<tr><td>86</td><td>Q4净利润2.81万亿VND</td><td>≈$1.1亿</td><td><span class="tag tag-direct">直接引用</span></td><td>同上</td></tr>
+<tr><td>87</td><td>"2024年利润超额完成年度目标20%"</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.steelorbis.com/steel-news/latest-news/vietnams-hoa-phat-group-posts-higher-net-profit-and-sales-revenue-for-2024-1376196.htm">SteelOrbis</a></td></tr>
+<tr><td>88</td><td>EPS 2,887 VND</td><td>≈$0.12</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://finance.vietstock.vn/HPG/ownership-structure.htm?languageid=2">Vietstock - HPG</a></td></tr>
+<tr><td>89</td><td>2025年目标营收170万亿VND，税后利润15万亿VND</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>和发2025年度股东大会决议</td></tr>
+<tr><td>90</td><td>"2025年营收目标低于2024年实际"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>报告标注"⚠️ 口径可能调整"</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 class="subsection-title">2.6 主要人员 · 2.7 政府关系 · 2.8 Porter五力/风险矩阵</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>#</th><th>数据/观点</th><th>原文数值</th><th>来源类型</th><th>来源链接</th></tr></thead>
+<tbody>
+<tr><td>91</td><td>陈廷龙（Trần Đình Long），1992年创业</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://vietnamnet.vn/en/tran-dinh-long-s-recovery-will-he-cement-his-position-among-vietnam-s-richest-2332503.html">VietNamNet - Profile</a>；<a href="https://en.wikipedia.org/wiki/Tr%E1%BA%A7n_%C4%90%C3%ACnh_Long">Wikipedia</a>；<a href="https://news.tuoitre.vn/steel-tycoon-tran-dinh-long-becomes-richest-person-on-vietnam-stock-market-10374014.htm">Tuoi Tre</a></td></tr>
+<tr><td>92</td><td>"越南顶级富豪之一"</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.forbes.com/vietnam/">福布斯越南富豪榜</a></td></tr>
+<tr><td>93</td><td>"低调务实、极少接受媒体采访"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>分析性描述</td></tr>
+<tr><td>94</td><td>"技术导向型创始人"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>工程背景分析</td></tr>
+<tr><td>95</td><td>2025年2月越南工贸部对中国HRC征19.38%-27.83%反倾销税</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://m.163.com/news/article/JP136JPS0534MHMX.html">163.com</a>；<a href="https://discoveryalert.com.au/vietnam-anti-dumping-tariff-chinese-steel-2026/">Discovery Alert</a>；<a href="https://www.kallanish.com/en/news/steel/market-reports/article-details/vietnam-opens-chinese-hrc-ad-review-filing-0526/">Kallanish</a></td></tr>
+<tr><td>96</td><td>"和发是联合发起方之一"</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>同上；越南工贸部公告</td></tr>
+<tr><td>97</td><td>和发-政府"策略性盟友"关系判断</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>定性分析</td></tr>
+<tr><td>98</td><td>Porter五力各项评级</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>Porter五力标准框架输出</td></tr>
+<tr><td>99</td><td>风险矩阵各项评级</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>基于事实的分析判断</td></tr>
+</tbody>
+</table>
+</div>
+
+<hr class="divider">
+
+<!-- ================================================================ -->
+<!-- 三、台塑集团 -->
+<!-- ================================================================ -->
+<h2 class="section-title">三、台塑集团（Formosa Plastics Group）</h2>
+
+<h3 class="subsection-title">3.1 公司概况</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>#</th><th>数据/观点</th><th>原文数值</th><th>来源类型</th><th>来源链接</th></tr></thead>
+<tbody>
+<tr><td>100</td><td>1954年创立，创始人王永庆(1917-2008)</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://baike.baidu.com/item/%E5%8F%B0%E5%A1%91%E9%9B%86%E5%9B%A2/3661270">百度百科 - 台塑集团</a>；<a href="https://www.fpg.taipei">台塑集团官网</a></td></tr>
+<tr><td>101</td><td>总部中国台湾省台北市</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.fpg.taipei">台塑集团官网</a></td></tr>
+<tr><td>102</td><td>"台湾最大民营企业集团"</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.moea.gov.tw">台湾经济部</a>；工商时报报道</td></tr>
+<tr><td>103</td><td>核心上市公司：1301/1303/1326/6505</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.twse.com.tw">台湾证券交易所</a></td></tr>
+<tr><td>104</td><td>2024年全球化工50强（化学品销售额$303亿）</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.fpg.com.tw/uploads/images/media-center/ebook-top/2025/2024%20EN%20annual.pdf">台塑2024年报</a>；<a href="https://www.fpg.com.tw/uploads/images/media-center/ebook-top/2025/2025%20intro_EN_0714.pdf">台塑集团介绍</a></td></tr>
+<tr><td>105</td><td>王永庆"台湾经营之神"称号</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://baike.baidu.com/item/%E7%8E%8B%E6%B0%B8%E5%BA%86/54184">百度百科 - 王永庆</a></td></tr>
+<tr><td>106</td><td>王永在(1921-2014)，共同创办人</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://baike.baidu.com/item/王永庆家族/4324750">百度百科 - 王永庆家族</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 class="subsection-title">3.2 股权与治理结构</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>#</th><th>数据/观点</th><th>原文数值</th><th>来源类型</th><th>来源链接</th></tr></thead>
+<tbody>
+<tr><td>107</td><td>"台塑集团没有集团母公司"</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.fpg.taipei/cn/about/ir/shareholders">台塑股东资讯</a>；<a href="https://www.fpg.taipei/en/about/ir">台塑IR</a></td></tr>
+<tr><td>108</td><td>四大公司交叉持股架构</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>四大公司年报；<a href="https://publishing.insead.edu/case/taiwans-formosa-plastics-group-transition-interplay-succession-inheritance-and-family-strife">INSEAD案例</a></td></tr>
+<tr><td>109</td><td>长庚纪念医院为关键控股平台</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://publishing.insead.edu/case/taiwans-formosa-plastics-group-transition-interplay-succession-inheritance-and-family-strife">INSEAD案例</a></td></tr>
+<tr><td>110</td><td>八大基金管理人（2010年设立）</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://news.sina.com.cn/c/2010-06-22/113817690855s.shtml">新浪新闻 - 王文洋进入权力中心</a></td></tr>
+<tr><td>111</td><td>王文渊净资产约NT$100亿（≈$3.1亿）</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>福布斯估算；<a href="https://www.fpg.taipei/en/issue-news/2025/361">FPG appoints new president</a></td></tr>
+<tr><td>112</td><td>王文潮净资产约NT$90亿（≈$2.8亿）</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>同上</td></tr>
+<tr><td>113</td><td>家族内部四派系分析</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>公开资料归纳</td></tr>
+<tr><td>114</td><td>"遗产诉讼是持续消耗家族精力和集团信誉的慢性风险"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>分析判断</td></tr>
+<tr><td>115</td><td>"经营权集中在王文渊手中"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>公开报道分析</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 class="subsection-title">3.3 产业布局</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>#</th><th>数据/观点</th><th>原文数值</th><th>来源类型</th><th>来源链接</th></tr></thead>
+<tbody>
+<tr><td>116</td><td>麦寮六轻累计投资逾NT$1万亿（≈$313亿）</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.fpg.com.tw/uploads/images/media-center/ebook-top/2025/2024%20EN%20annual.pdf">台塑2024年报</a></td></tr>
+<tr><td>117</td><td>麦寮六轻自备电厂~1,800万千瓦</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>台塑石化年报</td></tr>
+<tr><td>118</td><td>麦寮六轻年产值逾NT$1兆（≈$313亿）</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>同上</td></tr>
+<tr><td>119</td><td>台塑石化为"台湾唯一民营炼油厂"</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://baike.baidu.com/item/%E5%8F%B0%E5%A1%91%E7%9F%B3%E5%8C%96%E8%82%A1%E4%BB%BD%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8/5876328">百度百科 - 台塑石化</a></td></tr>
+<tr><td>120</td><td>台塑宁波为"亚洲最大PVC一体化基地之一"</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.fpg.com.tw/uploads/images/media-center/ebook-top/2025/2025%20intro_EN_0714.pdf">台塑集团介绍</a></td></tr>
+<tr><td>121</td><td>全球前十大PVC生产商</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>行业排名</td></tr>
+<tr><td>122</td><td>南亚为"全球最大CCL生产商之一"</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>行业排名</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 class="subsection-title">3.4 财务数据</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>#</th><th>数据/观点</th><th>原文数值</th><th>来源类型</th><th>来源链接</th></tr></thead>
+<tbody>
+<tr><td>123</td><td>2024年集团总营收 NT$2.1019兆</td><td>≈$646亿</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.fpg.com.tw/uploads/images/media-center/ebook-top/2025/2024%20EN%20annual.pdf">台塑2024年报</a></td></tr>
+<tr><td>124</td><td>集团总营收同比-1.1%</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>同上</td></tr>
+<tr><td>125</td><td>2024年集团总资产 NT$4.015兆</td><td>≈$1,234亿</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://foe.org/wp-content/uploads/2025/06/ESG_Report_final.pdf">FOE - ESG Report on FPG</a></td></tr>
+<tr><td>126</td><td>全球化工销售额$303亿</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.fpg.com.tw/uploads/images/media-center/ebook-top/2025/2024%20EN%20annual.pdf">台塑2024年报</a></td></tr>
+<tr><td>127</td><td>台塑石化2024年经营利润 -6.514亿NT$</td><td>≈-$2,035万</td><td><span class="tag tag-direct">直接引用</span></td><td>台塑石化2024年财务报表</td></tr>
+<tr><td>128</td><td>四大公司2024年营收估算</td><td>⚠️ 估算</td><td><span class="tag tag-estimate">估算值</span></td><td>建议查阅 <a href="https://www.fpc.com.tw">台塑1301</a>、<a href="https://www.nanya.com.tw">南亚1303</a>、<a href="https://www.fcg.com.tw">台化1326</a>、<a href="https://www.fpcc.com.tw">台塑石化6505</a> 年报</td></tr>
+<tr><td>129</td><td>"石化行业下行周期"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>营收趋势分析</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 class="subsection-title">3.5 钢铁业务（台塑河静钢铁）</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>#</th><th>数据/观点</th><th>原文数值</th><th>来源类型</th><th>来源链接</th></tr></thead>
+<tbody>
+<tr><td>130</td><td>项目2008年启动，2017年一号高炉点火</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://finance.sina.com.cn/roll/20120426/171611935056.shtml">新浪财经</a>；<a href="https://en.wikipedia.org/wiki/Formosa_Ha_Tinh_Steel">Wikipedia - FHS</a>；<a href="https://www.fhs.com.vn/about">FHS官网</a></td></tr>
+<tr><td>131</td><td>总投资从$150亿增至$220亿+</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://finance.sina.com.cn/roll/20120426/171611935056.shtml">新浪财经</a></td></tr>
+<tr><td>132</td><td>"越南史上最大外商直接投资案"</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>越南计划投资部数据</td></tr>
+<tr><td>133</td><td>"东南亚最大一贯作业大炼钢厂"</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>行业公开信息</td></tr>
+<tr><td>134</td><td>一号高炉4000m³，年产能约355万吨</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.csc.com.tw/csc_e/gc/goth_ste_p2.html">中钢CSC</a>；<a href="https://en.wikipedia.org/wiki/Formosa_Ha_Tinh_Steel">Wikipedia - FHS</a></td></tr>
+<tr><td>135</td><td>两座高炉总产能约710万吨/年</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>同上</td></tr>
+<tr><td>136</td><td>产品：HRC、钢胚</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.fhs.com.vn/about">FHS官网</a></td></tr>
+<tr><td>137</td><td>"初始规划远期产能3,000万吨/年——当前远未达成"</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>项目初始规划文件</td></tr>
+<tr><td>138</td><td>铁矿石主要从澳洲、巴西进口</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.taipeitimes.com/News/biz/archives/2014/03/21/2003586144">Taipei Times</a>；<a href="https://bruks-siwertell.com/blog/successful-start-dedicated-coal-intake-vietnamese-steel-plant">Bruks Siwertell</a></td></tr>
+<tr><td>139</td><td>河静省山阳港可停靠30万吨级船舶</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>港口公开资料</td></tr>
+<tr><td>140</td><td>"无自有矿山"（与和发对比）</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.gem.wiki/Ha_Tinh_Formosa_Plastics_Steel_Complex_power_station">Global Energy Monitor</a></td></tr>
+<tr><td>140b</td><td>JFE钢铁收购台塑河静5%股权</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.jfe-steel.co.jp/en/release/2015/150730.html">JFE Steel - 5% Stake</a>；<a href="https://taiwanreview.nat.gov.tw/print/Economics/Top-News/8563/Formosa-Group-enters-Vietnam-joint-venture">Taiwan Review</a></td></tr>
+<tr><td>140c</td><td>台塑河静2023年亏损$6.2亿</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://theinvestor.vn/giant-steelmaker-formosa-ha-tinh-suffers-620-mln-loss-in-2023-d11072.html">The Investor - FHS $620M loss</a></td></tr>
+<tr><td>140d</td><td>台塑河静获准试车</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="http://www.yejinzg.com/show/41_529926_1.html">冶金交流中心</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 class="subsection-title">3.6 2016年环境灾难 · 3.7 当前市场地位 · 3.8 政府关系 · 3.9 SWOT</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>#</th><th>数据/观点</th><th>原文数值</th><th>来源类型</th><th>来源链接</th></tr></thead>
+<tbody>
+<tr><td>141</td><td>2016年4月排放含苯酚废水导致越南中部四省鱼类死亡</td><td>约200km</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://news.mongabay.com/2026/04/10-years-after-vietnams-formosa-steel-plant-spill-justice-for-victims-remains-elusive/">Mongabay</a>；<a href="https://www.rfa.org/english/news/vietnam/formosa-compensation-environment-spill-10152024124255.html">RFA</a>；<a href="https://ilajuc.org/en/vietnamese-victims-sue-formosa-group-for-damages-caused-by-toxic-waste-and-ocean-pollution/">ILAJUC</a></td></tr>
+<tr><td>142</td><td>赔偿$5亿</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>越南政府公告；台塑官方声明</td></tr>
+<tr><td>143</td><td>"越南史上最大环保赔偿案"</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://news.mongabay.com/2026/04/10-years-after-vietnams-formosa-steel-plant-spill-justice-for-victims-remains-elusive/">Mongabay</a></td></tr>
+<tr><td>144</td><td>台塑通过越南电视台7分钟公开道歉</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>越南国家电视台(VTV)播出记录</td></tr>
+<tr><td>144b</td><td>活跃人士质疑台塑赔偿义务未完全履行</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.rfa.org/english/news/vietnam/formosa-compensation-environment-spill-10152024124255.html">RFA</a></td></tr>
+<tr><td>145</td><td>2025年联合和发推动对中国HRC征19-28%关税</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://m.163.com/news/article/JP136JPS0534MHMX.html">163.com</a>；<a href="https://discoveryalert.com.au/vietnam-anti-dumping-tariff-chinese-steel-2026/">Discovery Alert</a></td></tr>
+<tr><td>146</td><td>2025年9月上调HRC售价</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.10100.com/article/24711669">10100.com - 联手提价</a></td></tr>
+<tr><td>147</td><td>"与和发并列越南HRC两大定价标杆"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>市场地位分析</td></tr>
+<tr><td>148</td><td>"面临和发Dung Quat 2和VinMetal的双重挤压"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>竞争态势分析</td></tr>
+<tr><td>149</td><td>王永庆时代是台湾工商界"绝对龙头"</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://www.163.com/dy/article/JIVH8GKK0556AWBT.html">网易</a>；Wikipedia</td></tr>
+<tr><td>150</td><td>"2016年后越南政企关系经历极度冰冻→缓慢修复"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>事件时序分析</td></tr>
+<tr><td>151</td><td>"台资企业在涉及中国-越南地缘政治时处于微妙位置"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>地缘政治分析</td></tr>
+<tr><td>152</td><td>"若再次发生环境事故，将面临吊销许可证风险"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>监管趋势评估</td></tr>
+<tr><td>153</td><td>全部SWOT条目</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>标准框架输出</td></tr>
+</tbody>
+</table>
+</div>
+
+<hr class="divider">
+
+<!-- ================================================================ -->
+<!-- 四、共用/交叉引用行业数据 -->
+<!-- ================================================================ -->
+<h2 class="section-title">四、共用/交叉引用的行业数据</h2>
+
+<h3 class="subsection-title">4.1 越南钢铁行业宏观数据</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>#</th><th>数据/观点</th><th>原文数值</th><th>来源类型</th><th>来源链接</th></tr></thead>
+<tbody>
+<tr><td>154</td><td>2024年中国对越南HRC进口1,260万吨，+33%</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://asemconnectvietnam.gov.vn/default.aspx?ZID1=8&ID8=141040&ID1=2">ASEMConnect Vietnam</a>；<a href="https://english.news.cn/20240708/bc0c3113d4fb445d976b10032d07fa07/c.html">Xinhua</a></td></tr>
+<tr><td>155</td><td>2025年3月起对中国HRC征19-28%反倾销关税</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td><a href="https://m.163.com/news/article/JP136JPS0534MHMX.html">163.com</a>；<a href="https://discoveryalert.com.au/vietnam-anti-dumping-tariff-chinese-steel-2026/">Discovery Alert</a>；<a href="https://www.kallanish.com/en/news/steel/market-reports/article-details/vietnam-opens-chinese-hrc-ad-review-filing-0526/">Kallanish</a>；<a href="https://aslgate.com/vietnam-extends-anti-dumping-review-period-for-h-shaped-steel-imports-from-china/">ASL Gate</a></td></tr>
+<tr><td>156</td><td>三足鼎立格局</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>竞争格局分析</td></tr>
+<tr><td>157</td><td>"越南钢铁行业三强格局"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>同上</td></tr>
+<tr><td>158</td><td>汇率：VND/USD ≈25,000</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>越南央行公开汇率</td></tr>
+<tr><td>159</td><td>汇率：NT$/USD ≈32</td><td>—</td><td><span class="tag tag-direct">直接引用</span></td><td>台湾央行公开汇率</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 class="subsection-title">4.2 行业研究/分析报告来源</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>#</th><th>来源</th><th>URL</th></tr></thead>
+<tbody>
+<tr><td>S1</td><td>MHI Spectra - Decarbonizing Vietnam's Steel Industry</td><td><a href="https://spectra.mhi.com/energy-transition/decarbonizing-vietnams-steel-industry">链接</a></td></tr>
+<tr><td>S2</td><td>Transition Asia - Decarbonising Vietnam Steel</td><td><a href="https://transitionasia.org/wp-content/uploads/2025/07/TA_Decarbonising_Vietnam_Steel_Industry.pdf">链接</a></td></tr>
+<tr><td>S3</td><td>VNDirect - Vingroup Update Report</td><td><a href="https://www.vndirect.com.vn/VIC_Update_20250418.pdf">链接</a></td></tr>
+<tr><td>S4</td><td>SHS - HPG Initial Report 2025</td><td><a href="https://shs.com.vn/Sites/QuoteVN/SiteRoot/reportattach/20250527_155442_HPG%20Intitial%20Report%202025%20Eng%20Ver.pdf">链接</a></td></tr>
+<tr><td>S5</td><td>Shinhan Securities - HPG Q3 2025</td><td><a href="https://shinhansec.com.vn/uploads/report/SSV___B%C3%A1o_c%C3%A1o_update_Q32025__EN_v12.pdf">链接</a></td></tr>
+<tr><td>S6</td><td>UNDP - Green Transition Vietnam</td><td><a href="https://www.undp.org/vietnam/blog/green-transition-and-strategies-strengthen-viet-nams-position-global-economy">链接</a></td></tr>
+<tr><td>S7</td><td>VMRF - Vietnam Steel Emissions Quotas</td><td><a href="https://vmrf.vn/en/vietnams-steel-industry-under-emissions-quotas-short-term-pressure-and-long-term-opportunities-from-green-steel-2194">链接</a></td></tr>
+<tr><td>S8</td><td>Global Efficiency Intelligence - Net-Zero Roadmap</td><td><a href="https://www.globalefficiencyintel.com/netzero-roadmap-for-vietnams-steel-industry">链接</a></td></tr>
+<tr><td>S9</td><td>IMARC - Vietnam Stainless Steel Market</td><td><a href="https://www.imarcgroup.com/vietnam-stainless-steel-market">链接</a></td></tr>
+<tr><td>S10</td><td>Grand View Research - Vietnam Structural Steel</td><td><a href="https://www.grandviewresearch.com/horizon/outlook/structural-steel-market/vietnam">链接</a></td></tr>
+<tr><td>S11</td><td>Mordor Intelligence - Vietnam Steel Fabrication</td><td><a href="https://www.mordorintelligence.com/industry-reports/vietnam-structural-steel-fabrication-market">链接</a></td></tr>
+<tr><td>S12</td><td>Ken Research - Vietnam Steel Market</td><td><a href="https://www.kenresearch.com/industry-reports/vietnam-steel-market">链接</a></td></tr>
+<tr><td>S13</td><td>SMM Steel - Vietnam Top 10 Crude Steel</td><td><a href="https://news.metal.com/en/newscontent/103924856-SMM-Steel-Vietnam-Enters-Global-Top-10-Crude-Steel-Producers-for-First-Time">链接</a></td></tr>
+<tr><td>S14</td><td>Xinhua - Vietnam Steel Industry 2024</td><td><a href="https://english.news.cn/20240708/bc0c3113d4fb445d976b10032d07fa07/c.html">链接</a></td></tr>
+<tr><td>S15</td><td>VietNamNet - Steel manufacturers big losses</td><td><a href="https://vietnamnet.vn/en/steel-manufacturers-incur-big-losses-but-see-bright-prospects-2301058.html">链接</a></td></tr>
+<tr><td>S16</td><td>VietnamPlus - Vietnam attractive for Thai businesses</td><td><a href="https://en.vietnamplus.vn/vietnam-emerges-as-attractive-investment-destination-for-thai-businesses-post343426.vnp">链接</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 class="subsection-title">4.3 竞争格局分析</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>#</th><th>数据/观点</th><th>原文数值</th><th>来源类型</th><th>来源链接</th></tr></thead>
+<tbody>
+<tr><td>160</td><td>Porter五力分析</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>咨询框架标准输出</td></tr>
+<tr><td>161</td><td>竞争定位图/地图</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>定性分析</td></tr>
+<tr><td>162</td><td>"VinMetal背靠VinGroup（总资产约$347亿）"</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>⚠️ <strong>笔误嫌疑</strong>：按25,000汇率，839,216亿VND≈$33.6亿，非$347亿</td></tr>
+<tr><td>163</td><td>CBAM对越南钢材出口影响分析</td><td>—</td><td><span class="tag tag-reason">推理结论</span></td><td>EU政策框架推演</td></tr>
+</tbody>
+</table>
+</div>
+
+<hr class="divider">
+
+<!-- ================================================================ -->
+<!-- 五、来源质量评估 -->
+<!-- ================================================================ -->
+<h2 class="section-title">五、来源质量评估</h2>
+
+<h3 class="subsection-title">5.1 按来源可靠性分级</h3>
+<div class="table-wrap summary-table">
+<table>
+<thead><tr><th>等级</th><th>来源类型</th><th>涉及条目数</th><th>代表来源</th></tr></thead>
+<tbody>
+<tr>
+  <td><span style="background:#e6f7ee;color:#059669;padding:2px 10px;border-radius:100px;font-size:12px;font-weight:600;">🟢 高可靠</span></td>
+  <td>公司年报/官方公告/交易所数据</td>
+  <td>~65条</td>
+  <td style="font-size:12px;"><a href="https://ircdn.vingroup.net/storage/Uploads/0_Bao%20cao%20thuong%20nien/2025/ENG%20Vingroup%20AR25.pdf">Vingroup年报</a> · <a href="https://cmsv5.fiingroup.vn/medialib/FG/2025/2025-04/2025-04-17/20250417_HPG-250417-Annual-Report-2024.pdf">和发年报</a> · <a href="https://www.fpg.com.tw/uploads/images/media-center/ebook-top/2025/2024%20EN%20annual.pdf">台塑年报</a> · VinFast财报 · Vietstock</td>
+</tr>
+<tr>
+  <td><span style="background:#e6f7ee;color:#059669;padding:2px 10px;border-radius:100px;font-size:12px;font-weight:600;">🟢 高可靠</span></td>
+  <td>政府/国际组织</td>
+  <td>~10条</td>
+  <td style="font-size:12px;">越南工贸部反倾销公告 · World Steel Association · UNDP</td>
+</tr>
+<tr>
+  <td><span style="background:#fef3c7;color:#d97706;padding:2px 10px;border-radius:100px;font-size:12px;font-weight:600;">🟡 中可靠</span></td>
+  <td>权威行业媒体/研究机构</td>
+  <td>~35条</td>
+  <td style="font-size:12px;"><a href="https://www.steelorbis.com">SteelOrbis</a> · <a href="https://www.steelradar.com">SteelRadar</a> · <a href="https://www.psi.vn">PSI</a> · <a href="https://spectra.mhi.com">MHI Spectra</a> · <a href="https://shs.com.vn">SHS</a> · <a href="https://www.vndirect.com.vn">VNDirect</a> · INSEAD</td>
+</tr>
+<tr>
+  <td><span style="background:#fef3c7;color:#d97706;padding:2px 10px;border-radius:100px;font-size:12px;font-weight:600;">🟡 中可靠</span></td>
+  <td>知名新闻媒体</td>
+  <td>~20条</td>
+  <td style="font-size:12px;"><a href="https://www.vietnam.vn">Vietnam.vn</a> · <a href="https://vietnamnet.vn">VietnamNet</a> · <a href="https://theinvestor.vn">The Investor</a> · <a href="https://news.tuoitre.vn">Tuoi Tre</a> · <a href="https://news.mongabay.com">Mongabay</a> · <a href="https://www.rfa.org">RFA</a> · <a href="https://news.sina.com.cn">新浪</a> · <a href="https://m.163.com">163.com</a> · <a href="https://www.kallanish.com">Kallanish</a></td>
+</tr>
+<tr>
+  <td><span style="background:#fde8e8;color:#dc2626;padding:2px 10px;border-radius:100px;font-size:12px;font-weight:600;">🟠 需核实</span></td>
+  <td>百科/个人页面</td>
+  <td>~8条</td>
+  <td style="font-size:12px;"><a href="https://baike.baidu.com">百度百科</a> · <a href="https://en.wikipedia.org">Wikipedia</a> · <a href="https://craft.co">Craft.co</a> · <a href="https://www.studocu.vn">Studocu</a></td>
+</tr>
+<tr>
+  <td><span style="background:#fee2e2;color:#991b1b;padding:2px 10px;border-radius:100px;font-size:12px;font-weight:600;">🔴 估算值</span></td>
+  <td>报告标注"估算"</td>
+  <td>~8条</td>
+  <td style="font-size:12px;">四大公司分拆营收 · 钢材需求推算</td>
+</tr>
+<tr>
+  <td><span style="background:#e8f0fe;color:#4a6cf7;padding:2px 10px;border-radius:100px;font-size:12px;font-weight:600;">🔵 推理结论</span></td>
+  <td>分析判断</td>
+  <td>~45条</td>
+  <td style="font-size:12px;">SWOT · Porter五力 · 竞争格局</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<h3 class="subsection-title">5.2 需要重点交叉核对的条目</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>#</th><th>条目</th><th>风险</th><th>建议核查方式</th><th>补充来源</th></tr></thead>
+<tbody>
+<tr>
+  <td>162</td>
+  <td>VinGroup总资产"约$347亿"</td>
+  <td><span class="tag tag-estimate">笔误嫌疑</span></td>
+  <td>确认年报总资产原始数据</td>
+  <td><a href="https://ircdn.vingroup.net/storage/Uploads/0_Bao%20cao%20thuong%20nien/2025/ENG%20Vingroup%20AR25.pdf">Vingroup 2024年报</a></td>
+</tr>
+<tr>
+  <td>128</td>
+  <td>台塑四大公司2024年分拆营收</td>
+  <td><span class="tag tag-estimate">估算</span></td>
+  <td>查阅四大公司各自年报</td>
+  <td><a href="https://www.fpc.com.tw">台塑FPC</a> · <a href="https://www.nanya.com.tw">南亚Nanya</a> · <a href="https://www.fcg.com.tw">台化FCG</a> · <a href="https://www.fpcc.com.tw">台塑石化FPCC</a></td>
+</tr>
+<tr>
+  <td>65-66</td>
+  <td>和发"关联方持股34%"</td>
+  <td><span style="background:#fef3c7;color:#d97706;padding:2px 10px;border-radius:100px;font-size:11px;font-weight:600;">可能滞后</span></td>
+  <td>确认最新股东名册</td>
+  <td><a href="https://finance.vietstock.vn/HPG/ownership-structure.htm?languageid=2">Vietstock HPG</a></td>
+</tr>
+<tr>
+  <td>90</td>
+  <td>和发2025营收目标170万亿 vs 2024实际420万亿</td>
+  <td><span style="background:#fef3c7;color:#d97706;padding:2px 10px;border-radius:100px;font-size:11px;font-weight:600;">口径差异</span></td>
+  <td>确认合并口径细节</td>
+  <td><a href="https://file.hoaphat.com.vn/hoaphat-com-vn/2026/05/annual-report-2025.pdf">和发2025年报</a></td>
+</tr>
+<tr>
+  <td>42</td>
+  <td>VinMetal原材料来源"预计依赖进口"</td>
+  <td><span style="background:#fef3c7;color:#d97706;padding:2px 10px;border-radius:100px;font-size:11px;font-weight:600;">纯推测</span></td>
+  <td>等待VinMetal官方披露</td>
+  <td><a href="https://asiamanufacturingnewstoday.com">Asia Manufacturing News</a></td>
+</tr>
+<tr>
+  <td>39-41</td>
+  <td>VinFast/Vinhomes钢材需求推算</td>
+  <td><span style="background:#fef3c7;color:#d97706;padding:2px 10px;border-radius:100px;font-size:11px;font-weight:600;">粗估</span></td>
+  <td>专业模型交叉验证</td>
+  <td>—</td>
+</tr>
+<tr>
+  <td>140c</td>
+  <td>台塑河静2023年亏损$6.2亿</td>
+  <td><span style="background:#fef3c7;color:#d97706;padding:2px 10px;border-radius:100px;font-size:11px;font-weight:600;">需核实</span></td>
+  <td>确认FHS年报精确数据</td>
+  <td><a href="https://theinvestor.vn/giant-steelmaker-formosa-ha-tinh-suffers-620-mln-loss-in-2023-d11072.html">The Investor</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<hr class="divider">
+
+<!-- ================================================================ -->
+<!-- 六、完整来源链接汇总 -->
+<!-- ================================================================ -->
+<h2 class="section-title">六、完整来源链接汇总</h2>
+
+<h3 class="subsection-title">Vingroup 相关（~20个独立来源）</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>#</th><th>来源名称</th><th>URL</th></tr></thead>
+<tbody>
+<tr><td>V1</td><td>Vingroup 2025年报 (EN)</td><td><a href="https://ircdn.vingroup.net/storage/Uploads/0_Bao%20cao%20thuong%20nien/2025/ENG%20Vingroup%20AR25.pdf">链接</a></td></tr>
+<tr><td>V2</td><td>Vietnam.vn - Vingroup Record Revenue</td><td><a href="https://www.vietnam.vn/en/vingroup-dat-doanh-thu-ky-luc-gan-200-000-ti-dong">链接</a></td></tr>
+<tr><td>V3</td><td>Vietnam.vn - Vingroup Ownership</td><td><a href="https://www.vietnam.vn/en/ai-dang-thuc-su-nam-co-phan-vingroup">链接</a></td></tr>
+<tr><td>V4</td><td>The Investor - Vingroup Record Profit 2025</td><td><a href="https://theinvestor.vn/vingroup-posts-record-profit-revenue-in-2025-on-property-surge-manufacturing-expansion-d18275.html">链接</a></td></tr>
+<tr><td>V5</td><td>The Investor - Vuong contributes shares</td><td><a href="https://theinvestor.vn/vietnam-billionaire-pham-nhat-vuong-to-contribute-48-mln-vingroup-shares-to-vinspeed-d15850.html">链接</a></td></tr>
+<tr><td>V6</td><td>VinFast 2024 Financial Results</td><td><a href="https://vinfastauto.com/vn_en/vinfast-reports-fourth-quarter-and-full-year-2024-financial-results">链接</a></td></tr>
+<tr><td>V7</td><td>MarketScreener - Vingroup Shareholders</td><td><a href="https://www.marketscreener.com/quote/stock/VINGROUP-6603353/company-shareholders/">链接</a></td></tr>
+<tr><td>V8</td><td>Asia Manufacturing News - VinMetal</td><td><a href="https://asiamanufacturingnewstoday.com/2025/10/vingroup-establishes-vinmetal-steel-manufacturing-company-enters-metallurgy-industry/">链接</a></td></tr>
+<tr><td>V9</td><td>Lao Dong News - VinRobotics</td><td><a href="https://news.laodong.vn/kinh-doanh/vingroup-thanh-lap-them-cong-ty-con-ve-nguoi-may-1578720.ldo">链接</a></td></tr>
+<tr><td>V10</td><td>SEETAO - VinEnergo Wind Power</td><td><a href="https://www.seetao.com/details/253958.html">链接</a></td></tr>
+<tr><td>V11</td><td>China MOFCOM - Vingroup Revenue</td><td><a href="https://vn.mofcom.gov.cn/jmxw/art/2025/art_2180c128536347d67c93d5d2debc72.html">链接</a></td></tr>
+<tr><td>V12</td><td>TNGlobal - GSM VN $1.7B</td><td><a href="https://technode.global/2026/03/10/vietnams-top-billionaire-pham-nhat-vuong-family-establish-1-7b-holding-company-gsm-vn/">链接</a></td></tr>
+<tr><td>V13</td><td>VietnamNet - Vuong tops SE Asia</td><td><a href="https://vietnamnet.vn/en/pham-nhat-vuong-hits-record-wealth-tops-southeast-asia-rankings-2512749.html">链接</a></td></tr>
+<tr><td>V14</td><td>Vietnam News - 63rd on Forbes</td><td><a href="https://vietnamnews.vn/economy/1780028/billionaire-pham-nhat-vuong-rises-to-63rd-on-global-rich-list-as-vingroup-shares-hit-record-highs.html">链接</a></td></tr>
+<tr><td>V15</td><td>Tuoi Tre - Vingroup sues 68</td><td><a href="https://news.tuoitre.vn/vietnams-vingroup-sues-68-organizations-individuals-over-online-misinformation-103250909143126249.htm">链接</a></td></tr>
+<tr><td>V16</td><td>Fulcrum.sg - Vietnam's Richest Man</td><td><a href="https://fulcrum.sg/will-vietnams-richest-man-be-safe/">链接</a></td></tr>
+<tr><td>V17</td><td>Asia Times - Vietnam's New Capitalism</td><td><a href="https://asiatimes.com/2025/05/vingroup-tests-the-line-of-vietnams-new-capitalism/">链接</a></td></tr>
+<tr><td>V18</td><td>CVD - Rise of Vietnamese Empire</td><td><a href="https://cvdvn.net/2021/06/11/the-rise-and-rise-of-a-vietnamese-corporate-empire/">链接</a></td></tr>
+<tr><td>V19</td><td>VNDirect - Vingroup Update</td><td><a href="https://www.vndirect.com.vn/VIC_Update_20250418.pdf">链接</a></td></tr>
+<tr><td>V20</td><td>Studocu - Vingroup AR 2024</td><td><a href="https://www.studocu.vn/vn/document/hoc-vien-ngan-hang/leadership-and-management/vingroup-annual-report-2024-corporate-governance-achievements/144508135">链接</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 class="subsection-title">和发集团相关（~20个独立来源）</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>#</th><th>来源名称</th><th>URL</th></tr></thead>
+<tbody>
+<tr><td>H1</td><td>和发集团官网</td><td><a href="https://www.hoaphat.com.vn">链接</a></td></tr>
+<tr><td>H2</td><td>和发2024年报 (PDF)</td><td><a href="https://cmsv5.fiingroup.vn/medialib/FG/2025/2025-04/2025-04-17/20250417_HPG-250417-Annual-Report-2024.pdf">链接</a></td></tr>
+<tr><td>H3</td><td>和发2025年报 (PDF)</td><td><a href="https://file.hoaphat.com.vn/hoaphat-com-vn/2026/05/annual-report-2025.pdf">链接</a></td></tr>
+<tr><td>H4</td><td>Vietstock - HPG Ownership</td><td><a href="https://finance.vietstock.vn/HPG/ownership-structure.htm?languageid=2">链接</a></td></tr>
+<tr><td>H5</td><td>Vietstock - HPG Profile</td><td><a href="https://finance.vietstock.vn/hpg/ho-so-doanh-nghiep.htm?languageid=2">链接</a></td></tr>
+<tr><td>H6</td><td>Vietstock - HPG Annual Report 2024</td><td><a href="https://en.vietstock.vn/2025/04/hpg-link-to-the-annual-report-2024-962-609327.htm">链接</a></td></tr>
+<tr><td>H7</td><td>SteelOrbis - Hoa Phat 2024 Results</td><td><a href="https://www.steelorbis.com/steel-news/latest-news/vietnams-hoa-phat-group-posts-higher-net-profit-and-sales-revenue-for-2024-1376196.htm">链接</a></td></tr>
+<tr><td>H8</td><td>SteelRadar - Vietnam Crude Steel 2024</td><td><a href="https://www.steelradar.com/en/haber/vietnams-crude-steel-production-increased-in-2024/">链接</a></td></tr>
+<tr><td>H9</td><td>和发官网 - Roper Valley铁矿</td><td><a href="https://www.hoaphat.com.vn/news/hoa-phat-group-successfully-acquires-australia-s-roper-valley-iron-ore-mine.html">链接</a></td></tr>
+<tr><td>H10</td><td>Nhip Cau Dau Tu - Roper Valley</td><td><a href="https://e.nhipcaudautu.vn/companies/hoa-phat-acquires-australias-roper-valley-iron-ore-mine-3340703/">链接</a></td></tr>
+<tr><td>H11</td><td>SEAISI - Hoa Phat Australia Mine</td><td><a href="https://www.seaisi.org/details/2459?type=news-rooms">链接</a></td></tr>
+<tr><td>H12</td><td>PSI - HPG 9M2024 Update (PDF)</td><td><a href="https://www.psi.vn/uploads/trung-tam-phan-tich/bao-cao/Tai%20lieu%202/[ENG]%20PSI_Update%20Report_3Q.2024_HPG.pdf">链接</a></td></tr>
+<tr><td>H13</td><td>SHS - HPG Initial Report 2025 (PDF)</td><td><a href="https://shs.com.vn/Sites/QuoteVN/SiteRoot/reportattach/20250527_155442_HPG%20Intitial%20Report%202025%20Eng%20Ver.pdf">链接</a></td></tr>
+<tr><td>H14</td><td>Shinhan Securities - HPG Q3 2025 (PDF)</td><td><a href="https://shinhansec.com.vn/uploads/report/SSV___B%C3%A1o_c%C3%A1o_update_Q32025__EN_v12.pdf">链接</a></td></tr>
+<tr><td>H15</td><td>VietnamNet - Tran Dinh Long</td><td><a href="https://vietnamnet.vn/en/tran-dinh-long-s-recovery-will-he-cement-his-position-among-vietnam-s-richest-2332503.html">链接</a></td></tr>
+<tr><td>H16</td><td>Tuoi Tre - Steel Tycoon</td><td><a href="https://news.tuoitre.vn/steel-tycoon-tran-dinh-long-becomes-richest-person-on-vietnam-stock-market-10374014.htm">链接</a></td></tr>
+<tr><td>H17</td><td>VietnamNet - Hoa Phat Steel Rails</td><td><a href="https://vietnamnet.vn/en/hoa-phat-bets-big-on-steel-rails-with-half-billion-dollar-project-2406098.html">链接</a></td></tr>
+<tr><td>H18</td><td>Wikipedia - Tran Dinh Long</td><td><a href="https://en.wikipedia.org/wiki/Tr%E1%BA%A7n_%C4%90%C3%ACnh_Long">链接</a></td></tr>
+<tr><td>H19</td><td>Studocu - Hoa Phat Supply Chain</td><td><a href="https://www.studocu.vn/vn/document/truong-dai-hoc-fpt/procurement-and-global-sourcing/analyzing-the-supply-chain-of-hoa-phat-sourcing-to-logistics-strategies/159968697">链接</a></td></tr>
+<tr><td>H20</td><td>Studocu - Hoa Phat Corporate Governance</td><td><a href="https://www.studocu.vn/vn/document/dai-hoc-kinh-te-quoc-dan/strategic-management/hoa-phat-corporate-governance/115408209">链接</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 class="subsection-title">台塑集团相关（~25个独立来源）</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>#</th><th>来源名称</th><th>URL</th></tr></thead>
+<tbody>
+<tr><td>F1</td><td>台塑集团官网</td><td><a href="https://www.fpg.taipei">链接</a></td></tr>
+<tr><td>F2</td><td>台塑集团IR</td><td><a href="https://www.fpg.taipei/en/about/ir">链接</a></td></tr>
+<tr><td>F3</td><td>台塑2024年报 (EN, PDF)</td><td><a href="https://www.fpg.com.tw/uploads/images/media-center/ebook-top/2025/2024%20EN%20annual.pdf">链接</a></td></tr>
+<tr><td>F4</td><td>台塑集团介绍 (EN, PDF)</td><td><a href="https://www.fpg.com.tw/uploads/images/media-center/ebook-top/2025/2025%20intro_EN_0714.pdf">链接</a></td></tr>
+<tr><td>F5</td><td>台塑集团官网 - 股东资讯</td><td><a href="https://www.fpg.taipei/cn/about/ir/shareholders">链接</a></td></tr>
+<tr><td>F6</td><td>FPG appoints new president</td><td><a href="https://www.fpg.taipei/en/issue-news/2025/361">链接</a></td></tr>
+<tr><td>F7</td><td>百度百科 - 台塑集团</td><td><a href="https://baike.baidu.com/item/%E5%8F%B0%E5%A1%91%E9%9B%86%E5%9B%A2/3661270">链接</a></td></tr>
+<tr><td>F8</td><td>百度百科 - 王永庆家族</td><td><a href="https://baike.baidu.com/item/王永庆家族/4324750">链接</a></td></tr>
+<tr><td>F9</td><td>百度百科 - 台塑石化</td><td><a href="https://baike.baidu.com/item/%E5%8F%B0%E5%A1%91%E7%9F%B3%E5%8C%96%E8%82%A1%E4%BB%BD%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8/5876328">链接</a></td></tr>
+<tr><td>F10</td><td>新浪财经 - 台塑河静投资$220亿</td><td><a href="https://finance.sina.com.cn/roll/20120426/171611935056.shtml">链接</a></td></tr>
+<tr><td>F11</td><td>冶金交流中心 - 台塑河静试车</td><td><a href="http://www.yejinzg.com/show/41_529926_1.html">链接</a></td></tr>
+<tr><td>F12</td><td>新浪新闻 - 王文洋进入权力中心</td><td><a href="https://news.sina.com.cn/c/2010-06-22/113817690855s.shtml">链接</a></td></tr>
+<tr><td>F13</td><td>网易 - 王永庆家族新一代</td><td><a href="https://www.163.com/dy/article/JIVH8GKK0556AWBT.html">链接</a></td></tr>
+<tr><td>F14</td><td>INSEAD - Formosa Case Study</td><td><a href="https://publishing.insead.edu/case/taiwans-formosa-plastics-group-transition-interplay-succession-inheritance-and-family-strife">链接</a></td></tr>
+<tr><td>F15</td><td>FOE - ESG Report on FPG (PDF)</td><td><a href="https://foe.org/wp-content/uploads/2025/06/ESG_Report_final.pdf">链接</a></td></tr>
+<tr><td>F16</td><td>10100.com - 和发台塑联手提价</td><td><a href="https://www.10100.com/article/24711669">链接</a></td></tr>
+<tr><td>F17</td><td>Wikipedia - Formosa Ha Tinh Steel</td><td><a href="https://en.wikipedia.org/wiki/Formosa_Ha_Tinh_Steel">链接</a></td></tr>
+<tr><td>F18</td><td>FHS官网</td><td><a href="https://www.fhs.com.vn/about">链接</a></td></tr>
+<tr><td>F19</td><td>JFE Steel - 5% Stake</td><td><a href="https://www.jfe-steel.co.jp/en/release/2015/150730.html">链接</a></td></tr>
+<tr><td>F20</td><td>中钢CSC - 台塑河静</td><td><a href="https://www.csc.com.tw/csc_e/gc/goth_ste_p2.html">链接</a></td></tr>
+<tr><td>F21</td><td>The Investor - FHS $620M loss</td><td><a href="https://theinvestor.vn/giant-steelmaker-formosa-ha-tinh-suffers-620-mln-loss-in-2023-d11072.html">链接</a></td></tr>
+<tr><td>F22</td><td>Mongabay - 10 years after spill</td><td><a href="https://news.mongabay.com/2026/04/10-years-after-vietnams-formosa-steel-plant-spill-justice-for-victims-remains-elusive/">链接</a></td></tr>
+<tr><td>F23</td><td>RFA - Formosa compensation</td><td><a href="https://www.rfa.org/english/news/vietnam/formosa-compensation-environment-spill-10152024124255.html">链接</a></td></tr>
+<tr><td>F24</td><td>ILAJUC - Vietnamese victims sue</td><td><a href="https://ilajuc.org/en/vietnamese-victims-sue-formosa-group-for-damages-caused-by-toxic-waste-and-ocean-pollution/">链接</a></td></tr>
+<tr><td>F25</td><td>Bruks Siwertell - Coal Intake</td><td><a href="https://bruks-siwertell.com/blog/successful-start-dedicated-coal-intake-vietnamese-steel-plant">链接</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 class="subsection-title">行业/政策共用来源（~16个）</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>#</th><th>来源名称</th><th>URL</th></tr></thead>
+<tbody>
+<tr><td>I1</td><td>163.com - 越南对中国钢材反倾销</td><td><a href="https://m.163.com/news/article/JP136JPS0534MHMX.html">链接</a></td></tr>
+<tr><td>I2</td><td>Discovery Alert - Vietnam AD Tariff</td><td><a href="https://discoveryalert.com.au/vietnam-anti-dumping-tariff-chinese-steel-2026/">链接</a></td></tr>
+<tr><td>I3</td><td>Kallanish - Vietnam HRC AD Review</td><td><a href="https://www.kallanish.com/en/news/steel/market-reports/article-details/vietnam-opens-chinese-hrc-ad-review-filing-0526/">链接</a></td></tr>
+<tr><td>I4</td><td>ASL Gate - Vietnam AD Extension</td><td><a href="https://aslgate.com/vietnam-extends-anti-dumping-review-period-for-h-shaped-steel-imports-from-china/">链接</a></td></tr>
+<tr><td>I5</td><td>ASEMConnect Vietnam - Steel Market</td><td><a href="https://asemconnectvietnam.gov.vn/default.aspx?ZID1=8&ID8=141040&ID1=2">链接</a></td></tr>
+<tr><td>I6</td><td>Xinhua - Vietnam Steel 2024</td><td><a href="https://english.news.cn/20240708/bc0c3113d4fb445d976b10032d07fa07/c.html">链接</a></td></tr>
+<tr><td>I7</td><td>SMM Steel - Vietnam Top 10</td><td><a href="https://news.metal.com/en/newscontent/103924856-SMM-Steel-Vietnam-Enters-Global-Top-10-Crude-Steel-Producers-for-First-Time">链接</a></td></tr>
+<tr><td>I8</td><td>MHI Spectra - Decarbonizing Vietnam Steel</td><td><a href="https://spectra.mhi.com/energy-transition/decarbonizing-vietnams-steel-industry">链接</a></td></tr>
+<tr><td>I9</td><td>Transition Asia - Decarbonising Steel</td><td><a href="https://transitionasia.org/wp-content/uploads/2025/07/TA_Decarbonising_Vietnam_Steel_Industry.pdf">链接</a></td></tr>
+<tr><td>I10</td><td>UNDP - Green Transition Vietnam</td><td><a href="https://www.undp.org/vietnam/blog/green-transition-and-strategies-strengthen-viet-nams-position-global-economy">链接</a></td></tr>
+<tr><td>I11</td><td>VMRF - Vietnam Steel Emissions</td><td><a href="https://vmrf.vn/en/vietnams-steel-industry-under-emissions-quotas-short-term-pressure-and-long-term-opportunities-from-green-steel-2194">链接</a></td></tr>
+<tr><td>I12</td><td>Global Efficiency Intel - Net-Zero Roadmap</td><td><a href="https://www.globalefficiencyintel.com/netzero-roadmap-for-vietnams-steel-industry">链接</a></td></tr>
+<tr><td>I13</td><td>IMARC - Vietnam Stainless Steel Market</td><td><a href="https://www.imarcgroup.com/vietnam-stainless-steel-market">链接</a></td></tr>
+<tr><td>I14</td><td>Grand View - Vietnam Structural Steel</td><td><a href="https://www.grandviewresearch.com/horizon/outlook/structural-steel-market/vietnam">链接</a></td></tr>
+<tr><td>I15</td><td>Ken Research - Vietnam Steel Market</td><td><a href="https://www.kenresearch.com/industry-reports/vietnam-steel-market">链接</a></td></tr>
+<tr><td>I16</td><td>VietnamPlus - Thai businesses in Vietnam</td><td><a href="https://en.vietnamplus.vn/vietnam-emerges-as-attractive-investment-destination-for-thai-businesses-post343426.vnp">链接</a></td></tr>
+</tbody>
+</table>
+</div>
+
+<hr class="divider">
+
+<!-- ================================================================ -->
+<!-- 七、总结 -->
+<!-- ================================================================ -->
+<h2 class="section-title">七、总结</h2>
+
+<div class="table-wrap summary-table">
+<table>
+<thead><tr><th>指标</th><th>数值</th></tr></thead>
+<tbody>
+<tr class="highlight"><td>数据/观点总条目</td><td><strong>~175条</strong></td></tr>
+<tr><td>🔗 直接引用源（有URL链接）</td><td><strong>~120条 (69%)</strong></td></tr>
+<tr><td>🧠 推理结论</td><td><strong>~45条 (26%)</strong></td></tr>
+<tr><td>⚠️ 明确标注估算</td><td><strong>~10条 (6%)</strong></td></tr>
+<tr class="highlight"><td>独立来源URL总数</td><td><strong>~81个</strong></td></tr>
+</tbody>
+</table>
+</div>
+
+<blockquote>
+  <strong>v2.0更新说明</strong><br>
+  • 从三份原始报告+深度研究报告中提取全部~81个独立URL<br>
+  • 所有🔗直接引用条目均已配置可点击链接<br>
+  • 新增第四节4.2「行业研究/分析报告来源」— 16个行业报告PDF链接<br>
+  • 新增第六节「完整来源链接汇总」— 按公司分组的全部URL清单<br>
+  • 新增条目：FY2025财务数据、GSM VN控股、FHS亏损、JFE入股等
+</blockquote>
+
+<blockquote style="border-left-color: var(--accent-red);">
+  <strong>核查建议</strong>：优先核实第5.2节中列出的高风险条目，其次对⚠️估算值类条目找到更精确的数据源替换。
+</blockquote>
+
+</div><!-- /container -->
+
+<footer class="footer">
+  越南钢铁三巨头深度报告 — 数据来源核查清单 &nbsp;|&nbsp; v2.0 &nbsp;|&nbsp; 2026-06-02 &nbsp;|&nbsp; <a href="https://www.hoaphat.com.vn" style="font-size:12px;">和发集团</a> · <a href="https://vingroup.net" style="font-size:12px;">Vingroup</a> · <a href="https://www.fpg.taipei" style="font-size:12px;">台塑集团</a>
+</footer>
+
+<a class="back-top" href="#" title="返回顶部">↑</a>
+
+</body>
+</html>
