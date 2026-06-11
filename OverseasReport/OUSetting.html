@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>境外分支机构定义</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "PingFang SC", -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+  background: #f5f6f8;
+  color: #1a1a1a;
+  min-height: 100vh;
+  padding: 0;
+}
+
+/* ── 顶部标题 ── */
+.page-header {
+  background: #fff;
+  text-align: center;
+  padding: 18px 16px 14px;
+  border-bottom: 1px solid #eee;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.page-header h1 {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: 0.5px;
+}
+.page-header .sub {
+  font-size: 12px;
+  color: #888;
+  margin-top: 4px;
+}
+
+/* ── 主体容器 ── */
+.main-container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* ── 表格区域 ── */
+.table-wrapper {
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+thead th {
+  background: #f8f9fb;
+  border-bottom: 2px solid #e8e8e8;
+  padding: 10px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+  text-align: center;
+  white-space: nowrap;
+}
+thead th.required::after {
+  content: ' *';
+  color: #e05050;
+}
+tbody td {
+  padding: 8px 8px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 13px;
+  vertical-align: top;
+}
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: #fafbfc; }
+
+/* 列宽分配 */
+th.col-org { width: 22%; }
+th.col-country { width: 52%; }
+th.col-code { width: 16%; }
+th.col-act { width: 10%; }
+
+/* ── 输入框 ── */
+.cell-input {
+  width: 100%;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  padding: 7px 9px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #333;
+  outline: none;
+  transition: border-color 0.15s;
+  background: #fff;
+}
+.cell-input:focus { border-color: #185FA5; box-shadow: 0 0 0 2px rgba(24,95,165,0.08); }
+
+/* ── 国家选择 cell ── */
+.country-cell {
+  min-height: 38px;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  padding: 6px 8px;
+  cursor: pointer;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  transition: border-color 0.15s;
+  position: relative;
+}
+.country-cell:hover { border-color: #aaa; }
+.country-cell:focus-within { border-color: #185FA5; box-shadow: 0 0 0 2px rgba(24,95,165,0.08); }
+.country-cell .placeholder {
+  color: #bbb;
+  font-size: 13px;
+  padding: 2px 0;
+  pointer-events: none;
+}
+.country-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: #E6F1FB;
+  color: #185FA5;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  line-height: 1.4;
+  max-width: 100%;
+}
+.country-tag .tag-remove {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  color: #7aa8d4;
+  line-height: 1;
+  margin-left: 2px;
+  transition: color 0.12s;
+  user-select: none;
+}
+.country-tag .tag-remove:hover { color: #e05050; }
+
+/* ── eCode3 只读 ── */
+.code-display {
+  padding: 7px 9px;
+  font-size: 13px;
+  color: #555;
+  word-break: break-all;
+  line-height: 1.5;
+  min-height: 32px;
+  background: #f9f9f9;
+  border-radius: 5px;
+  border: 1px solid #eee;
+}
+
+/* ── 操作按钮 ── */
+.btn-row-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid #e0e0e0;
+  background: #fff;
+  color: #999;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.btn-row-delete:hover { color: #e05050; border-color: #e05050; background: #fef5f5; }
+
+/* ── 底部按钮 ── */
+.footer-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.btn {
+  padding: 9px 24px;
+  border-radius: 7px;
+  font-size: 14px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+}
+.btn-add-row {
+  background: #f0f4f8;
+  color: #185FA5;
+  border: 1px dashed #b8cde0;
+}
+.btn-add-row:hover { background: #e0ebf5; }
+.btn-save {
+  background: #185FA5;
+  color: #fff;
+}
+.btn-save:hover { background: #134b85; }
+.btn-reset {
+  background: #fff;
+  color: #666;
+  border: 1px solid #ddd;
+}
+.btn-reset:hover { background: #f5f5f5; }
+
+/* ════════════════════════════════════════════════════════
+   级联选择弹窗
+   ════════════════════════════════════════════════════════ */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 9000;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.active { display: flex; }
+.cascade-modal {
+  background: #fff;
+  border-radius: 12px;
+  width: calc(100% - 32px);
+  max-width: 620px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  overflow: hidden;
+}
+
+/* 弹窗头部 */
+.cascade-modal .modal-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.cascade-modal .modal-header h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+.cascade-modal .modal-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #999;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+.cascade-modal .modal-close:hover { color: #333; }
+
+/* 搜索框 */
+.cascade-modal .search-bar {
+  padding: 10px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  flex-shrink: 0;
+}
+.cascade-modal .search-bar input {
+  width: 100%;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+}
+.cascade-modal .search-bar input:focus { border-color: #185FA5; }
+
+/* 已选标签 */
+.cascade-modal .selected-tags {
+  padding: 6px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  border-bottom: 1px solid #f0f0f0;
+  flex-shrink: 0;
+  min-height: 32px;
+  align-items: center;
+}
+.cascade-modal .selected-tags .no-selection {
+  color: #bbb;
+  font-size: 12px;
+}
+.cascade-modal .selected-tags .st {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: #E6F1FB;
+  color: #185FA5;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.cascade-modal .selected-tags .st .r {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  color: #7aa8d4;
+  line-height: 1;
+  margin-left: 2px;
+}
+.cascade-modal .selected-tags .st .r:hover { color: #e05050; }
+
+/* 双栏主体 */
+.cascade-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  min-height: 260px;
+}
+.cascade-col {
+  flex: 1;
+  overflow-y: auto;
+  border-right: 1px solid #eee;
+  scrollbar-width: thin;
+}
+.cascade-col:last-child { border-right: none; }
+.cascade-col::-webkit-scrollbar { width: 4px; }
+.cascade-col::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
+
+.cascade-col .col-title {
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: #fafbfc;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.cascade-item {
+  padding: 9px 12px;
+  font-size: 13px;
+  color: #333;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+  transition: background 0.1s;
+}
+.cascade-item:hover { background: #f5f7fa; }
+.cascade-item.active { background: #E6F1FB; color: #185FA5; font-weight: 600; }
+.cascade-item .item-arrow { font-size: 10px; color: #bbb; }
+.cascade-item.active .item-arrow { color: #185FA5; }
+.cascade-item .item-check {
+  display: none;
+  font-size: 14px;
+  color: #185FA5;
+  margin-left: 6px;
+}
+.cascade-item.selected .item-check { display: inline; }
+
+/* 弹窗底部 */
+.cascade-modal .modal-footer {
+  padding: 12px 16px;
+  border-top: 1px solid #eee;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+.cascade-modal .modal-footer button {
+  padding: 7px 20px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.12s;
+}
+.btn-cancel { background: #f0f0f0; color: #666; }
+.btn-cancel:hover { background: #e4e4e4; }
+.btn-confirm { background: #185FA5; color: #fff; }
+.btn-confirm:hover { background: #134b85; }
+
+/* ── Toast ── */
+.toast {
+  position: fixed;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.82);
+  color: #fff;
+  padding: 10px 22px;
+  border-radius: 20px;
+  font-size: 13px;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.25s;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; }
+
+/* 响应式 */
+@media (max-width: 600px) {
+  .main-container { padding: 10px; }
+  table { display: block; overflow-x: auto; }
+}
+</style>
+</head>
+<body>
+
+<!-- 顶部标题 -->
+<div class="page-header">
+  <h1>境外分支机构定义</h1>
+  <div class="sub">请录入各境外分支机构所覆盖的国家/地区</div>
+</div>
+
+<!-- 主体 -->
+<div class="main-container">
+  <div class="table-wrapper">
+    <table id="mainTable">
+      <thead>
+        <tr>
+          <th class="col-org required">组织名称</th>
+          <th class="col-country required">包含国家</th>
+          <th class="col-code">eCode3</th>
+          <th class="col-act">操作</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <div class="footer-actions">
+    <button class="btn btn-add-row" onclick="addRow()">+ 新增行</button>
+    <button class="btn btn-save" onclick="saveData()">保存</button>
+    <button class="btn btn-reset" onclick="resetAll()">重置</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- 级联选择弹窗 -->
+<div class="modal-overlay" id="cascadeOverlay">
+  <div class="cascade-modal">
+    <div class="modal-header">
+      <h3>选择国家 / 地区</h3>
+      <button class="modal-close" onclick="closeCascadeModal()">✕</button>
+    </div>
+    <div class="search-bar">
+      <input type="text" id="countrySearch" placeholder="🔍 搜索国家名称（模糊匹配）…" oninput="onCountrySearch()">
+    </div>
+    <div class="selected-tags" id="selectedTags">
+      <span class="no-selection">暂未选择</span>
+    </div>
+    <div class="cascade-body">
+      <div class="cascade-col" id="colContinent">
+        <div class="col-title">大洲</div>
+      </div>
+      <div class="cascade-col" id="colCountry">
+        <div class="col-title">国家 / 地区</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeCascadeModal()">取消</button>
+      <button class="btn-confirm" onclick="confirmCountrySelection()">确认选择</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     国家数据（从 Excel 提取）
+     ════════════════════════════════════════════════════════ -->
+<script>
+const COUNTRY_DATA = {
+  "亚洲": [
+    {"n":"阿富汗","c":"AFG"},{"n":"亚美尼亚","c":"ARM"},{"n":"阿塞拜疆","c":"AZE"},{"n":"巴林","c":"BHR"},
+    {"n":"孟加拉国","c":"BGD"},{"n":"不丹","c":"BTN"},{"n":"文莱","c":"BRN"},{"n":"柬埔寨","c":"KHM"},
+    {"n":"中国","c":"CHN"},{"n":"塞浦路斯","c":"CYP"},{"n":"格鲁吉亚","c":"GEO"},{"n":"印度","c":"IND"},
+    {"n":"印度尼西亚","c":"IDN"},{"n":"伊朗","c":"IRN"},{"n":"伊拉克","c":"IRQ"},{"n":"以色列","c":"ISR"},
+    {"n":"日本","c":"JPN"},{"n":"约旦","c":"JOR"},{"n":"哈萨克斯坦","c":"KAZ"},{"n":"朝鲜","c":"PRK"},
+    {"n":"韩国","c":"KOR"},{"n":"科威特","c":"KWT"},{"n":"吉尔吉斯斯坦","c":"KGZ"},{"n":"老挝","c":"LAO"},
+    {"n":"黎巴嫩","c":"LBN"},{"n":"马来西亚","c":"MYS"},{"n":"马尔代夫","c":"MDV"},{"n":"蒙古","c":"MNG"},
+    {"n":"缅甸","c":"MMR"},{"n":"尼泊尔","c":"NPL"},{"n":"阿曼","c":"OMN"},{"n":"巴基斯坦","c":"PAK"},
+    {"n":"巴勒斯坦","c":"PSE"},{"n":"菲律宾","c":"PHL"},{"n":"卡塔尔","c":"QAT"},{"n":"沙特阿拉伯","c":"SAU"},
+    {"n":"新加坡","c":"SGP"},{"n":"斯里兰卡","c":"LKA"},{"n":"叙利亚","c":"SYR"},{"n":"塔吉克斯坦","c":"TJK"},
+    {"n":"泰国","c":"THA"},{"n":"东帝汶","c":"TLS"},{"n":"土耳其","c":"TUR"},{"n":"土库曼斯坦","c":"TKM"},
+    {"n":"阿联酋","c":"ARE"},{"n":"乌兹别克斯坦","c":"UZB"},{"n":"越南","c":"VNM"},{"n":"也门","c":"YEM"},
+    {"n":"中国香港","c":"HKG"},{"n":"中国澳门","c":"MAC"},{"n":"中国台湾","c":"TWN"}
+  ],
+  "欧洲": [
+    {"n":"奥兰群岛","c":"ALA"},{"n":"阿尔巴尼亚","c":"ALB"},{"n":"安道尔","c":"AND"},{"n":"奥地利","c":"AUT"},
+    {"n":"白俄罗斯","c":"BLR"},{"n":"比利时","c":"BEL"},{"n":"波黑","c":"BIH"},{"n":"保加利亚","c":"BGR"},
+    {"n":"克罗地亚","c":"HRV"},{"n":"捷克","c":"CZE"},{"n":"丹麦","c":"DNK"},{"n":"爱沙尼亚","c":"EST"},
+    {"n":"法罗群岛","c":"FRO"},{"n":"芬兰","c":"FIN"},{"n":"法国","c":"FRA"},{"n":"德国","c":"DEU"},
+    {"n":"直布罗陀","c":"GIB"},{"n":"希腊","c":"GRC"},{"n":"根西岛","c":"GGY"},{"n":"匈牙利","c":"HUN"},
+    {"n":"冰岛","c":"ISL"},{"n":"爱尔兰","c":"IRL"},{"n":"马恩岛","c":"IMN"},{"n":"意大利","c":"ITA"},
+    {"n":"泽西岛","c":"JEY"},{"n":"拉脱维亚","c":"LVA"},{"n":"列支敦士登","c":"LIE"},{"n":"立陶宛","c":"LTU"},
+    {"n":"卢森堡","c":"LUX"},{"n":"马耳他","c":"MLT"},{"n":"摩尔多瓦","c":"MDA"},{"n":"摩纳哥","c":"MCO"},
+    {"n":"黑山","c":"MNE"},{"n":"荷兰","c":"NLD"},{"n":"北马其顿","c":"MKD"},{"n":"挪威","c":"NOR"},
+    {"n":"波兰","c":"POL"},{"n":"葡萄牙","c":"PRT"},{"n":"罗马尼亚","c":"ROU"},{"n":"俄罗斯","c":"RUS"},
+    {"n":"圣马力诺","c":"SMR"},{"n":"塞尔维亚","c":"SRB"},{"n":"斯洛伐克","c":"SVK"},{"n":"斯洛文尼亚","c":"SVN"},
+    {"n":"西班牙","c":"ESP"},{"n":"斯瓦尔巴和扬马延","c":"SJM"},{"n":"瑞典","c":"SWE"},{"n":"瑞士","c":"CHE"},
+    {"n":"乌克兰","c":"UKR"},{"n":"英国","c":"GBR"},{"n":"梵蒂冈","c":"VAT"}
+  ],
+  "非洲": [
+    {"n":"阿尔及利亚","c":"DZA"},{"n":"安哥拉","c":"AGO"},{"n":"贝宁","c":"BEN"},{"n":"博茨瓦纳","c":"BWA"},
+    {"n":"布基纳法索","c":"BFA"},{"n":"布隆迪","c":"BDI"},{"n":"喀麦隆","c":"CMR"},{"n":"佛得角","c":"CPV"},
+    {"n":"中非","c":"CAF"},{"n":"乍得","c":"TCD"},{"n":"科摩罗","c":"COM"},{"n":"刚果(布)","c":"COG"},
+    {"n":"刚果(金)","c":"COD"},{"n":"科特迪瓦","c":"CIV"},{"n":"吉布提","c":"DJI"},{"n":"埃及","c":"EGY"},
+    {"n":"赤道几内亚","c":"GNQ"},{"n":"厄立特里亚","c":"ERI"},{"n":"埃塞俄比亚","c":"ETH"},{"n":"加蓬","c":"GAB"},
+    {"n":"冈比亚","c":"GMB"},{"n":"加纳","c":"GHA"},{"n":"几内亚","c":"GIN"},{"n":"几内亚比绍","c":"GNB"},
+    {"n":"肯尼亚","c":"KEN"},{"n":"莱索托","c":"LSO"},{"n":"利比里亚","c":"LBR"},{"n":"利比亚","c":"LBY"},
+    {"n":"马达加斯加","c":"MDG"},{"n":"马拉维","c":"MWI"},{"n":"马里","c":"MLI"},{"n":"毛里塔尼亚","c":"MRT"},
+    {"n":"毛里求斯","c":"MUS"},{"n":"摩洛哥","c":"MAR"},{"n":"莫桑比克","c":"MOZ"},{"n":"纳米比亚","c":"NAM"},
+    {"n":"尼日尔","c":"NER"},{"n":"尼日利亚","c":"NGA"},{"n":"卢旺达","c":"RWA"},{"n":"圣多美和普林西比","c":"STP"},
+    {"n":"塞内加尔","c":"SEN"},{"n":"塞舌尔","c":"SYC"},{"n":"塞拉利昂","c":"SLE"},{"n":"索马里","c":"SOM"},
+    {"n":"南非","c":"ZAF"},{"n":"南苏丹","c":"SSD"},{"n":"苏丹","c":"SDN"},{"n":"斯威士兰","c":"SWZ"},
+    {"n":"坦桑尼亚","c":"TZA"},{"n":"多哥","c":"TGO"},{"n":"突尼斯","c":"TUN"},{"n":"乌干达","c":"UGA"},
+    {"n":"赞比亚","c":"ZMB"},{"n":"津巴布韦","c":"ZWE"}
+  ],
+  "北美洲": [
+    {"n":"安圭拉","c":"AIA"},{"n":"安提瓜和巴布达","c":"ATG"},{"n":"阿鲁巴","c":"ABW"},{"n":"巴哈马","c":"BHS"},
+    {"n":"巴巴多斯","c":"BRB"},{"n":"伯利兹","c":"BLZ"},{"n":"百慕大","c":"BMU"},{"n":"加拿大","c":"CAN"},
+    {"n":"开曼群岛","c":"CYM"},{"n":"哥斯达黎加","c":"CRI"},{"n":"古巴","c":"CUB"},{"n":"库拉索","c":"CUW"},
+    {"n":"多米尼克","c":"DMA"},{"n":"多米尼加","c":"DOM"},{"n":"萨尔瓦多","c":"SLV"},{"n":"格林纳达","c":"GRD"},
+    {"n":"瓜德罗普","c":"GLP"},{"n":"危地马拉","c":"GTM"},{"n":"海地","c":"HTI"},{"n":"洪都拉斯","c":"HND"},
+    {"n":"牙买加","c":"JAM"},{"n":"马提尼克","c":"MTQ"},{"n":"墨西哥","c":"MEX"},{"n":"蒙特塞拉特","c":"MSR"},
+    {"n":"尼加拉瓜","c":"NIC"},{"n":"巴拿马","c":"PAN"},{"n":"波多黎各","c":"PRI"},{"n":"圣基茨和尼维斯","c":"KNA"},
+    {"n":"圣卢西亚","c":"LCA"},{"n":"圣马丁(法)","c":"MAF"},{"n":"圣文森特和格林纳丁斯","c":"VCT"},{"n":"特立尼达和多巴哥","c":"TTO"},
+    {"n":"特克斯和凯科斯群岛","c":"TCA"},{"n":"美国","c":"USA"},{"n":"英属维尔京群岛","c":"VGB"},{"n":"美属维尔京群岛","c":"VIR"},
+    {"n":"圣巴泰勒米","c":"BLM"},{"n":"圣马丁(荷)","c":"SXM"},{"n":"博奈尔/圣尤斯特歇斯/萨巴","c":"BES"},{"n":"格林兰","c":"GRL"}
+  ],
+  "南美洲": [
+    {"n":"阿根廷","c":"ARG"},{"n":"玻利维亚","c":"BOL"},{"n":"巴西","c":"BRA"},{"n":"智利","c":"CHL"},
+    {"n":"哥伦比亚","c":"COL"},{"n":"厄瓜多尔","c":"ECU"},{"n":"法属圭亚那","c":"GUF"},{"n":"圭亚那","c":"GUY"},
+    {"n":"巴拉圭","c":"PRY"},{"n":"秘鲁","c":"PER"},{"n":"苏里南","c":"SUR"},{"n":"乌拉圭","c":"URY"},
+    {"n":"委内瑞拉","c":"VEN"},{"n":"福克兰群岛","c":"FLK"},{"n":"南乔治亚和南桑威奇群岛","c":"SGS"}
+  ],
+  "大洋洲": [
+    {"n":"美属萨摩亚","c":"ASM"},{"n":"澳大利亚","c":"AUS"},{"n":"库克群岛","c":"COK"},{"n":"斐济","c":"FJI"},
+    {"n":"法属波利尼西亚","c":"PYF"},{"n":"关岛","c":"GUM"},{"n":"基里巴斯","c":"KIR"},{"n":"马绍尔群岛","c":"MHL"},
+    {"n":"密克罗尼西亚","c":"FSM"},{"n":"瑙鲁","c":"NRU"},{"n":"新喀里多尼亚","c":"NCL"},{"n":"新西兰","c":"NZL"},
+    {"n":"纽埃","c":"NIU"},{"n":"诺福克岛","c":"NFK"},{"n":"北马里亚纳群岛","c":"MNP"},{"n":"帕劳","c":"PLW"},
+    {"n":"巴布亚新几内亚","c":"PNG"},{"n":"所罗门群岛","c":"SLB"},{"n":"汤加","c":"TON"},{"n":"图瓦卢","c":"TUV"},
+    {"n":"瓦努阿图","c":"VUT"},{"n":"瓦利斯和富图纳","c":"WLF"},{"n":"萨摩亚","c":"WSM"},{"n":"皮特凯恩","c":"PCN"},
+    {"n":"托克劳","c":"TKL"}
+  ],
+  "南极洲": [
+    {"n":"布韦岛","c":"BVT"},{"n":"法属南部领地","c":"ATF"},{"n":"赫德岛和麦克唐纳群岛","c":"HMD"}
+  ]
+};
+
+// 大洲列表（固定顺序）
+const CONTINENTS = ["亚洲","欧洲","非洲","北美洲","南美洲","大洋洲","南极洲"];
+
+// 扁平化：name → eCode3 快速查找
+const NAME_TO_CODE = {};
+for (const [continent, countries] of Object.entries(COUNTRY_DATA)) {
+  countries.forEach(c => { NAME_TO_CODE[c.n] = c.c; });
+}
+
+/* ════════════════════════════════════════════════════════
+   行数据管理
+   ════════════════════════════════════════════════════════ */
+let rowIdCounter = 0;
+let currentEditingRowId = null;  // 当前正在选择国家的行ID
+let tempSelectedCountries = {};  // 临时选择: { countryName: eCode3 }
+
+function createRowData() {
+  rowIdCounter++;
+  return {
+    id: rowIdCounter,
+    orgName: '',
+    selectedCountries: {},  // { 国家名: eCode3 }
+  };
+}
+
+// 所有行数据
+let rows = [createRowData()];
+
+/* ════════════════════════════════════════════════════════
+   渲染表格
+   ════════════════════════════════════════════════════════ */
+function renderTable() {
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+
+  rows.forEach((row, idx) => {
+    const tr = document.createElement('tr');
+
+    // 列1: 组织名称
+    const tdOrg = document.createElement('td');
+    const inpOrg = document.createElement('input');
+    inpOrg.type = 'text';
+    inpOrg.className = 'cell-input';
+    inpOrg.placeholder = '请输入组织名称';
+    inpOrg.value = row.orgName;
+    inpOrg.addEventListener('input', function() {
+      row.orgName = this.value;
+    });
+    tdOrg.appendChild(inpOrg);
+    tr.appendChild(tdOrg);
+
+    // 列2: 包含国家
+    const tdCountry = document.createElement('td');
+    const countryCell = document.createElement('div');
+    countryCell.className = 'country-cell';
+    countryCell.tabIndex = 0;
+    countryCell.setAttribute('data-row-id', row.id);
+    countryCell.addEventListener('click', function(e) {
+      if (e.target.classList.contains('tag-remove')) return;
+      openCascadeModal(row.id);
+    });
+    renderCountryCell(countryCell, row);
+    tdCountry.appendChild(countryCell);
+    tr.appendChild(tdCountry);
+
+    // 列3: eCode3
+    const tdCode = document.createElement('td');
+    const codeDiv = document.createElement('div');
+    codeDiv.className = 'code-display';
+    codeDiv.id = 'code-' + row.id;
+    codeDiv.textContent = getCodeString(row);
+    tdCode.appendChild(codeDiv);
+    tr.appendChild(tdCode);
+
+    // 列4: 操作
+    const tdAct = document.createElement('td');
+    tdAct.style.textAlign = 'center';
+    tdAct.style.paddingTop = '10px';
+    const btnDel = document.createElement('button');
+    btnDel.className = 'btn-row-delete';
+    btnDel.title = '删除此行';
+    btnDel.textContent = '✕';
+    btnDel.addEventListener('click', function() {
+      deleteRow(row.id);
+    });
+    tdAct.appendChild(btnDel);
+    tr.appendChild(tdAct);
+
+    tbody.appendChild(tr);
+  });
+}
+
+function renderCountryCell(cell, row) {
+  const names = Object.keys(row.selectedCountries);
+  // 保留已有的 tag-remove 按钮内的文本节点，整体重建
+  cell.innerHTML = '';
+  if (names.length === 0) {
+    const ph = document.createElement('span');
+    ph.className = 'placeholder';
+    ph.textContent = '点击选择国家 / 地区…';
+    cell.appendChild(ph);
+  } else {
+    names.forEach(name => {
+      const tag = document.createElement('span');
+      tag.className = 'country-tag';
+      const txt = document.createTextNode(name);
+      tag.appendChild(txt);
+      const rm = document.createElement('span');
+      rm.className = 'tag-remove';
+      rm.textContent = '×';
+      rm.addEventListener('click', function(e) {
+        e.stopPropagation();
+        delete row.selectedCountries[name];
+        renderCountryCell(cell, row);
+        updateCodeDisplay(row.id);
+      });
+      tag.appendChild(rm);
+      cell.appendChild(tag);
+    });
+  }
+}
+
+function getCodeString(row) {
+  const codes = Object.values(row.selectedCountries);
+  return codes.length > 0 ? codes.join(' / ') : '—';
+}
+
+function updateCodeDisplay(rowId) {
+  const row = rows.find(r => r.id === rowId);
+  if (!row) return;
+  const div = document.getElementById('code-' + rowId);
+  if (div) div.textContent = getCodeString(row);
+}
+
+function refreshRowDisplay(rowId) {
+  const row = rows.find(r => r.id === rowId);
+  if (!row) return;
+  const cell = document.querySelector('.country-cell[data-row-id="' + rowId + '"]');
+  if (cell) renderCountryCell(cell, row);
+  updateCodeDisplay(rowId);
+}
+
+/* ════════════════════════════════════════════════════════
+   行操作
+   ════════════════════════════════════════════════════════ */
+function addRow() {
+  rows.push(createRowData());
+  renderTable();
+  // 滚动到新行
+  setTimeout(() => {
+    const tableBody = document.getElementById('tableBody');
+    const lastRow = tableBody.lastElementChild;
+    if (lastRow) lastRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 100);
+}
+
+function deleteRow(rowId) {
+  if (rows.length <= 1) {
+    showToast('至少保留一行');
+    return;
+  }
+  const confirmed = confirm('确定要删除此行吗？已填入的数据将丢失。');
+  if (!confirmed) return;
+  rows = rows.filter(r => r.id !== rowId);
+  renderTable();
+  showToast('已删除');
+}
+
+/* ════════════════════════════════════════════════════════
+   级联选择弹窗
+   ════════════════════════════════════════════════════════ */
+let activeContinent = null;
+
+function openCascadeModal(rowId) {
+  currentEditingRowId = rowId;
+  const row = rows.find(r => r.id === rowId);
+  if (!row) return;
+
+  // 复制当前选择到临时变量
+  tempSelectedCountries = { ...row.selectedCountries };
+  activeContinent = null;
+
+  // 重置搜索
+  document.getElementById('countrySearch').value = '';
+
+  // 渲染弹窗
+  renderContinentList();
+  renderCountryList(null);
+  renderSelectedTags();
+  document.getElementById('cascadeOverlay').classList.add('active');
+}
+
+function closeCascadeModal() {
+  document.getElementById('cascadeOverlay').classList.remove('active');
+  currentEditingRowId = null;
+  tempSelectedCountries = {};
+  activeContinent = null;
+}
+
+function confirmCountrySelection() {
+  if (currentEditingRowId === null) return;
+  const row = rows.find(r => r.id === currentEditingRowId);
+  if (!row) return;
+
+  row.selectedCountries = { ...tempSelectedCountries };
+  refreshRowDisplay(currentEditingRowId);
+  closeCascadeModal();
+  showToast('已更新国家选择');
+}
+
+function renderSelectedTags() {
+  const container = document.getElementById('selectedTags');
+  const names = Object.keys(tempSelectedCountries);
+  container.innerHTML = '';
+  if (names.length === 0) {
+    container.innerHTML = '<span class="no-selection">暂未选择</span>';
+  } else {
+    names.forEach(name => {
+      const tag = document.createElement('span');
+      tag.className = 'st';
+      tag.appendChild(document.createTextNode(name));
+      const rm = document.createElement('span');
+      rm.className = 'r';
+      rm.textContent = '×';
+      rm.addEventListener('click', function() {
+        delete tempSelectedCountries[name];
+        renderSelectedTags();
+        // 同步刷新右侧勾选
+        renderCountryList(activeContinent);
+        renderContinentList();
+      });
+      tag.appendChild(rm);
+      container.appendChild(tag);
+    });
+  }
+}
+
+function renderContinentList() {
+  const col = document.getElementById('colContinent');
+  // 保留标题
+  col.innerHTML = '<div class="col-title">大洲</div>';
+
+  CONTINENTS.forEach(continent => {
+    // 计算该大洲下已选中的国家数
+    const countries = COUNTRY_DATA[continent] || [];
+    let selectedCount = 0;
+    countries.forEach(c => { if (tempSelectedCountries[c.n]) selectedCount++; });
+
+    const item = document.createElement('div');
+    item.className = 'cascade-item';
+    if (continent === activeContinent) item.classList.add('active');
+
+    const nameSpan = document.createElement('span');
+    nameSpan.textContent = continent;
+    item.appendChild(nameSpan);
+
+    const rightSpan = document.createElement('span');
+    rightSpan.style.display = 'flex';
+    rightSpan.style.alignItems = 'center';
+    rightSpan.style.gap = '6px';
+    if (selectedCount > 0) {
+      const badge = document.createElement('span');
+      badge.style.cssText = 'background:#185FA5;color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;';
+      badge.textContent = selectedCount;
+      rightSpan.appendChild(badge);
+    }
+    const arrow = document.createElement('span');
+    arrow.className = 'item-arrow';
+    arrow.textContent = '>';
+    rightSpan.appendChild(arrow);
+    item.appendChild(rightSpan);
+
+    item.addEventListener('click', function() {
+      activeContinent = continent;
+      document.getElementById('countrySearch').value = '';
+      renderContinentList();
+      renderCountryList(continent);
+    });
+
+    col.appendChild(item);
+  });
+}
+
+function renderCountryList(continent) {
+  const col = document.getElementById('colCountry');
+  const searchTerm = (document.getElementById('countrySearch').value || '').trim().toLowerCase();
+
+  // If no continent selected and no search, show hint
+  if (!continent && !searchTerm) {
+    col.innerHTML = '<div class="col-title">国家 / 地区</div><div style="padding:20px;text-align:center;color:#bbb;font-size:13px;">请先从左侧选择大洲<br>或在上方搜索</div>';
+    return;
+  }
+
+  col.innerHTML = '<div class="col-title">国家 / 地区</div>';
+
+  let candidates = [];
+
+  if (searchTerm) {
+    // 模糊搜索：遍历所有大洲
+    for (const [cont, countries] of Object.entries(COUNTRY_DATA)) {
+      countries.forEach(c => {
+        if (c.n.toLowerCase().includes(searchTerm)) {
+          candidates.push({ ...c, continent: cont });
+        }
+      });
+    }
+  } else if (continent) {
+    candidates = (COUNTRY_DATA[continent] || []).map(c => ({ ...c, continent }));
+  }
+
+  if (candidates.length === 0) {
+    const empty = document.createElement('div');
+    empty.style.cssText = 'padding:20px;text-align:center;color:#bbb;font-size:13px;';
+    empty.textContent = '无匹配结果';
+    col.appendChild(empty);
+    return;
+  }
+
+  candidates.forEach(c => {
+    const item = document.createElement('div');
+    item.className = 'cascade-item';
+    if (tempSelectedCountries[c.n]) item.classList.add('selected');
+
+    const leftSpan = document.createElement('span');
+    leftSpan.textContent = c.n;
+    item.appendChild(leftSpan);
+
+    const rightSpan = document.createElement('span');
+    rightSpan.style.display = 'flex';
+    rightSpan.style.alignItems = 'center';
+    rightSpan.style.gap = '4px';
+    rightSpan.style.fontSize = '11px';
+    rightSpan.style.color = '#aaa';
+
+    if (!continent) {
+      // 搜索模式下显示所属大洲
+      const contBadge = document.createElement('span');
+      contBadge.textContent = c.continent;
+      rightSpan.appendChild(contBadge);
+    }
+
+    const check = document.createElement('span');
+    check.className = 'item-check';
+    check.textContent = '✓';
+    rightSpan.appendChild(check);
+
+    item.appendChild(rightSpan);
+
+    item.addEventListener('click', function() {
+      if (tempSelectedCountries[c.n]) {
+        delete tempSelectedCountries[c.n];
+      } else {
+        tempSelectedCountries[c.n] = c.c;
+      }
+      renderCountryList(continent);
+      renderSelectedTags();
+      renderContinentList();
+    });
+
+    col.appendChild(item);
+  });
+}
+
+function onCountrySearch() {
+  const searchTerm = document.getElementById('countrySearch').value.trim().toLowerCase();
+  if (searchTerm) {
+    // 搜索模式下不依赖 continent
+    renderCountryList(null);
+    // 清除 continent 高亮
+    activeContinent = null;
+    renderContinentList();
+  } else {
+    // 恢复按大洲过滤
+    renderCountryList(activeContinent);
+    renderContinentList();
+  }
+}
+
+// 点击遮罩关闭
+document.getElementById('cascadeOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeCascadeModal();
+});
+
+/* ════════════════════════════════════════════════════════
+   保存 / 重置
+   ════════════════════════════════════════════════════════ */
+function saveData() {
+  // 检查必填
+  for (const row of rows) {
+    if (!row.orgName.trim()) {
+      showToast('请填写所有行的"组织名称"');
+      return;
+    }
+    if (Object.keys(row.selectedCountries).length === 0) {
+      showToast('请为每行至少选择一个国家');
+      return;
+    }
+  }
+
+  const data = rows.map(r => ({
+    组织名称: r.orgName.trim(),
+    包含国家: Object.keys(r.selectedCountries).join('\n'),
+    eCode3: Object.values(r.selectedCountries).join(' / '),
+  }));
+
+  // 存储到 localStorage
+  localStorage.setItem('OUSetting_data', JSON.stringify(data));
+  showToast('保存成功！');
+  console.log('保存数据:', data);
+}
+
+function resetAll() {
+  const confirmed = confirm('确定要重置所有数据吗？此操作不可恢复。');
+  if (!confirmed) return;
+  rowIdCounter = 0;
+  rows = [createRowData()];
+  renderTable();
+  localStorage.removeItem('OUSetting_data');
+  showToast('已重置');
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toast._timeout);
+  toast._timeout = setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+/* ════════════════════════════════════════════════════════
+   初始化
+   ════════════════════════════════════════════════════════ */
+function init() {
+  // 尝试从 localStorage 恢复数据
+  const saved = localStorage.getItem('OUSetting_data');
+  if (saved) {
+    try {
+      const arr = JSON.parse(saved);
+      rows = arr.map(item => {
+        rowIdCounter++;
+        const countryMap = {};
+        const names = (item['包含国家'] || '').split('\n').filter(Boolean);
+        names.forEach(name => {
+          const code = NAME_TO_CODE[name] || '';
+          countryMap[name.trim()] = code;
+        });
+        return {
+          id: rowIdCounter,
+          orgName: item['组织名称'] || '',
+          selectedCountries: countryMap,
+        };
+      });
+      if (rows.length === 0) rows = [createRowData()];
+    } catch(e) {
+      rows = [createRowData()];
+    }
+  }
+  renderTable();
+}
+
+init();
+</script>
+
+</body>
+</html>
