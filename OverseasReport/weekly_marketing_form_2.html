@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>海外营销周报</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+    background: #f5f6f8;
+    color: #333;
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+
+  /* ===== 顶部标题 ===== */
+  .page-header {
+    background: #fff;
+    text-align: center;
+    padding: 16px 16px 12px;
+    border-bottom: 1px solid #eee;
+    position: relative;
+  }
+  .page-header h1 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1a1a1a;
+    letter-spacing: 0.5px;
+  }
+  .page-header .subtitle {
+    font-size: 12px;
+    color: #888;
+    margin-top: 4px;
+  }
+  /* 空提交按钮 */
+  .btn-empty-submit {
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: #bbb;
+    background: none;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 3px 8px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+  }
+  .btn-empty-submit:hover { color: #999; border-color: #bbb; }
+
+  /* 空提交弹窗 */
+  .empty-modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 9000;
+    align-items: center;
+    justify-content: center;
+  }
+  .empty-modal-overlay.active { display: flex; }
+  .empty-modal {
+    background: #fff;
+    border-radius: 12px;
+    width: calc(100% - 40px);
+    max-width: 400px;
+    padding: 20px 20px 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  }
+  .empty-modal h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 14px;
+  }
+  .empty-modal .reason-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .empty-modal .reason-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+  }
+  .empty-modal .reason-item input[type=radio] {
+    width: 17px; height: 17px; cursor: pointer; accent-color: #3a7bd5;
+  }
+  .empty-modal textarea {
+    width: 100%;
+    min-height: 72px;
+    border: 1px solid #ddd;
+    border-radius: 7px;
+    padding: 9px 10px;
+    font-size: 13px;
+    font-family: inherit;
+    color: #333;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.15s;
+    display: none;
+    margin-top: 4px;
+  }
+  .empty-modal textarea:focus { border-color: #3a7bd5; }
+  .empty-modal textarea.visible { display: block; }
+  .empty-modal .modal-footer {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 16px;
+  }
+  .empty-modal .modal-footer button {
+    padding: 8px 20px;
+    border-radius: 7px;
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    font-weight: 500;
+  }
+  .empty-modal .btn-cancel-modal {
+    background: #f0f0f0;
+    color: #666;
+  }
+  .empty-modal .btn-cancel-modal:hover { background: #e4e4e4; }
+  .empty-modal .btn-confirm-modal {
+    background: #3a7bd5;
+    color: #fff;
+  }
+  .empty-modal .btn-confirm-modal:hover { background: #2e6abf; }
+
+  /* ===== 国家选择 ===== */
+  .country-section {
+    background: #fff;
+    margin: 8px 0 0;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .country-label {
+    font-size: 14px;
+    color: #333;
+    white-space: nowrap;
+    font-weight: 500;
+  }
+  .country-select-wrapper {
+    flex: 1;
+    position: relative;
+  }
+
+  /* ===== 卡片区域 ===== */
+  .cards-container {
+    margin-top: 8px;
+  }
+
+  .card {
+    background: #fff;
+    margin-bottom: 8px;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .card-header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-icon {
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  .card-collapse-btn {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    transition: transform 0.25s;
+    font-size: 14px;
+  }
+  .card-collapse-btn.collapsed {
+    transform: rotate(180deg);
+  }
+
+  .card-body {
+    padding: 0 16px 16px;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  .card-body.hidden {
+    display: none;
+  }
+
+  /* ===== 表单项 ===== */
+  .form-group {
+    margin-bottom: 14px;
+  }
+  .form-label {
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 6px;
+    display: block;
+    font-weight: 500;
+  }
+  .form-label.required::after {
+    content: " *";
+    color: #e74c3c;
+  }
+  /* 标签行（标题 + 说明按钮在一行） */
+  .label-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .label-row .form-label {
+    margin-bottom: 0;
+  }
+
+  /* 通用 input/select/textarea 样式 */
+  .form-input,
+  .form-select,
+  .form-textarea,
+  .searchable-input {
+    width: 100%;
+    background: #f4f5f7;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 13px;
+    font-size: 14px;
+    color: #333;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    font-family: inherit;
+  }
+  .form-input::placeholder,
+  .form-select::placeholder,
+  .form-textarea::placeholder,
+  .searchable-input::placeholder {
+    color: #b0b3bb;
+  }
+  .form-input:focus,
+  .form-select:focus,
+  .form-textarea:focus,
+  .searchable-input:focus {
+    background: #eef0f5;
+    box-shadow: 0 0 0 1.5px #7ba7d4;
+  }
+
+  /* select 箭头 */
+  .select-wrapper {
+    position: relative;
+  }
+  .select-wrapper::after {
+    content: "";
+    position: absolute;
+    right: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid #b0b3bb;
+    pointer-events: none;
+  }
+  .form-select {
+    padding-right: 32px;
+  }
+
+  .form-textarea {
+    resize: none;
+    min-height: 88px;
+    line-height: 1.5;
+  }
+
+  /* ===== 数字输入 + 后缀 ===== */
+  .input-with-suffix {
+    display: flex;
+    align-items: center;
+    background: #f4f5f7;
+    border-radius: 8px;
+    overflow: hidden;
+    border: none;
+    transition: background 0.15s, box-shadow 0.15s;
+  }
+  .input-with-suffix:focus-within {
+    background: #eef0f5;
+    box-shadow: 0 0 0 1.5px #7ba7d4;
+  }
+  .input-with-suffix .num-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 11px 13px;
+    font-size: 14px;
+    color: #333;
+    outline: none;
+    font-family: inherit;
+    min-width: 0;
+  }
+  .input-with-suffix .num-input::placeholder { color: #b0b3bb; }
+  .input-with-suffix .num-input::-webkit-inner-spin-button,
+  .input-with-suffix .num-input::-webkit-outer-spin-button {
+    -webkit-appearance: none; margin: 0;
+  }
+  .input-with-suffix .num-input[type="number"] { -moz-appearance: textfield; }
+  .input-with-suffix .suffix {
+    padding: 0 13px;
+    font-size: 13px;
+    color: #888;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* ===== 日期输入 ===== */
+  .form-date {
+    width: 100%;
+    background: #f4f5f7;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 13px;
+    font-size: 14px;
+    color: #333;
+    outline: none;
+    font-family: inherit;
+  }
+  .form-date:focus {
+    background: #eef0f5;
+    box-shadow: 0 0 0 1.5px #7ba7d4;
+  }
+  .form-date.optional {
+    color: #888;
+  }
+
+  /* ===== 搜索下拉 ===== */
+  .searchable-wrapper {
+    position: relative;
+  }
+  .searchable-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0; right: 0;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    z-index: 100;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  .searchable-dropdown.show { display: block; }
+  .dropdown-item {
+    padding: 11px 14px;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    border-bottom: 1px solid #f5f5f5;
+  }
+  .dropdown-item:last-child { border-bottom: none; }
+  .dropdown-item:hover, .dropdown-item.active {
+    background: #eef4fc;
+    color: #3a7bd5;
+  }
+  .dropdown-item em {
+    color: #3a7bd5;
+    font-style: normal;
+    font-weight: 600;
+  }
+  .dropdown-empty {
+    padding: 14px;
+    font-size: 13px;
+    color: #aaa;
+    text-align: center;
+  }
+
+  /* ===== 联动选择框 ===== */
+  .dynamic-select-wrapper {
+    margin-top: 8px;
+  }
+
+  /* ===== 复选/单选 ===== */
+  .radio-group {
+    display: flex;
+    gap: 24px;
+    margin-top: 4px;
+  }
+  .radio-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+  }
+  .radio-item input[type="radio"],
+  .radio-item input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #3a7bd5;
+    cursor: pointer;
+  }
+
+  /* ===== 是否报送集团领导（单行紧凑） ===== */
+  .inline-radio-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: nowrap;
+    margin-bottom: 14px;
+  }
+  .inline-radio-label {
+    font-size: 13px;
+    color: #333;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .inline-radio-label.required::after {
+    content: " *";
+    color: #e74c3c;
+  }
+  .inline-radio-options {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+
+  /* ===== 子卡片（可收起的二级卡片） ===== */
+  .sub-card {
+    border: 1px solid #eaecef;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    background: #fafbfc;
+    overflow: hidden;
+  }
+  /* 子卡片头部（标题栏，可点击收起） */
+  .sub-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    cursor: pointer;
+    user-select: none;
+    background: #f0f4fa;
+    border-bottom: 1px solid #eaecef;
+  }
+  .sub-card-header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #3a7bd5;
+    flex: 1;
+    min-width: 0;
+  }
+  .sub-card-header-left span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sub-card-header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .sub-card-collapse-btn {
+    font-size: 12px;
+    color: #999;
+    transition: transform 0.2s;
+    display: flex;
+    align-items: center;
+  }
+  .sub-card-collapse-btn.collapsed {
+    transform: rotate(180deg);
+  }
+  .sub-card-remove {
+    font-size: 18px;
+    color: #c0c4cc;
+    cursor: pointer;
+    line-height: 1;
+    padding: 2px 2px;
+  }
+  .sub-card-remove:hover { color: #e74c3c; }
+  /* 子卡片内容区 */
+  .sub-card-body {
+    padding: 14px;
+  }
+  .sub-card-body.hidden {
+    display: none;
+  }
+
+  /* ===== 新增按钮 ===== */
+  .add-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 12px;
+    background: #d6e4f7;
+    color: #3a7bd5;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 4px;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+  .add-btn:hover { background: #c2d8f2; }
+  .add-btn:active { background: #aeccea; }
+
+  /* ===== 底部操作栏 ===== */
+  .bottom-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: #fff;
+    border-top: 1px solid #eee;
+    padding: 10px 16px;
+    display: flex;
+    gap: 10px;
+    z-index: 200;
+  }
+  .btn-submit {
+    flex: 2;
+    padding: 13px;
+    background: #3a7bd5;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+  .btn-submit:hover { background: #2e6abf; }
+  .btn-submit:active { background: #2558a0; }
+  .btn-save {
+    flex: 1;
+    padding: 13px;
+    background: #f0f0f0;
+    color: #666;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+  .btn-save:hover { background: #e4e4e4; }
+
+  /* ===== 弹窗提示 ===== */
+  .toast {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.72);
+    color: #fff;
+    padding: 12px 22px;
+    border-radius: 8px;
+    font-size: 14px;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; }
+
+  /* 区块标题分割 */
+  .section-divider {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-divider::before, .section-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #e8e8e8;
+  }
+
+  /* 隐藏行 */
+  .field-hidden { display: none; }
+
+  /* ===== 说明按钮 ===== */
+  .info-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #3a7bd5;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    flex-shrink: 0;
+    border: none;
+    font-family: inherit;
+    line-height: 1;
+  }
+  .info-btn:hover { background: #2e6abf; }
+
+  /* ===== 模态弹窗 ===== */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 5000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.show {
+    display: flex;
+  }
+  .modal-box {
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    max-width: 420px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  }
+  .modal-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .modal-close {
+    font-size: 20px;
+    color: #bbb;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 2px;
+  }
+  .modal-close:hover { color: #666; }
+  .modal-content {
+    font-size: 13px;
+    color: #444;
+    line-height: 1.8;
+  }
+  .modal-content p {
+    margin-bottom: 10px;
+  }
+  .modal-content .example-block {
+    background: #f5f7fb;
+    border-left: 3px solid #3a7bd5;
+    border-radius: 4px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    font-size: 12.5px;
+    color: #555;
+    line-height: 1.7;
+  }
+  .modal-content .example-num {
+    font-weight: 600;
+    color: #3a7bd5;
+    margin-bottom: 4px;
+  }
+</style>
+</head>
+<body>
+
+<!-- 顶部标题 -->
+<div class="page-header">
+  <h1>海外营销周报</h1>
+  <div class="subtitle">填报时间截至周日 10：00</div>
+  <button class="btn-empty-submit" onclick="openEmptySubmitModal()">空提交</button>
+</div>
+
+<!-- 空提交弹窗 -->
+<div class="empty-modal-overlay" id="emptyModalOverlay">
+  <div class="empty-modal">
+    <h3>空提交 · 填写理由</h3>
+    <div class="reason-list">
+      <label class="reason-item">
+        <input type="radio" name="emptyReason" value="休假中" onchange="onEmptyReasonChange(this)">
+        休假中
+      </label>
+      <label class="reason-item">
+        <input type="radio" name="emptyReason" value="出差/会议途中，不便填写" onchange="onEmptyReasonChange(this)">
+        出差 / 会议途中，不便填写
+      </label>
+      <label class="reason-item">
+        <input type="radio" name="emptyReason" value="other" onchange="onEmptyReasonChange(this)">
+        其他
+      </label>
+    </div>
+    <textarea id="emptyReasonOther" maxlength="100" placeholder="请输入具体理由（100字以内）"></textarea>
+    <div class="modal-footer">
+      <button class="btn-cancel-modal" onclick="closeEmptySubmitModal()">取消</button>
+      <button class="btn-confirm-modal" onclick="confirmEmptySubmit()">确认提交</button>
+    </div>
+  </div>
+</div>
+
+<!-- 当前所在国家 -->
+<div class="country-section">
+  <span class="country-label">当前所在国家：</span>
+  <div class="country-select-wrapper">
+    <div class="searchable-wrapper" id="countryWrapper">
+      <input class="searchable-input" type="text" id="countryInput"
+             placeholder="请选择当前所在国家" autocomplete="off" readonly
+             onclick="toggleDropdown('country')" />
+      <div class="searchable-dropdown" id="countryDropdown"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 主体卡片区 -->
+<div class="cards-container">
+
+  <!-- ===== 开拓项目（营销管理） ===== -->
+  <div class="card">
+    <div class="card-header" onclick="toggleCard('develop')">
+      <div class="card-header-left">
+        <div class="card-icon">🎯</div>
+        <div class="card-title">开拓项目（营销管理）</div>
+      </div>
+      <div class="card-collapse-btn" id="developCollapseBtn">&#8963;</div>
+    </div>
+    <div class="card-body" id="developBody">
+      <div id="developCards"></div>
+      <button class="add-btn" onclick="addDevelopCard()">
+        <span style="font-size:18px">⊕</span> 新增开拓项目
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== 客户管理 ===== -->
+  <div class="card">
+    <div class="card-header" onclick="toggleCard('customer')">
+      <div class="card-header-left">
+        <div class="card-icon">🗂️</div>
+        <div class="card-title">客户管理</div>
+      </div>
+      <div class="card-collapse-btn" id="customerCollapseBtn">&#8963;</div>
+    </div>
+    <div class="card-body" id="customerBody">
+      <div id="customerCards"></div>
+      <button class="add-btn" onclick="addCustomerCard()">
+        <span style="font-size:18px">⊕</span> 新增客户管理
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== 组织建设 ===== -->
+  <div class="card">
+    <div class="card-header" onclick="toggleCard('orgBuild')">
+      <div class="card-header-left">
+        <div class="card-icon">🏗️</div>
+        <div class="card-title">组织建设</div>
+      </div>
+      <div class="card-collapse-btn" id="orgBuildCollapseBtn">&#8963;</div>
+    </div>
+    <div class="card-body" id="orgBuildBody">
+      <div class="form-group">
+        <label class="form-label">队伍建设</label>
+        <textarea class="form-textarea" placeholder="请输入队伍建设情况（200字以内）" maxlength="200" style="min-height:80px;"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">机构建设</label>
+        <textarea class="form-textarea" placeholder="请输入机构建设情况（200字以内）" maxlength="200" style="min-height:80px;"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">生态建设</label>
+        <textarea class="form-textarea" placeholder="请输入生态建设情况（200字以内）" maxlength="200" style="min-height:80px;"></textarea>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 底部操作栏 -->
+<div class="bottom-bar">
+  <button class="btn-submit" onclick="submitForm()">提交</button>
+  <button class="btn-save" onclick="saveForm()">保存</button>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- ===== 当前项目进展 · 填报指南弹窗 ===== -->
+<div class="modal-overlay" id="progressGuideModal" onclick="closeModal('progressGuideModal')">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-title">
+      <span>当前项目进展 · 填报指南</span>
+      <span class="modal-close" onclick="closeModal('progressGuideModal')">&times;</span>
+    </div>
+    <div class="modal-content">
+      <p>在<strong>补充说明</strong>栏，填报人需填写"见人见事"情况，请参考以下示例：</p>
+      <div class="example-block">
+        <div class="example-num">示例 1 · 关键商务信息</div>
+        ×月×日，赛迪股份报价经理××与业主××召开视频会议，沟通确认短名单、考核值等关键技术参数，技术附件基本确认完毕，待业主通知报价。
+      </div>
+      <div class="example-block">
+        <div class="example-num">示例 2 · 互访信息</div>
+        ×月×日，赛迪股份XXX带队拜访了XXX客户投资总监，交流了XXX项目XXX事项，达成了XXX成果，下一步要准备XXX继续跟进。
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================================================================
+   数据字典
+   ================================================================ */
+const COUNTRIES = [
+  "中国", "美国", "德国", "法国", "英国", "日本", "韩国", "印度", "巴西",
+  "俄罗斯", "沙特阿拉伯", "阿联酋", "土耳其", "南非", "澳大利亚",
+  "加拿大", "墨西哥", "阿根廷", "印度尼西亚", "越南", "泰国", "马来西亚",
+  "新加坡", "菲律宾", "波兰", "荷兰", "比利时", "意大利", "西班牙", "葡萄牙",
+  "瑞典", "挪威", "丹麦", "芬兰", "捷克", "匈牙利", "罗马尼亚", "哈萨克斯坦",
+  "乌兹别克斯坦", "巴基斯坦", "孟加拉国", "伊朗", "伊拉克", "埃及",
+  "尼日利亚", "肯尼亚", "坦桑尼亚", "摩洛哥", "阿尔及利亚"
+];
+
+const CUSTOMERS = [
+  "ACME Corp", "GlobalTech Ltd", "Pacific Steel Co.",
+  "ArcelorMittal", "Tata Steel", "POSCO", "Nippon Steel",
+  "Tenaris", "Voestalpine", "ThyssenKrupp", "Nucor Corporation",
+  "SSAB", "Outokumpu", "Salzgitter AG", "Aperam"
+];
+
+const PROJECTS = [
+  "Omega Steel Plant Phase II", "Phoenix Greenfield Project",
+  "Atlas Rolling Mill Upgrade", "Delta Coking Plant",
+  "Horizon Blast Furnace Relining", "Nova Continuous Caster",
+  "Summit EAF Modernization", "Titan Wire Rod Mill",
+  "Apex Pelletizing Plant", "Eclipse Cold Rolling Mill"
+];
+
+const DEVELOP_PROGRESS_L1 = [
+  "项目前期跟踪", "技术交流", "商务报价", "项目中标",
+  "合同签订", "项目丢标", "项目延期", "项目取消", "其他"
+];
+
+const DEVELOP_PROGRESS_L2 = {
+  "项目前期跟踪": [
+    "1）收到业主询价信息，进行沟通澄清",
+    "2）出于内部人力、竞争力、项目可靠性等原因判断，我方不参与本项目跟踪",
+    "3）业主计划来访交流和参观样板厂，内部安排准备",
+    "4）收集项目的商务背景信息，计划拜访业主",
+    "5）提供预算性报价和方案",
+    "6）内部立项，成立报价团队"
+  ],
+  "技术交流": [
+    "1）交流技术方案，准备初步技术附件",
+    "2）业主计划来访交流和参观样板厂，内部安排准备",
+    "3）提交初步技术附件，等待业主反馈审核意见",
+    "4）收到业主审核意见并澄清，内部确认和修改技术附件",
+    "5）业主提出方案的变化，内部确认和修改",
+    "6）提交最终修改的技术附件",
+    "7）双方签署技术附件"
+  ],
+  "商务报价": [
+    "1）业主要求提供商务报价，内部确认",
+    "2）内部准备、审核价格",
+    "3）提交报价，等待业主反馈",
+    "4）和业主澄清价格对应的范围、主要商务条款等",
+    "5）业主推迟决策",
+    "6）业主提出降价要求",
+    "7）应业主要求，我方提供修改报价",
+    "8）和业主进行商务谈判",
+    "9）提供最终价格",
+    "10）业主确认我方价格"
+  ],
+  "项目中标": [
+    "1）业主口头/书面确认接受我方价格",
+    "2）业主发布中标通知书",
+    "3）我方确认业主发送的中标通知书",
+    "4）完成业主系统的供应商注册"
+  ],
+  "合同签订": [
+    "1）谈判合同条款",
+    "2）内部走合同评审流程",
+    "3）完成合同签订"
+  ],
+  "项目丢标": [
+    "1）我方未中标，了解中标方",
+    "2）内部分析丢标原因"
+  ],
+  "项目延期": [
+    "1）业主通知项目延期",
+    "2）了解业主重启时间"
+  ],
+  "项目取消": ["业主通知项目取消"],
+  "其他": null  // input
+};
+
+const CUSTOMER_CHANGE_TYPES = [
+  "重大经营状况变化", "宣布重大投资计划", "客户管理层/关键人员变化",
+  "涉及重大诉讼或处罚", "其他影响履约能力的事项", "无"
+];
+
+const IMPACT_TYPES = [
+  "影响较小", "有影响，将专题分析汇报", "影响较大，将专题分析汇报"
+];
+
+const PRODUCTION_CHANGE_TYPES = ["产能扩张", "新建设施", "关停拆除", "无"];
+
+/* ================================================================
+   工具函数
+   ================================================================ */
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function toggleCard(id) {
+  const body = document.getElementById(id + 'Body');
+  const btn = document.getElementById(id + 'CollapseBtn');
+  if (body.classList.contains('hidden')) {
+    body.classList.remove('hidden');
+    btn.classList.remove('collapsed');
+  } else {
+    body.classList.add('hidden');
+    btn.classList.add('collapsed');
+  }
+}
+
+/* 模态弹窗 */
+function openModal(id) {
+  document.getElementById(id).classList.add('show');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+/* ================================================================
+   通用搜索下拉
+   ================================================================ */
+let activeDropdown = null;
+
+function buildDropdownItems(dropdownEl, list, inputEl, onSelect) {
+  dropdownEl.innerHTML = '';
+  if (list.length === 0) {
+    dropdownEl.innerHTML = '<div class="dropdown-empty">无匹配结果</div>';
+    return;
+  }
+  const query = inputEl.value.toLowerCase();
+  list.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'dropdown-item';
+    if (query && item.toLowerCase().includes(query)) {
+      const idx = item.toLowerCase().indexOf(query);
+      div.innerHTML = item.slice(0, idx) +
+        '<em>' + item.slice(idx, idx + query.length) + '</em>' +
+        item.slice(idx + query.length);
+    } else {
+      div.textContent = item;
+    }
+    div.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      inputEl.value = item;
+      inputEl.dataset.value = item;
+      dropdownEl.classList.remove('show');
+      activeDropdown = null;
+      onSelect && onSelect(item);
+    });
+    dropdownEl.appendChild(div);
+  });
+}
+
+function toggleDropdown(id) {
+  const input = document.getElementById(id + 'Input');
+  const dropdown = document.getElementById(id + 'Dropdown');
+  if (!dropdown) return;
+  if (dropdown.classList.contains('show')) {
+    dropdown.classList.remove('show');
+    activeDropdown = null;
+    return;
+  }
+  dropdown.classList.add('show');
+  activeDropdown = id;
+  buildDropdownItems(dropdown, COUNTRIES, input, null);
+}
+
+// 国家搜索输入
+document.addEventListener('DOMContentLoaded', () => {
+  const ci = document.getElementById('countryInput');
+  ci.removeAttribute('readonly');
+  const cd = document.getElementById('countryDropdown');
+  ci.addEventListener('input', () => {
+    const q = ci.value.toLowerCase();
+    const filtered = q ? COUNTRIES.filter(c => c.toLowerCase().includes(q)) : COUNTRIES;
+    buildDropdownItems(cd, filtered, ci, null);
+    cd.classList.add('show');
+  });
+  ci.addEventListener('focus', () => {
+    buildDropdownItems(cd, COUNTRIES, ci, null);
+    cd.classList.add('show');
+  });
+
+  document.addEventListener('click', (e) => {
+    document.querySelectorAll('.searchable-dropdown.show').forEach(dd => {
+      const wrapper = dd.closest('.searchable-wrapper');
+      if (wrapper && !wrapper.contains(e.target)) {
+        dd.classList.remove('show');
+      }
+    });
+  });
+
+  // 初始化各卡片区至少一个
+  addDevelopCard();
+  addCustomerCard();
+  // 周报板块不预填，由用户按需添加
+});
+
+/* ================================================================
+   搜索下拉（通用，用于子卡片内部）
+   ================================================================ */
+function makeSearchableSelect(list, placeholder, onSelect, readonlyMode) {
+  const uid = 'sd_' + Math.random().toString(36).slice(2);
+  const wrapper = document.createElement('div');
+  wrapper.className = 'searchable-wrapper';
+
+  const input = document.createElement('input');
+  input.className = 'searchable-input';
+  input.placeholder = placeholder;
+  input.autocomplete = 'off';
+  input.dataset.uid = uid;
+  if (readonlyMode) input.readOnly = true;
+
+  const dropdown = document.createElement('div');
+  dropdown.className = 'searchable-dropdown';
+  dropdown.id = uid;
+
+  function renderItems(q) {
+    dropdown.innerHTML = '';
+    const filtered = q ? list.filter(i => i.toLowerCase().includes(q.toLowerCase())) : list;
+    if (!filtered.length) {
+      dropdown.innerHTML = '<div class="dropdown-empty">无匹配结果</div>';
+      return;
+    }
+    filtered.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'dropdown-item';
+      if (q) {
+        const idx = item.toLowerCase().indexOf(q.toLowerCase());
+        div.innerHTML = item.slice(0, idx) +
+          '<em>' + item.slice(idx, idx + q.length) + '</em>' +
+          item.slice(idx + q.length);
+      } else {
+        div.textContent = item;
+      }
+      div.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        input.value = item;
+        input.dataset.selectedValue = item;
+        dropdown.classList.remove('show');
+        onSelect && onSelect(item, wrapper);
+      });
+      dropdown.appendChild(div);
+    });
+  }
+
+  if (readonlyMode) {
+    input.addEventListener('click', () => {
+      if (dropdown.classList.contains('show')) {
+        dropdown.classList.remove('show');
+      } else {
+        renderItems('');
+        dropdown.classList.add('show');
+      }
+    });
+  } else {
+    input.addEventListener('focus', () => { renderItems(input.value); dropdown.classList.add('show'); });
+    input.addEventListener('input', () => { renderItems(input.value); dropdown.classList.add('show'); });
+  }
+
+  wrapper.appendChild(input);
+  wrapper.appendChild(dropdown);
+  return { wrapper, input };
+}
+
+/* ================================================================
+   native select helper
+   ================================================================ */
+function makeNativeSelect(options, placeholder) {
+  const wrap = document.createElement('div');
+  wrap.className = 'select-wrapper';
+  const sel = document.createElement('select');
+  sel.className = 'form-select';
+  const ph = document.createElement('option');
+  ph.value = '';
+  ph.textContent = placeholder;
+  ph.disabled = true;
+  ph.selected = true;
+  sel.appendChild(ph);
+  options.forEach(o => {
+    const opt = document.createElement('option');
+    opt.value = o;
+    opt.textContent = o;
+    sel.appendChild(opt);
+  });
+  wrap.appendChild(sel);
+  return { wrap, sel };
+}
+
+/* ================================================================
+   数字输入 + 后缀 helper
+   ================================================================ */
+function makeNumberInput(placeholder, suffix) {
+  const container = document.createElement('div');
+  container.className = 'input-with-suffix';
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.className = 'num-input';
+  input.placeholder = placeholder;
+  input.min = '0';
+  input.step = 'any';
+  const span = document.createElement('span');
+  span.className = 'suffix';
+  span.textContent = suffix || '';
+  container.appendChild(input);
+  container.appendChild(span);
+  return { container, input };
+}
+
+/* ================================================================
+   日期输入 helper
+   ================================================================ */
+function makeDateInput(min, max, optional) {
+  const input = document.createElement('input');
+  input.type = 'date';
+  input.className = 'form-date' + (optional ? ' optional' : '');
+  if (min) input.min = min;
+  if (max) input.max = max;
+  return input;
+}
+
+/* ================================================================
+   makeFormGroup 辅助函数
+   ================================================================ */
+function makeFormGroup(label, required, contentFn) {
+  const group = document.createElement('div');
+  group.className = 'form-group';
+  const lbl = document.createElement('label');
+  lbl.className = 'form-label' + (required ? ' required' : '');
+  lbl.textContent = label;
+  group.appendChild(lbl);
+  const content = contentFn();
+  group.appendChild(content);
+  return group;
+}
+
+/* ================================================================
+   子卡片（可收起）创建helper
+   ================================================================ */
+let subCardGlobalCount = 0;
+function makeSubCard(titleText, onRemove) {
+  subCardGlobalCount++;
+  const scId = 'sc_' + subCardGlobalCount;
+
+  const sub = document.createElement('div');
+  sub.className = 'sub-card';
+
+  // 头部
+  const header = document.createElement('div');
+  header.className = 'sub-card-header';
+
+  const headerLeft = document.createElement('div');
+  headerLeft.className = 'sub-card-header-left';
+  const titleSpan = document.createElement('span');
+  titleSpan.textContent = titleText;
+  headerLeft.appendChild(titleSpan);
+
+  const headerRight = document.createElement('div');
+  headerRight.className = 'sub-card-header-right';
+
+  // 折叠按钮
+  const collapseBtn = document.createElement('span');
+  collapseBtn.className = 'sub-card-collapse-btn';
+  collapseBtn.innerHTML = '&#8963;';
+  headerRight.appendChild(collapseBtn);
+
+  // 删除按钮
+  if (onRemove) {
+    const rm = document.createElement('span');
+    rm.className = 'sub-card-remove';
+    rm.innerHTML = '&times;';
+    rm.onclick = (e) => { e.stopPropagation(); onRemove(sub); };
+    headerRight.appendChild(rm);
+  }
+
+  header.appendChild(headerLeft);
+  header.appendChild(headerRight);
+
+  // 内容区
+  const body = document.createElement('div');
+  body.className = 'sub-card-body';
+  body.id = scId;
+
+  // 收起/展开逻辑
+  header.addEventListener('click', () => {
+    if (body.classList.contains('hidden')) {
+      body.classList.remove('hidden');
+      collapseBtn.classList.remove('collapsed');
+    } else {
+      body.classList.add('hidden');
+      collapseBtn.classList.add('collapsed');
+    }
+  });
+
+  sub.appendChild(header);
+  sub.appendChild(body);
+
+  return { sub, body, titleSpan };
+}
+
+/* 内联单行 radio（是否报送集团领导） */
+function makeInlineRadio(labelText, required, radioName) {
+  const row = document.createElement('div');
+  row.className = 'inline-radio-group';
+
+  const lbl = document.createElement('span');
+  lbl.className = 'inline-radio-label' + (required ? ' required' : '');
+  lbl.textContent = labelText;
+  row.appendChild(lbl);
+
+  const opts = document.createElement('div');
+  opts.className = 'inline-radio-options';
+  ['是', '否'].forEach((opt, i) => {
+    const label = document.createElement('label');
+    label.className = 'radio-item';
+    const inp = document.createElement('input');
+    inp.type = 'radio';
+    inp.name = radioName;
+    inp.value = opt;
+    if (i === 0) inp.checked = true;
+    label.appendChild(inp);
+    label.appendChild(document.createTextNode(opt));
+    opts.appendChild(label);
+  });
+  row.appendChild(opts);
+  return row;
+}
+
+/* ================================================================
+   开拓项目卡片
+   ================================================================ */
+let developCount = 0;
+
+function addDevelopCard() {
+  developCount++;
+  const idx = developCount;
+  const container = document.getElementById('developCards');
+
+  const { sub, body: subBody, titleSpan } = makeSubCard(
+    '项目 ' + idx,
+    idx > 1 ? (el) => el.remove() : null
+  );
+
+  // 客户名称
+  subBody.appendChild(makeFormGroup('客户名称', true, () => {
+    const { wrapper, input: cInput } = makeSearchableSelect(CUSTOMERS, '请选择客户', (val) => {
+      // 更新子卡片标题
+      titleSpan.textContent = val ? val + ' · 项目 ' + idx : '项目 ' + idx;
+    }, false);
+    return wrapper;
+  }));
+
+  // 项目名称
+  subBody.appendChild(makeFormGroup('项目名称', true, () => {
+    const { wrapper } = makeSearchableSelect(PROJECTS, '请输入项目简称', null, false);
+    wrapper.querySelector('input').placeholder = '请输入项目简称';
+    return wrapper;
+  }));
+
+  // 项目分类
+  subBody.appendChild(makeFormGroup('项目分类', true, () => {
+    const { wrap } = makeNativeSelect(['保持关注项目', '正常跟踪项目', '重点投入项目'], '请选择项目当前分类');
+    return wrap;
+  }));
+
+  // ===== 当前项目进展（含说明按钮 + 补充说明） =====
+  const progressGroup = document.createElement('div');
+  progressGroup.className = 'form-group';
+
+  // 标题行：标签 + ？说明按钮
+  const labelRow = document.createElement('div');
+  labelRow.className = 'label-row';
+  const progressLabel = document.createElement('label');
+  progressLabel.className = 'form-label required';
+  progressLabel.textContent = '当前项目进展';
+  progressLabel.style.marginBottom = '0';
+  const infoBtn = document.createElement('button');
+  infoBtn.className = 'info-btn';
+  infoBtn.title = '填报指南';
+  infoBtn.textContent = '?';
+  infoBtn.type = 'button';
+  infoBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openModal('progressGuideModal');
+  });
+  labelRow.appendChild(progressLabel);
+  labelRow.appendChild(infoBtn);
+  progressGroup.appendChild(labelRow);
+
+  // 一级下拉
+  const progressWrap = document.createElement('div');
+  const { wrap: l1Wrap, sel: l1Sel } = makeNativeSelect(DEVELOP_PROGRESS_L1, '请选择当前项目进展状态');
+  progressWrap.appendChild(l1Wrap);
+
+  // 二级选择容器
+  const l2Container = document.createElement('div');
+  l2Container.className = 'dynamic-select-wrapper';
+  progressWrap.appendChild(l2Container);
+
+  // 补充说明（默认隐藏，选完一级后出现，必填）
+  const remarkGroup = document.createElement('div');
+  remarkGroup.className = 'form-group field-hidden';
+  remarkGroup.style.marginTop = '8px';
+  remarkGroup.style.marginBottom = '0';
+  const remarkTa = document.createElement('textarea');
+  remarkTa.className = 'form-textarea';
+  remarkTa.placeholder = '补充说明：请填写"见人见事"情况（点击右上角 ? 查看示例）';
+  remarkTa.maxLength = 500;
+  remarkTa.style.minHeight = '100px';
+  remarkGroup.appendChild(remarkTa);
+  progressWrap.appendChild(remarkGroup);
+
+  l1Sel.addEventListener('change', () => {
+    const val = l1Sel.value;
+    l2Container.innerHTML = '';
+    if (!val) {
+      remarkGroup.classList.add('field-hidden');
+      return;
+    }
+    const opts = DEVELOP_PROGRESS_L2[val];
+    if (opts === null) {
+      // "其他"情况，二级直接是自由输入，补充说明也展示
+      const ta = document.createElement('textarea');
+      ta.className = 'form-textarea';
+      ta.placeholder = '请输入具体进展内容（200字以内）';
+      ta.maxLength = 200;
+      ta.style.minHeight = '80px';
+      l2Container.appendChild(ta);
+    } else if (opts && opts.length > 0) {
+      const { wrap: l2Wrap } = makeNativeSelect(opts, '请选择当前项目进展状态');
+      l2Container.appendChild(l2Wrap);
+    }
+    // 出现补充说明
+    remarkGroup.classList.remove('field-hidden');
+  });
+
+  progressGroup.appendChild(progressWrap);
+  subBody.appendChild(progressGroup);
+
+  // 项目竞争对手
+  subBody.appendChild(makeFormGroup('项目竞争对手', false, () => {
+    const ta = document.createElement('textarea');
+    ta.className = 'form-textarea';
+    ta.placeholder = '请输入项目竞争对手情况（200字以内）';
+    ta.maxLength = 200;
+    return ta;
+  }));
+
+  // 是否报送集团领导（单行紧凑）
+  subBody.appendChild(makeInlineRadio('是否报送集团领导: ', true, 'devReport_' + idx));
+
+  container.appendChild(sub);
+}
+
+/* ================================================================
+   客户管理卡片
+   ================================================================ */
+let customerCount = 0;
+
+function addCustomerCard() {
+  customerCount++;
+  const idx = customerCount;
+  const container = document.getElementById('customerCards');
+
+  const { sub, body: subBody, titleSpan } = makeSubCard(
+    '客户 ' + idx,
+    idx > 1 ? (el) => el.remove() : null
+  );
+
+  // 客户名称
+  subBody.appendChild(makeFormGroup('客户名称', true, () => {
+    const { wrapper } = makeSearchableSelect(CUSTOMERS, '请选择客户', (val) => {
+      titleSpan.textContent = val ? val : '客户 ' + idx;
+    }, false);
+    return wrapper;
+  }));
+
+  // 客户重大变化
+  subBody.appendChild(makeFormGroup('客户重大变化', false, () => {
+    const wrap = document.createElement('div');
+    const { wrap: l1Wrap, sel: l1Sel } = makeNativeSelect(CUSTOMER_CHANGE_TYPES, '请选择');
+    wrap.appendChild(l1Wrap);
+    const l2Container = document.createElement('div');
+    l2Container.className = 'dynamic-select-wrapper';
+    wrap.appendChild(l2Container);
+    l1Sel.addEventListener('change', () => {
+      l2Container.innerHTML = '';
+      if (l1Sel.value && l1Sel.value !== '无') {
+        const ta = document.createElement('textarea');
+        ta.className = 'form-textarea';
+        ta.placeholder = '请输入具体内容（200字以内）';
+        ta.maxLength = 200;
+        ta.style.minHeight = '80px';
+        l2Container.appendChild(ta);
+      }
+    });
+    return wrap;
+  }));
+
+  // 对我公司影响判断
+  subBody.appendChild(makeFormGroup('对我公司的影响判断', false, () => {
+    const { wrap } = makeNativeSelect(IMPACT_TYPES, '请选择');
+    return wrap;
+  }));
+
+  // 客户产线设备的变化
+  subBody.appendChild(makeFormGroup('客户生产产线设备的变化', false, () => {
+    const wrap = document.createElement('div');
+    const { wrap: l1Wrap, sel: l1Sel } = makeNativeSelect(PRODUCTION_CHANGE_TYPES, '请选择');
+    wrap.appendChild(l1Wrap);
+    const l2Container = document.createElement('div');
+    l2Container.className = 'dynamic-select-wrapper';
+    wrap.appendChild(l2Container);
+    l1Sel.addEventListener('change', () => {
+      l2Container.innerHTML = '';
+      if (l1Sel.value && l1Sel.value !== '无') {
+        const ta = document.createElement('textarea');
+        ta.className = 'form-textarea';
+        ta.placeholder = '请输入具体内容（200字以内）';
+        ta.maxLength = 200;
+        ta.style.minHeight = '80px';
+        l2Container.appendChild(ta);
+      }
+    });
+    return wrap;
+  }));
+
+  // 是否报送集团领导（单行紧凑）
+  subBody.appendChild(makeInlineRadio('是否报送集团领导：', true, 'custReport_' + idx));
+
+  container.appendChild(sub);
+}
+
+/* ================================================================
+   提交 / 保存
+   ================================================================ */
+function collectFormData() {
+  const data = {};
+  data.country = document.getElementById('countryInput').value;
+  return data;
+}
+
+function validateRequired() {
+  const country = document.getElementById('countryInput').value.trim();
+  if (!country) {
+    showToast('请先选择当前所在国家');
+    return false;
+  }
+  return true;
+}
+
+function submitForm() {
+  if (!validateRequired()) return;
+  showToast('提交成功！感谢您的填报');
+}
+
+function saveForm() {
+  showToast('已保存草稿');
+}
+
+// ===== 空提交弹窗 =====
+function openEmptySubmitModal() {
+  // 重置状态
+  document.querySelectorAll('input[name="emptyReason"]').forEach(r => r.checked = false);
+  const otherTa = document.getElementById('emptyReasonOther');
+  otherTa.value = '';
+  otherTa.classList.remove('visible');
+  document.getElementById('emptyModalOverlay').classList.add('active');
+}
+
+function closeEmptySubmitModal() {
+  document.getElementById('emptyModalOverlay').classList.remove('active');
+}
+
+function onEmptyReasonChange(radio) {
+  const otherTa = document.getElementById('emptyReasonOther');
+  if (radio.value === 'other') {
+    otherTa.classList.add('visible');
+    otherTa.focus();
+  } else {
+    otherTa.classList.remove('visible');
+    otherTa.value = '';
+  }
+}
+
+function confirmEmptySubmit() {
+  const selected = document.querySelector('input[name="emptyReason"]:checked');
+  if (!selected) {
+    showToast('请选择空提交理由');
+    return;
+  }
+  if (selected.value === 'other') {
+    const txt = document.getElementById('emptyReasonOther').value.trim();
+    if (!txt) {
+      showToast('请填写具体理由');
+      return;
+    }
+  }
+  closeEmptySubmitModal();
+  showToast('空提交成功！');
+}
+
+// 点击遮罩关闭弹窗
+document.getElementById('emptyModalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeEmptySubmitModal();
+});
+</script>
+</body>
+</html>
