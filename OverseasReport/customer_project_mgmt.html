@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>新增维护项目/客户</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+    background: #f5f6f8;
+    color: #333;
+    min-height: 100vh;
+  }
+
+  /* ===== 顶部 ===== */
+  .page-header {
+    background: #fff;
+    text-align: center;
+    padding: 16px 16px 0;
+    border-bottom: 1px solid #eee;
+  }
+  .page-header h1 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1a1a1a;
+    letter-spacing: 0.5px;
+  }
+
+  /* ===== Tab ===== */
+  .tab-bar {
+    display: flex;
+    background: #fff;
+    border-bottom: 1px solid #eee;
+  }
+  .tab-item {
+    flex: 1;
+    text-align: center;
+    padding: 13px 0;
+    font-size: 15px;
+    color: #888;
+    cursor: pointer;
+    border-bottom: 2.5px solid transparent;
+    user-select: none;
+    font-weight: 500;
+    transition: color 0.15s;
+  }
+  .tab-item.active {
+    color: #3a7bd5;
+    border-bottom-color: #3a7bd5;
+    font-weight: 600;
+  }
+
+  /* ===== Tab 内容 ===== */
+  .tab-content { display: none; padding: 12px 12px 30px; }
+  .tab-content.active { display: block; }
+
+  /* ===== 搜索区域 ===== */
+  .search-section {
+    background: #fff;
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .search-section .search-label {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  /* ===== 通用表单 ===== */
+  .form-group {
+    margin-bottom: 14px;
+  }
+  .form-label {
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 6px;
+    display: block;
+    font-weight: 500;
+  }
+  .form-label.required::after {
+    content: " *";
+    color: #e74c3c;
+  }
+
+  .form-input,
+  .form-select,
+  .form-textarea,
+  .searchable-input {
+    width: 100%;
+    background: #f4f5f7;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 13px;
+    font-size: 14px;
+    color: #333;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    font-family: inherit;
+  }
+  .form-input::placeholder,
+  .form-select::placeholder,
+  .form-textarea::placeholder,
+  .searchable-input::placeholder { color: #b0b3bb; }
+  .form-input:focus,
+  .form-select:focus,
+  .form-textarea:focus,
+  .searchable-input:focus {
+    background: #eef0f5;
+    box-shadow: 0 0 0 1.5px #7ba7d4;
+  }
+
+  .form-textarea {
+    resize: none;
+    min-height: 80px;
+    line-height: 1.5;
+  }
+
+  .form-input:read-only {
+    background: #eef0f2;
+    color: #666;
+  }
+
+  /* select 箭头 */
+  .select-wrapper {
+    position: relative;
+  }
+  .select-wrapper::after {
+    content: "";
+    position: absolute;
+    right: 13px; top: 50%;
+    transform: translateY(-50%);
+    width: 0; height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid #b0b3bb;
+    pointer-events: none;
+  }
+  .form-select { padding-right: 32px; }
+
+  /* 搜索下拉 */
+  .searchable-wrapper { position: relative; }
+  .searchable-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0; right: 0;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    z-index: 100;
+    max-height: 260px;
+    overflow-y: auto;
+  }
+  .searchable-dropdown.show { display: block; }
+  .dropdown-item {
+    padding: 10px 14px;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    border-bottom: 1px solid #f5f5f5;
+  }
+  .dropdown-item:last-child { border-bottom: none; }
+  .dropdown-item:hover, .dropdown-item.active {
+    background: #eef4fc;
+    color: #3a7bd5;
+  }
+  .dropdown-item em { color: #3a7bd5; font-style: normal; font-weight: 600; }
+  .dropdown-empty {
+    padding: 14px;
+    font-size: 13px;
+    color: #aaa;
+    text-align: center;
+  }
+  .dropdown-item .sub-text {
+    font-size: 12px;
+    color: #999;
+    margin-top: 2px;
+  }
+
+  /* 数字输入 + 后缀 */
+  .input-with-suffix {
+    display: flex;
+    align-items: center;
+    background: #f4f5f7;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .input-with-suffix:focus-within {
+    background: #eef0f5;
+    box-shadow: 0 0 0 1.5px #7ba7d4;
+  }
+  .input-with-suffix .num-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 11px 13px;
+    font-size: 14px;
+    color: #333;
+    outline: none;
+    font-family: inherit;
+    min-width: 0;
+  }
+  .input-with-suffix .num-input::placeholder { color: #b0b3bb; }
+  .input-with-suffix .num-input::-webkit-inner-spin-button,
+  .input-with-suffix .num-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+  .input-with-suffix .num-input[type="number"] { -moz-appearance: textfield; }
+  .input-with-suffix .suffix {
+    padding: 0 13px;
+    font-size: 13px;
+    color: #888;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Radio */
+  .radio-group {
+    display: flex;
+    gap: 24px;
+    margin-top: 4px;
+  }
+  .radio-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+  }
+  .radio-item input[type="radio"] {
+    width: 16px; height: 16px;
+    accent-color: #3a7bd5;
+    cursor: pointer;
+  }
+
+  /* 双字段行 */
+  .form-row {
+    display: flex;
+    gap: 10px;
+  }
+  .form-row .form-group { flex: 1; }
+  .form-row .form-group:first-child { flex: 0 0 110px; }
+
+  /* ===== 详情卡片 ===== */
+  .detail-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .detail-card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+  }
+
+  /* ===== 新增按钮（行内） ===== */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .section-header .search-label {
+    margin-bottom: 0;
+    flex: 1;
+  }
+  .btn-add-inline {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 14px;
+    background: #2a5ea8;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+  .btn-add-inline:hover { background: #1e4f8f; }
+  .btn-add-inline:active { background: #174080; }
+
+  /* ===== 新增按钮（全宽） ===== */
+  .add-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 12px;
+    background: #d6e4f7;
+    color: #3a7bd5;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 8px;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+  .add-btn:hover { background: #c2d8f2; }
+  .add-btn:active { background: #aeccea; }
+
+  /* ===== 操作按钮 ===== */
+  .btn-save {
+    display: block;
+    width: 100%;
+    padding: 13px;
+    background: #3a7bd5;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+    margin-top: 16px;
+  }
+  .btn-save:hover { background: #2e6abf; }
+  .btn-save:active { background: #2558a0; }
+  .btn-save:disabled {
+    background: #a0bfe0;
+    cursor: not-allowed;
+  }
+  .detail-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .detail-actions .btn-save { flex: 2; margin-top: 0; }
+  .detail-actions .btn-cancel {
+    flex: 1;
+    padding: 13px;
+    background: #f0f0f0;
+    color: #666;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+    background: #b0c4de;
+    cursor: not-allowed;
+  }
+
+  /* ===== 弹窗 ===== */
+  .modal-overlay {
+    position: fixed;
+    top: 0; right: 0; bottom: 0; left: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 500;
+    justify-content: center;
+    align-items: flex-end;
+  }
+  .modal-overlay.show {
+    display: flex;
+  }
+  .modal-panel {
+    background: #fff;
+    border-radius: 16px 16px 0 0;
+    width: 100%;
+    max-height: 92vh;
+    overflow-y: auto;
+    padding: 20px 16px 30px;
+    animation: slideUp 0.25s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .modal-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+  .modal-close {
+    width: 28px; height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #999;
+    cursor: pointer;
+    border-radius: 50%;
+    background: #f0f0f0;
+    border: none;
+  }
+  .modal-close:hover { background: #e4e4e4; }
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .modal-actions .btn-save { flex: 2; margin-top: 0; }
+  .modal-actions .btn-cancel {
+    flex: 1;
+    padding: 13px;
+    background: #f0f0f0;
+    color: #666;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .modal-actions .btn-cancel:hover { background: #e4e4e4; }
+
+  /* ===== Toast ===== */
+  .toast {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.72);
+    color: #fff;
+    padding: 12px 22px;
+    border-radius: 8px;
+    font-size: 14px;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; }
+
+  /* ===== 空状态提示 ===== */
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #aaa;
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  /* 验证错误 */
+  .field-error { color: #e74c3c; font-size: 12px; margin-top: 4px; display: none; }
+  .field-error.show { display: block; }
+  .form-input.error, .searchable-input.error {
+    background: #fef0f0;
+    box-shadow: 0 0 0 1.5px #e74c3c;
+  }
+
+  /* 隐藏辅助 */
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- 顶部 -->
+<div class="page-header">
+  <h1>新增维护项目/客户</h1>
+</div>
+
+<!-- Tab -->
+<div class="tab-bar">
+  <div class="tab-item active" onclick="switchTab('customer')">客户</div>
+  <div class="tab-item" onclick="switchTab('project')">项目</div>
+</div>
+
+<!-- ========== 客户 Tab ========== -->
+<div class="tab-content active" id="tabCustomer">
+  <!-- 搜索 -->
+  <div class="search-section">
+    <div class="section-header">
+      <label class="search-label">搜索客户（支持中英文全称/简称）</label>
+      <button class="btn-add-inline" onclick="openNewCustomerModal()">
+        <span style="font-size:15px">＋</span> 新增客户
+      </button>
+    </div>
+    <div class="searchable-wrapper" id="custSearchWrapper">
+      <input class="searchable-input" id="custSearchInput"
+             placeholder="输入客户名称搜索" autocomplete="off" />
+      <div class="searchable-dropdown" id="custSearchDropdown"></div>
+    </div>
+  </div>
+
+  <!-- 客户详情编辑区 -->
+  <div id="custDetailArea" class="hidden">
+    <div class="detail-card">
+      <div class="detail-card-title" id="custDetailTitle">客户信息</div>
+
+      <div class="form-group">
+        <label class="form-label required">客户中文全称</label>
+        <input class="form-input" id="custCnFull" maxlength="100" placeholder="请输入客户中文全称" />
+        <div class="field-error" id="errCustCnFull">不能为空</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label required">客户中文简称</label>
+        <input class="form-input" id="custCnShort" maxlength="50" placeholder="请输入客户中文简称" />
+        <div class="field-error" id="errCustCnShort">不能为空，或与已有记录重复</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label required">客户英文全称</label>
+        <input class="form-input" id="custEnFull" maxlength="100" placeholder="请输入客户英文全称" />
+        <div class="field-error" id="errCustEnFull">不能为空</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label required">客户英文简称</label>
+        <input class="form-input" id="custEnShort" maxlength="50" placeholder="请输入客户英文简称" />
+        <div class="field-error" id="errCustEnShort">不能为空，或与已有记录重复</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label required">客户所在国家</label>
+        <div class="searchable-wrapper" id="custCountryWrapper">
+          <input class="searchable-input" id="custCountryInput"
+                 placeholder="请选择客户所在国家" autocomplete="off" />
+          <div class="searchable-dropdown" id="custCountryDropdown"></div>
+        </div>
+        <div class="field-error" id="errCustCountry">请选择客户所在国家</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">REP_Code</label>
+        <input class="form-input" id="custRepCode" placeholder="选填" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">CRM_Code</label>
+        <input class="form-input" id="custCrmCode" placeholder="选填" />
+      </div>
+
+      <div class="detail-actions">
+        <button class="btn-save" onclick="saveCustomer()">提交</button>
+        <button class="btn-cancel" onclick="cancelEditCustomer()">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 空状态 -->
+  <div id="custEmptyState" class="empty-state">
+    请搜索选择客户，或点击"新增客户"
+  </div>
+</div>
+
+<!-- ========== 项目 Tab ========== -->
+<div class="tab-content" id="tabProject">
+  <!-- 选择客户 -->
+  <div class="search-section">
+    <label class="search-label">选择客户</label>
+    <div class="searchable-wrapper" id="projCustSearchWrapper">
+      <input class="searchable-input" id="projCustSearchInput"
+             placeholder="输入客户名称搜索" autocomplete="off" />
+      <div class="searchable-dropdown" id="projCustSearchDropdown"></div>
+    </div>
+  </div>
+
+  <!-- 选择项目（客户选中后显示） -->
+  <div class="search-section hidden" id="projSearchSection">
+    <div class="section-header">
+      <label class="search-label">选择项目</label>
+      <button class="btn-add-inline" onclick="showNewProjectForm()">
+        <span style="font-size:15px">＋</span> 新增项目
+      </button>
+    </div>
+    <div class="searchable-wrapper" id="projSearchWrapper">
+      <input class="searchable-input" id="projSearchInput"
+             placeholder="输入项目名称搜索" autocomplete="off" />
+      <div class="searchable-dropdown" id="projSearchDropdown"></div>
+    </div>
+  </div>
+
+  <!-- 项目详情编辑区 -->
+  <div id="projDetailArea" class="hidden">
+    <div class="detail-card">
+      <div class="detail-card-title" id="projDetailTitle">项目信息</div>
+
+      <div class="form-group">
+        <label class="form-label required">项目中文名称</label>
+        <input class="form-input" id="projCnName" maxlength="50" placeholder="请输入项目中文名称" />
+        <div class="field-error" id="errProjCnName">不能为空，或与已有记录重复</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label required">项目英文名称</label>
+        <input class="form-input" id="projEnName" maxlength="50" placeholder="请输入项目英文名称（首字母自动大写）" />
+        <div class="field-error" id="errProjEnName">不能为空，或与已有记录重复</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label required">项目中文简称</label>
+        <input class="form-input" id="projCnShort" maxlength="30" placeholder="请输入项目中文简称" />
+        <div class="field-error" id="errProjCnShort">不能为空，或与已有记录重复</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label required">项目英文简称</label>
+        <input class="form-input" id="projEnShort" maxlength="30" placeholder="请输入项目英文简称（首字母自动大写）" />
+        <div class="field-error" id="errProjEnShort">不能为空，或与已有记录重复</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">竞争对手情况</label>
+        <textarea class="form-textarea" id="projCompetitor" maxlength="500" placeholder="请输入竞争对手情况，500字以内"></textarea>
+        <div class="field-error" id="errProjCompetitor">不超过500字</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">项目简介</label>
+        <textarea class="form-textarea" id="projDesc" placeholder="请输入项目简介"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label required">项目所在国家</label>
+        <div class="searchable-wrapper" id="projCountryWrapper">
+          <input class="searchable-input" id="projCountryInput"
+                 placeholder="请选择项目所在国家" autocomplete="off" />
+          <div class="searchable-dropdown" id="projCountryDropdown"></div>
+        </div>
+        <div class="field-error" id="errProjCountry">请选择项目所在国家</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" style="display:inline;margin-right:10px">是否立项</label>
+        <label class="radio-item" style="display:inline-flex;margin-right:16px"><input type="radio" name="projIsApproved" value="是" onchange="toggleApprovalCode()" /> 是</label>
+        <label class="radio-item" style="display:inline-flex"><input type="radio" name="projIsApproved" value="否" checked onchange="toggleApprovalCode()" /> 否</label>
+      </div>
+
+      <div class="form-group hidden" id="projApprovalCodeGroup">
+        <label class="form-label required">立项编号</label>
+        <input class="form-input" id="projApprovalCode" maxlength="50" placeholder="请输入立项编号" />
+        <div class="field-error" id="errProjApprovalCode">选择"是"时不能为空</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label required" style="display:inline;margin-right:10px">项目板块</label>
+        <label class="radio-item" style="display:inline-flex;margin-right:16px"><input type="radio" name="projSector" value="钢铁" checked /> 钢铁</label>
+        <label class="radio-item" style="display:inline-flex"><input type="radio" name="projSector" value="非钢" /> 非钢</label>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">工程产品类别</label>
+        <div class="select-wrapper">
+          <select class="form-select" id="projProductCategory">
+            <option value="" disabled selected>请选择</option>
+            <option value="设计">设计</option>
+            <option value="咨询">咨询</option>
+            <option value="设备供货">设备供货</option>
+            <option value="EP">EP</option>
+            <option value="EPC">EPC</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label required">项目分类</label>
+        <div class="select-wrapper">
+          <select class="form-select" id="projCategory">
+            <option value="" disabled selected>请选择</option>
+            <option value="重点投入项目">重点投入项目</option>
+            <option value="正常跟踪项目">正常跟踪项目</option>
+            <option value="保持关注项目">保持关注项目</option>
+          </select>
+        </div>
+        <div class="field-error" id="errProjCategory">请选择项目分类</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">项目类型</label>
+        <div class="select-wrapper">
+          <select class="form-select" id="projType">
+            <option value="" disabled selected>请选择</option>
+            <option value="咨询项目开拓">咨询项目开拓</option>
+            <option value="设计项目开拓">设计项目开拓</option>
+            <option value="总承包项目开拓">总承包项目开拓</option>
+            <option value="施工总承包开拓">施工总承包开拓</option>
+            <option value="施工专业承包开拓">施工专业承包开拓</option>
+            <option value="设备成套开拓">设备成套开拓</option>
+            <option value="设备/材料供货开拓">设备/材料供货开拓</option>
+            <option value="全过程工程咨询开拓">全过程工程咨询开拓</option>
+            <option value="勘察项目开拓">勘察项目开拓</option>
+            <option value="运维项目开拓">运维项目开拓</option>
+            <option value="软件开发项目开拓">软件开发项目开拓</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">预计合同金额</label>
+        <div class="input-with-suffix">
+          <input type="number" class="num-input" id="projAmount" placeholder="请输入金额" min="0" step="any" />
+          <span class="suffix">万元</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">客户分管领导</label>
+        <input class="form-input" id="projClientLeader" placeholder="请输入人员姓名" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">工程项目主管领导</label>
+        <input class="form-input" id="projLeader" placeholder="请输入人员姓名" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">项目经理/报价经理</label>
+        <div class="form-row">
+          <div class="form-group">
+            <div class="select-wrapper">
+              <select class="form-select" id="projBidUnit">
+                <option value="" disabled selected>选择单位</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <input class="form-input" id="projBidManager" placeholder="输入人员姓名" />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">大区营销经理</label>
+        <input class="form-input" id="projAreaManager" placeholder="请输入人员姓名" />
+      </div>
+
+      <div class="detail-actions">
+        <button class="btn-save" onclick="saveProject()">提交</button>
+        <button class="btn-cancel" onclick="cancelEditProject()">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 空状态 -->
+  <div id="projEmptyState" class="empty-state">
+    请先选择客户
+  </div>
+</div>
+
+<!-- ========== 新增客户弹窗 ========== -->
+<div id="newCustModal" style="display:none;position:fixed;top:0;right:0;bottom:0;left:0;background:rgba(0,0,0,0.45);z-index:500;justify-content:center;align-items:flex-end;" onclick="if(event.target===this)closeNewCustomerModal()">
+  <div class="modal-panel">
+    <div class="modal-header">
+      <div class="modal-title">新增客户</div>
+      <button class="modal-close" onclick="closeNewCustomerModal()">&times;</button>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label required">客户中文全称</label>
+      <input class="form-input" id="newCustCnFull" maxlength="100" placeholder="请输入客户中文全称" />
+      <div class="field-error" id="errNewCustCnFull">不能为空</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label required">客户中文简称</label>
+      <input class="form-input" id="newCustCnShort" maxlength="50" placeholder="请输入客户中文简称" />
+      <div class="field-error" id="errNewCustCnShort">不能为空，或与已有记录重复</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label required">客户英文全称</label>
+      <input class="form-input" id="newCustEnFull" maxlength="100" placeholder="请输入客户英文全称" />
+      <div class="field-error" id="errNewCustEnFull">不能为空</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label required">客户英文简称</label>
+      <input class="form-input" id="newCustEnShort" maxlength="50" placeholder="请输入客户英文简称" />
+      <div class="field-error" id="errNewCustEnShort">不能为空，或与已有记录重复</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label required">客户所在国家</label>
+      <div class="searchable-wrapper" id="newCustCountryWrapper">
+        <input class="searchable-input" id="newCustCountryInput"
+               placeholder="请选择客户所在国家" autocomplete="off" />
+        <div class="searchable-dropdown" id="newCustCountryDropdown"></div>
+      </div>
+      <div class="field-error" id="errNewCustCountry">请选择客户所在国家</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">REP_Code</label>
+      <input class="form-input" id="newCustRepCode" placeholder="选填" />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">CRM_Code</label>
+      <input class="form-input" id="newCustCrmCode" placeholder="选填" />
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-save" onclick="confirmNewCustomer()">确认新增</button>
+      <button class="btn-cancel" onclick="closeNewCustomerModal()">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================================================================
+   模拟数据
+   ================================================================ */
+const COUNTRIES = [
+  "中国","美国","德国","法国","英国","日本","韩国","印度","巴西",
+  "俄罗斯","沙特阿拉伯","阿联酋","土耳其","南非","澳大利亚",
+  "加拿大","墨西哥","阿根廷","印度尼西亚","越南","泰国","马来西亚",
+  "新加坡","菲律宾","波兰","荷兰","比利时","意大利","西班牙","葡萄牙",
+  "瑞典","挪威","丹麦","芬兰","捷克","匈牙利","罗马尼亚","哈萨克斯坦",
+  "乌兹别克斯坦","巴基斯坦","孟加拉国","伊朗","伊拉克","埃及",
+  "尼日利亚","肯尼亚","坦桑尼亚","摩洛哥","阿尔及利亚"
+];
+
+const BID_UNITS = ["赛迪股份","赛迪城建","赛迪咨询","赛迪信息","赛迪热工环保","赛迪装备","赛迪工程咨询"];
+
+/* 客户数据库 */
+let customers = [
+  { id:1, cnFull:"阿尔及利亚国家钢铁公司", cnShort:"阿尔钢铁", enFull:"Algerian National Iron and Steel Company", enShort:"TOSYALI", country:"阿尔及利亚", repCode:"", crmCode:"" },
+  { id:2, cnFull:"沙特阿拉伯萨勒曼钢铁公司", cnShort:"萨勒曼钢铁", enFull:"Saudi Salman Steel Company", enShort:"SALMAN", country:"沙特阿拉伯", repCode:"REP-001", crmCode:"CRM-001" },
+  { id:3, cnFull:"越南台塑钢铁股份有限公司", cnShort:"台塑钢铁", enFull:"Formosa Ha Tinh Steel Corporation", enShort:"FHS", country:"越南", repCode:"REP-002", crmCode:"" },
+  { id:4, cnFull:"印度塔塔钢铁有限公司", cnShort:"塔塔钢铁", enFull:"Tata Steel Limited", enShort:"TATA", country:"印度", repCode:"", crmCode:"CRM-002" },
+  { id:5, cnFull:"巴西盖尔道钢铁集团", cnShort:"盖尔道", enFull:"Gerdau S.A.", enShort:"GERDAU", country:"巴西", repCode:"REP-003", crmCode:"" },
+  { id:6, cnFull:"土耳其伊斯帕塔钢铁公司", cnShort:"伊斯帕塔", enFull:"ISDEMIR Iron and Steel Works", enShort:"ISDEMIR", country:"土耳其", repCode:"", crmCode:"" },
+  { id:7, cnFull:"马来西亚联合钢铁公司", cnShort:"马联钢铁", enFull:"Allied Steel Sdn Bhd", enShort:"ALLIED", country:"马来西亚", repCode:"", crmCode:"" },
+  { id:8, cnFull:"俄罗斯北方钢铁集团", cnShort:"北方钢铁", enFull:"Severstal PAO", enShort:"SEVERSTAL", country:"俄罗斯", repCode:"", crmCode:"CRM-003" }
+];
+
+let nextCustId = 9;
+
+/* 项目数据库 */
+let projects = [
+  { id:1, custId:1, cnName:"阿尔及利亚年产250万吨综合钢厂项目", cnShort:"阿尔及利亚综合钢厂", enName:"Algeria 2.5MTPA Integrated Steel Plant Project", enShort:"Algeria ISP", competitor:"西马克、达涅利、普锐特", desc:"新建综合钢厂，含炼铁、炼钢、轧钢全流程", country:"阿尔及利亚", isApproved:"是", approvalCode:"CISDI-2024-001", category:"重点投入项目", sector:"钢铁", productCategory:"EPC", type:"总承包项目开拓", amount:500000, clientLeader:"周总", leader:"张磊", bidUnit:"赛迪股份", bidManager:"王强", areaManager:"李明" },
+  { id:2, custId:2, cnName:"沙特萨勒曼钢铁高炉改造项目", cnShort:"萨勒曼高炉改造", enName:"Saudi Salman BF Relining Project", enShort:"Salman BF", competitor:"Paul Wurth、西马克", desc:"高炉大修改造工程", country:"沙特阿拉伯", isApproved:"否", approvalCode:"", category:"重点投入项目", sector:"钢铁", productCategory:"EP", type:"总承包项目开拓", amount:80000, clientLeader:"", leader:"赵伟", bidUnit:"赛迪股份", bidManager:"刘洋", areaManager:"陈东" },
+  { id:3, custId:2, cnName:"沙特萨勒曼冷轧酸洗机组项目", cnShort:"萨勒曼冷轧酸洗", enName:"Saudi Salman CPL Project", enShort:"Salman CPL", competitor:"西马克、三菱日立", desc:"新建冷轧酸洗联合机组", country:"沙特阿拉伯", isApproved:"否", approvalCode:"", category:"正常跟踪项目", sector:"钢铁", productCategory:"设备供货", type:"设备/材料供货开拓", amount:35000, clientLeader:"", leader:"赵伟", bidUnit:"赛迪装备", bidManager:"孙鹏", areaManager:"陈东" },
+  { id:4, custId:3, cnName:"越南台塑二期扩建工程", cnShort:"台塑二期扩建", enName:"Vietnam FHS Phase II Expansion", enShort:"FHS Phase II", competitor:"中冶南方、中冶赛迪", desc:"二期扩建，新增2号高炉及配套", country:"越南", isApproved:"是", approvalCode:"CISDI-2024-008", category:"重点投入项目", sector:"钢铁", productCategory:"EPC", type:"总承包项目开拓", amount:420000, clientLeader:"陈总", leader:"张磊", bidUnit:"赛迪股份", bidManager:"王强", areaManager:"周涛" },
+  { id:5, custId:4, cnName:"印度塔塔钢铁烧结机改造项目", cnShort:"塔塔烧结机改造", enName:"India Tata Sinter Plant Upgrade", enShort:"Tata Sinter", competitor:"奥钢联、西马克", desc:"烧结机产能提升改造", country:"印度", isApproved:"否", approvalCode:"", category:"正常跟踪项目", sector:"钢铁", productCategory:"设计", type:"设计项目开拓", amount:12000, clientLeader:"", leader:"钱进", bidUnit:"赛迪咨询", bidManager:"吴刚", areaManager:"李明" },
+  { id:6, custId:6, cnName:"土耳其伊斯帕塔电炉炼钢项目", cnShort:"伊斯帕塔电炉炼钢", enName:"Turkey ISDEMIR EAF Steelmaking Project", enShort:"ISDEMIR EAF", competitor:"达涅利、特诺恩", desc:"新建电弧炉炼钢车间", country:"土耳其", isApproved:"否", approvalCode:"", category:"保持关注项目", sector:"钢铁", productCategory:"EP", type:"总承包项目开拓", amount:65000, clientLeader:"", leader:"张磊", bidUnit:"赛迪股份", bidManager:"刘洋", areaManager:"陈东" }
+];
+
+let nextProjId = 7;
+
+/* ================================================================
+   工具
+   ================================================================ */
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-item').forEach((el, i) => {
+    el.classList.toggle('active', (tab === 'customer' && i === 0) || (tab === 'project' && i === 1));
+  });
+  document.getElementById('tabCustomer').classList.toggle('active', tab === 'customer');
+  document.getElementById('tabProject').classList.toggle('active', tab === 'project');
+}
+
+/* ================================================================
+   通用搜索下拉
+   ================================================================ */
+function initSearchableDropdown(wrapperEl, inputEl, dropdownEl, getDataFn, renderItemFn, onSelectFn) {
+  function render(q) {
+    dropdownEl.innerHTML = '';
+    const list = getDataFn(q);
+    if (!list.length) {
+      dropdownEl.innerHTML = '<div class="dropdown-empty">无匹配结果</div>';
+      return;
+    }
+    list.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'dropdown-item';
+      div.innerHTML = renderItemFn(item, q);
+      div.addEventListener('mousedown', e => {
+        e.preventDefault();
+        onSelectFn(item);
+        dropdownEl.classList.remove('show');
+      });
+      dropdownEl.appendChild(div);
+    });
+  }
+
+  inputEl.addEventListener('focus', () => { render(inputEl.value.trim()); dropdownEl.classList.add('show'); });
+  inputEl.addEventListener('input', () => { render(inputEl.value.trim()); dropdownEl.classList.add('show'); });
+
+  document.addEventListener('click', e => {
+    if (!wrapperEl.contains(e.target)) dropdownEl.classList.remove('show');
+  });
+
+  return { render, show: () => { render(inputEl.value.trim()); dropdownEl.classList.add('show'); } };
+}
+
+/* 高亮匹配文本 */
+function highlight(text, query) {
+  if (!query) return escHtml(text);
+  const idx = text.toLowerCase().indexOf(query.toLowerCase());
+  if (idx === -1) return escHtml(text);
+  return escHtml(text.slice(0, idx)) + '<em>' + escHtml(text.slice(idx, idx + query.length)) + '</em>' + escHtml(text.slice(idx + query.length));
+}
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* ================================================================
+   客户 Tab 逻辑
+   ================================================================ */
+let selectedCustId = null;
+
+const custSearch = initSearchableDropdown(
+  document.getElementById('custSearchWrapper'),
+  document.getElementById('custSearchInput'),
+  document.getElementById('custSearchDropdown'),
+  function(q) {
+    if (!q) return customers;
+    const ql = q.toLowerCase();
+    return customers.filter(c =>
+      c.cnFull.toLowerCase().includes(ql) ||
+      c.cnShort.toLowerCase().includes(ql) ||
+      c.enFull.toLowerCase().includes(ql) ||
+      c.enShort.toLowerCase().includes(ql)
+    );
+  },
+  function(c, q) {
+    return '<div style="font-weight:500">' + highlight(c.cnFull, q) + '</div>' +
+           '<div class="sub-text">' + escHtml(c.enFull) + '</div>' +
+           '<div class="sub-text">简称：' + escHtml(c.cnShort) + ' / ' + escHtml(c.enShort) + ' · ' + escHtml(c.country) + '</div>';
+  },
+  function(c) {
+    selectCustomer(c.id);
+  }
+);
+
+function selectCustomer(id) {
+  selectedCustId = id;
+  const c = customers.find(x => x.id === id);
+  if (!c) return;
+  custBackup = JSON.parse(JSON.stringify(c));
+  document.getElementById('custSearchInput').value = c.cnFull + '（' + c.enShort + '）';
+  document.getElementById('custDetailTitle').textContent = '编辑客户 · ' + c.cnShort;
+  document.getElementById('custCnFull').value = c.cnFull;
+  document.getElementById('custCnShort').value = c.cnShort;
+  document.getElementById('custEnFull').value = c.enFull;
+  document.getElementById('custEnShort').value = c.enShort;
+  document.getElementById('custCountryInput').value = c.country;
+  document.getElementById('custRepCode').value = c.repCode || '';
+  document.getElementById('custCrmCode').value = c.crmCode || '';
+  document.getElementById('custDetailArea').classList.remove('hidden');
+  document.getElementById('custEmptyState').classList.add('hidden');
+}
+
+/* 客户国家下拉 */
+initSearchableDropdown(
+  document.getElementById('custCountryWrapper'),
+  document.getElementById('custCountryInput'),
+  document.getElementById('custCountryDropdown'),
+  function(q) {
+    if (!q) return COUNTRIES;
+    const ql = q.toLowerCase();
+    return COUNTRIES.filter(c => c.toLowerCase().includes(ql));
+  },
+  function(c, q) { return highlight(c, q); },
+  function(c) { document.getElementById('custCountryInput').value = c; }
+);
+
+function saveCustomer() {
+  clearFieldErrors('cust');
+  if (!selectedCustId) return;
+  const cnFull = document.getElementById('custCnFull').value.trim();
+  const cnShort = document.getElementById('custCnShort').value.trim();
+  const enFull = document.getElementById('custEnFull').value.trim();
+  const enShort = document.getElementById('custEnShort').value.trim();
+  const country = document.getElementById('custCountryInput').value.trim();
+  let valid = true;
+  if (!cnFull) { showFieldError('errCustCnFull', '不能为空'); valid = false; }
+  if (!cnShort) { showFieldError('errCustCnShort', '不能为空'); valid = false; }
+  else if (customers.some(c => c.cnShort === cnShort && c.id !== selectedCustId)) { showFieldError('errCustCnShort', '与已有客户中文简称重复'); valid = false; }
+  if (!enFull) { showFieldError('errCustEnFull', '不能为空'); valid = false; }
+  if (!enShort) { showFieldError('errCustEnShort', '不能为空'); valid = false; }
+  else if (customers.some(c => c.enShort === enShort && c.id !== selectedCustId)) { showFieldError('errCustEnShort', '与已有客户英文简称重复'); valid = false; }
+  if (!country) { showFieldError('errCustCountry', '请选择客户所在国家'); valid = false; }
+  if (!valid) return;
+
+  const c = customers.find(x => x.id === selectedCustId);
+  c.cnFull = cnFull; c.cnShort = cnShort; c.enFull = enFull; c.enShort = enShort;
+  c.country = country;
+  c.repCode = document.getElementById('custRepCode').value.trim();
+  c.crmCode = document.getElementById('custCrmCode').value.trim();
+  /* 刷新备份，以便下次取消能恢复到最新版本 */
+  custBackup = JSON.parse(JSON.stringify(c));
+  showToast('客户信息已保存');
+}
+
+/* 取消编辑客户，恢复到选中时的原始数据 */
+let custBackup = null;
+function cancelEditCustomer() {
+  if (!selectedCustId) return;
+  const c = customers.find(x => x.id === selectedCustId);
+  if (c && custBackup) { Object.assign(c, JSON.parse(JSON.stringify(custBackup))); }
+  showCustomerDetail(c);
+}
+
+/* 新增客户弹窗 */
+function openNewCustomerModal() {
+  ['newCustCnFull','newCustCnShort','newCustEnFull','newCustEnShort','newCustCountryInput','newCustRepCode','newCustCrmCode'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  clearFieldErrors('newCust');
+  document.getElementById('newCustModal').style.display = 'flex';
+}
+function closeNewCustomerModal() {
+  document.getElementById('newCustModal').style.display = 'none';
+}
+
+/* 新增客户弹窗国家下拉 */
+initSearchableDropdown(
+  document.getElementById('newCustCountryWrapper'),
+  document.getElementById('newCustCountryInput'),
+  document.getElementById('newCustCountryDropdown'),
+  function(q) {
+    if (!q) return COUNTRIES;
+    const ql = q.toLowerCase();
+    return COUNTRIES.filter(c => c.toLowerCase().includes(ql));
+  },
+  function(c, q) { return highlight(c, q); },
+  function(c) { document.getElementById('newCustCountryInput').value = c; }
+);
+
+function submitNewCustomer() {
+  clearFieldErrors('newCust');
+  const cnFull = document.getElementById('newCustCnFull').value.trim();
+  const cnShort = document.getElementById('newCustCnShort').value.trim();
+  const enFull = document.getElementById('newCustEnFull').value.trim();
+  const enShort = document.getElementById('newCustEnShort').value.trim();
+  const country = document.getElementById('newCustCountryInput').value.trim();
+  let valid = true;
+  if (!cnFull) { showFieldError('errNewCustCnFull', '不能为空'); valid = false; }
+  if (!cnShort) { showFieldError('errNewCustCnShort', '不能为空'); valid = false; }
+  else if (customers.some(c => c.cnShort === cnShort)) { showFieldError('errNewCustCnShort', '与已有客户中文简称重复'); valid = false; }
+  if (!enFull) { showFieldError('errNewCustEnFull', '不能为空'); valid = false; }
+  if (!enShort) { showFieldError('errNewCustEnShort', '不能为空'); valid = false; }
+  else if (customers.some(c => c.enShort === enShort)) { showFieldError('errNewCustEnShort', '与已有客户英文简称重复'); valid = false; }
+  if (!country) { showFieldError('errNewCustCountry', '请选择客户所在国家'); valid = false; }
+  if (!valid) return;
+
+  customers.push({
+    id: nextCustId++, cnFull, cnShort, enFull, enShort, country,
+    repCode: document.getElementById('newCustRepCode').value.trim(),
+    crmCode: document.getElementById('newCustCrmCode').value.trim()
+  });
+  closeNewCustomerModal();
+  showToast('客户新增成功');
+  document.getElementById('custSearchInput').value = '';
+}
+
+/* 提交新增客户 */
+function confirmNewCustomer() {
+  submitNewCustomer();
+}
+
+/* ================================================================
+   项目 Tab 逻辑
+   ================================================================ */
+let selectedProjCustId = null;
+let selectedProjId = null;
+
+/* 项目Tab客户搜索 */
+const projCustSearch = initSearchableDropdown(
+  document.getElementById('projCustSearchWrapper'),
+  document.getElementById('projCustSearchInput'),
+  document.getElementById('projCustSearchDropdown'),
+  function(q) {
+    if (!q) return customers;
+    const ql = q.toLowerCase();
+    return customers.filter(c =>
+      c.cnFull.toLowerCase().includes(ql) ||
+      c.cnShort.toLowerCase().includes(ql) ||
+      c.enFull.toLowerCase().includes(ql) ||
+      c.enShort.toLowerCase().includes(ql)
+    );
+  },
+  function(c, q) {
+    return '<div style="font-weight:500">' + highlight(c.cnFull, q) + '</div>' +
+           '<div class="sub-text">' + escHtml(c.enFull) + ' · ' + escHtml(c.country) + '</div>';
+  },
+  function(c) {
+    selectProjCustomer(c.id);
+  }
+);
+
+function selectProjCustomer(custId) {
+  selectedProjCustId = custId;
+  selectedProjId = null;
+  const c = customers.find(x => x.id === custId);
+  document.getElementById('projCustSearchInput').value = c.cnFull + '（' + c.enShort + '）';
+  document.getElementById('projSearchSection').classList.remove('hidden');
+  document.getElementById('projSearchInput').value = '';
+  document.getElementById('projDetailArea').classList.add('hidden');
+  document.getElementById('projEmptyState').classList.remove('hidden');
+  document.getElementById('projEmptyState').innerHTML = '请选择项目，或点击"新增项目"';
+}
+
+/* 项目搜索（按客户过滤） */
+const projSearch = initSearchableDropdown(
+  document.getElementById('projSearchWrapper'),
+  document.getElementById('projSearchInput'),
+  document.getElementById('projSearchDropdown'),
+  function(q) {
+    let list = projects.filter(p => p.custId === selectedProjCustId);
+    if (q) {
+      const ql = q.toLowerCase();
+      list = list.filter(p => p.cnName.toLowerCase().includes(ql) || p.enName.toLowerCase().includes(ql));
+    }
+    return list;
+  },
+  function(p, q) {
+    return '<div style="font-weight:500">' + highlight(p.cnName, q) + '</div>' +
+           '<div class="sub-text">' + escHtml(p.enName) + '</div>';
+  },
+  function(p) {
+    selectProject(p.id);
+  }
+);
+
+function selectProject(id) {
+  selectedProjId = id;
+  const p = projects.find(x => x.id === id);
+  if (!p) return;
+  projBackup = JSON.parse(JSON.stringify(p));
+  document.getElementById('projSearchInput').value = p.cnName;
+  document.getElementById('projDetailTitle').textContent = '编辑项目 · ' + p.cnName;
+  fillProjectForm(p);
+  document.getElementById('projDetailArea').classList.remove('hidden');
+  document.getElementById('projEmptyState').classList.add('hidden');
+}
+
+function fillProjectForm(p) {
+  document.getElementById('projCnName').value = p.cnName || '';
+  document.getElementById('projEnName').value = p.enName || '';
+  document.getElementById('projCnShort').value = p.cnShort || '';
+  document.getElementById('projEnShort').value = p.enShort || '';
+  document.getElementById('projCompetitor').value = p.competitor || '';
+  document.getElementById('projDesc').value = p.desc || '';
+  document.getElementById('projCountryInput').value = p.country || '';
+  document.querySelectorAll('input[name="projIsApproved"]').forEach(r => {
+    r.checked = (r.value === (p.isApproved || '否'));
+  });
+  document.getElementById('projApprovalCode').value = p.approvalCode || '';
+  toggleApprovalCode();
+  document.getElementById('projCategory').value = p.category || '';
+  document.querySelectorAll('input[name="projSector"]').forEach(r => {
+    r.checked = (r.value === (p.sector || '钢铁'));
+  });
+  document.getElementById('projProductCategory').value = p.productCategory || '';
+  document.getElementById('projType').value = p.type || '';
+  document.getElementById('projAmount').value = p.amount || '';
+  document.getElementById('projClientLeader').value = p.clientLeader || '';
+  document.getElementById('projLeader').value = p.leader || '';
+  document.getElementById('projBidUnit').value = p.bidUnit || '';
+  document.getElementById('projBidManager').value = p.bidManager || '';
+  document.getElementById('projAreaManager').value = p.areaManager || '';
+}
+
+function clearProjectForm() {
+  document.getElementById('projCnName').value = '';
+  document.getElementById('projEnName').value = '';
+  document.getElementById('projCnShort').value = '';
+  document.getElementById('projEnShort').value = '';
+  document.getElementById('projCompetitor').value = '';
+  document.getElementById('projDesc').value = '';
+  document.getElementById('projCountryInput').value = '';
+  document.querySelectorAll('input[name="projIsApproved"]').forEach(r => r.checked = (r.value === '否'));
+  document.getElementById('projApprovalCode').value = '';
+  toggleApprovalCode();
+  document.getElementById('projCategory').value = '';
+  document.querySelectorAll('input[name="projSector"]').forEach(r => r.checked = (r.value === '钢铁'));
+  document.getElementById('projProductCategory').value = '';
+  document.getElementById('projType').value = '';
+  document.getElementById('projAmount').value = '';
+  document.getElementById('projClientLeader').value = '';
+  document.getElementById('projLeader').value = '';
+  document.getElementById('projBidUnit').value = '';
+  document.getElementById('projBidManager').value = '';
+  document.getElementById('projAreaManager').value = '';
+}
+
+function showNewProjectForm() {
+  if (!selectedProjCustId) { showToast('请先选择客户'); return; }
+  selectedProjId = null;
+  clearProjectForm();
+  clearFieldErrors('proj');
+  const c = customers.find(x => x.id === selectedProjCustId);
+  document.getElementById('projDetailTitle').textContent = '新增项目 · ' + c.cnShort;
+  document.getElementById('projDetailArea').classList.remove('hidden');
+  document.getElementById('projEmptyState').classList.add('hidden');
+  document.getElementById('projSearchInput').value = '';
+}
+
+/* 是否立项切换：显示/隐藏立项编号 */
+function toggleApprovalCode() {
+  const isApproved = document.querySelector('input[name="projIsApproved"]:checked');
+  const group = document.getElementById('projApprovalCodeGroup');
+  if (isApproved && isApproved.value === '是') {
+    group.classList.remove('hidden');
+  } else {
+    group.classList.add('hidden');
+  }
+}
+
+/* 英文名称首字母大写 */
+document.addEventListener('DOMContentLoaded', () => {
+  [document.getElementById('projEnName'), document.getElementById('projEnShort')].forEach(enInput => {
+    enInput.addEventListener('blur', function() {
+      if (!this.value.trim()) return;
+      this.value = this.value.trim().replace(/\b\w/g, c => c.toUpperCase());
+    });
+  });
+  /* 填充报价单位下拉 */
+  const sel = document.getElementById('projBidUnit');
+  BID_UNITS.forEach(u => {
+    const opt = document.createElement('option');
+    opt.value = u; opt.textContent = u;
+    sel.appendChild(opt);
+  });
+
+  /* 项目所在国家模糊搜索下拉 */
+  initSearchableDropdown(
+    document.getElementById('projCountryWrapper'),
+    document.getElementById('projCountryInput'),
+    document.getElementById('projCountryDropdown'),
+    function(q) {
+      if (!q) return COUNTRIES;
+      const ql = q.toLowerCase();
+      return COUNTRIES.filter(c => c.toLowerCase().includes(ql));
+    },
+    function(c, q) { return highlight(c, q); },
+    function(c) { document.getElementById('projCountryInput').value = c; }
+  );
+});
+
+function saveProject() {
+  clearFieldErrors('proj');
+  const cnName = document.getElementById('projCnName').value.trim();
+  const enName = document.getElementById('projEnName').value.trim();
+  const cnShort = document.getElementById('projCnShort').value.trim();
+  const enShort = document.getElementById('projEnShort').value.trim();
+  const country = document.getElementById('projCountryInput').value.trim();
+  const isApproved = document.querySelector('input[name="projIsApproved"]:checked');
+  const approvalCode = document.getElementById('projApprovalCode').value.trim();
+  const category = document.getElementById('projCategory').value;
+  const sector = document.querySelector('input[name="projSector"]:checked');
+  let valid = true;
+  if (!cnName) { showFieldError('errProjCnName', '不能为空'); valid = false; }
+  else if (projects.some(p => p.cnName === cnName && p.id !== selectedProjId)) { showFieldError('errProjCnName', '与已有项目中文名称重复'); valid = false; }
+  if (!enName) { showFieldError('errProjEnName', '不能为空'); valid = false; }
+  else if (projects.some(p => p.enName === enName && p.id !== selectedProjId)) { showFieldError('errProjEnName', '与已有项目英文名称重复'); valid = false; }
+  if (!cnShort) { showFieldError('errProjCnShort', '不能为空'); valid = false; }
+  else if (projects.some(p => p.cnShort === cnShort && p.id !== selectedProjId)) { showFieldError('errProjCnShort', '与已有项目中文简称重复'); valid = false; }
+  if (!enShort) { showFieldError('errProjEnShort', '不能为空'); valid = false; }
+  else if (projects.some(p => p.enShort === enShort && p.id !== selectedProjId)) { showFieldError('errProjEnShort', '与已有项目英文简称重复'); valid = false; }
+  if (!country) { showFieldError('errProjCountry', '请选择项目所在国家'); valid = false; }
+  if (isApproved && isApproved.value === '是' && !approvalCode) { showFieldError('errProjApprovalCode', '选择"是"时不能为空'); valid = false; }
+  if (!category) { showFieldError('errProjCategory', '请选择项目分类'); valid = false; }
+  if (!sector) { showToast('请选择项目板块'); valid = false; }
+  if (!valid) return;
+
+  const data = {
+    custId: selectedProjCustId,
+    cnName,
+    enName,
+    cnShort,
+    enShort,
+    competitor: document.getElementById('projCompetitor').value.trim(),
+    desc: document.getElementById('projDesc').value.trim(),
+    country,
+    isApproved: isApproved ? isApproved.value : '否',
+    approvalCode,
+    category,
+    sector: sector.value,
+    productCategory: document.getElementById('projProductCategory').value,
+    type: document.getElementById('projType').value,
+    amount: parseFloat(document.getElementById('projAmount').value) || 0,
+    clientLeader: document.getElementById('projClientLeader').value.trim(),
+    leader: document.getElementById('projLeader').value.trim(),
+    bidUnit: document.getElementById('projBidUnit').value,
+    bidManager: document.getElementById('projBidManager').value.trim(),
+    areaManager: document.getElementById('projAreaManager').value.trim()
+  };
+
+  if (selectedProjId) {
+    /* 编辑已有 */
+    const p = projects.find(x => x.id === selectedProjId);
+    Object.assign(p, data);
+    projBackup = JSON.parse(JSON.stringify(p));
+    showToast('项目信息已保存');
+  } else {
+    /* 新增 */
+    data.id = nextProjId++;
+    projects.push(data);
+    selectedProjId = data.id;
+    projBackup = JSON.parse(JSON.stringify(data));
+    showToast('项目新增成功');
+    document.getElementById('projDetailTitle').textContent = '编辑项目 · ' + data.cnName;
+  }
+}
+
+/* 取消编辑项目，恢复到选中时的原始数据 */
+let projBackup = null;
+function cancelEditProject() {
+  if (selectedProjId) {
+    /* 编辑模式：恢复原始数据 */
+    const p = projects.find(x => x.id === selectedProjId);
+    if (p && projBackup) { Object.assign(p, JSON.parse(JSON.stringify(projBackup))); fillProjectForm(p); }
+  } else {
+    /* 新增模式：清空表单并隐藏 */
+    clearProjectForm();
+    document.getElementById('projDetailArea').classList.add('hidden');
+    document.getElementById('projEmptyState').classList.remove('hidden');
+  }
+}
+
+/* ================================================================
+   验证辅助
+   ================================================================ */
+function showFieldError(errId, msg) {
+  const el = document.getElementById(errId);
+  if (el) { el.textContent = msg; el.classList.add('show'); }
+}
+function clearFieldErrors(prefix) {
+  document.querySelectorAll('[id^="err' + capitalize(prefix) + '"]').forEach(el => el.classList.remove('show'));
+}
+function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+</script>
+</body>
+</html>
