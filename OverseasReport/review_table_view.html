@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>审核表格 · 海外部市场营销信息</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",Arial,sans-serif;
+  background:#f5f6f8;color:#1a1a1a;min-height:100vh;-webkit-font-smoothing:antialiased;
+}
+
+/* Header */
+.page-header{
+  background:#fff;padding:12px 14px 8px;border-bottom:1px solid #eee;
+  position:sticky;top:0;z-index:50;
+  display:flex;align-items:flex-start;justify-content:space-between;
+}
+.page-header-left { }
+.page-header-left h1{font-size:15px;font-weight:600;color:#111;}
+.page-header-right { display:flex;gap:6px;flex-shrink:0; }
+.hdr-btn {
+  padding:5px 10px;border-radius:5px;border:1px solid #ccc;
+  background:#fff;color:#555;font-size:11px;cursor:pointer;
+  font-family:inherit;white-space:nowrap;transition:all .12s;
+}
+.hdr-btn:hover{border-color:#185FA5;color:#185FA5;}
+
+/* Tab bar */
+.tab-bar{
+  display:flex;background:#fff;border-bottom:1px solid #eee;overflow-x:auto;
+  position:sticky;top:55px;z-index:49;scrollbar-width:none;
+}
+.tab-bar::-webkit-scrollbar{display:none}
+.tab-item{
+  padding:9px 14px;font-size:12px;color:#888;white-space:nowrap;cursor:pointer;
+  border-bottom:2px solid transparent;user-select:none;flex-shrink:0;
+}
+.tab-item.active{color:#185FA5;border-bottom-color:#185FA5;font-weight:600;}
+
+/* Table container */
+.table-wrap{overflow-x:auto;padding:8px 6px 160px;-webkit-overflow-scrolling:touch;}
+.table-wrap table{
+  border-collapse:collapse;min-width:100%;font-size:12px;background:#fff;
+  border-radius:8px;overflow:hidden;
+}
+.table-wrap thead th{
+  background:#f0f3f8;color:#444;font-weight:600;padding:9px 7px;
+  border:1px solid #e0e3e8;white-space:nowrap;text-align:center;font-size:11px;
+}
+.table-wrap thead th.sub-header{background:#f7f9fc;color:#777;font-weight:500;font-size:10px;}
+.table-wrap tbody td{
+  padding:7px 6px;border:1px solid #eee;vertical-align:middle;text-align:center;
+  min-width:70px;position:relative;
+}
+.table-wrap tbody td.name-col{min-width:100px;background:#fafbfc;color:#555;font-size:11px;}
+
+/* Editable cell */
+.cell-val{min-height:22px;padding:2px 4px;border-radius:3px;cursor:default;line-height:1.4;}
+.cell-val.editing{border:1.5px solid #185FA5;background:#fff;box-shadow:0 0 0 2px rgba(24,95,165,.1);}
+.cell-val.edited{background:#FFF8E1;}
+.cell-val input,.cell-val select{
+  width:100%;border:none;background:transparent;font-size:12px;
+  font-family:inherit;outline:none;padding:1px 0;
+}
+.cell-val select{appearance:none;-webkit-appearance:none;}
+.cell-val textarea{
+  width:100%;border:none;background:transparent;font-size:12px;
+  font-family:inherit;outline:none;resize:none;min-height:40px;padding:1px 0;
+}
+
+/* Cascading select in cell — 双栏级联选择器 */
+.cascade-stack{position:relative;}
+.cascade-trigger{
+  width:100%;border:1px solid #ddd;border-radius:3px;padding:4px 6px;
+  font-size:11px;font-family:inherit;cursor:pointer;background:#fff;
+  text-align:left;color:#333;min-height:24px;line-height:1.4;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.cascade-trigger::after{content:'▾';font-size:9px;color:#999;margin-left:4px;}
+.cascade-trigger:focus{outline:none;border-color:#185FA5;}
+.cascade-dropdown{
+  display:none;position:fixed;z-index:9999;background:#fff;
+  border-radius:8px;box-shadow:0 6px 28px rgba(0,0,0,.18);
+  min-width:340px;max-width:420px;overflow:hidden;
+}
+.cascade-dropdown.active{display:flex;}
+.cascade-col{
+  flex:1;min-width:150px;max-height:240px;overflow-y:auto;
+  border-right:1px solid #eee;scrollbar-width:thin;
+}
+.cascade-col:last-child{border-right:none;}
+.cascade-col::-webkit-scrollbar{width:4px;}
+.cascade-col::-webkit-scrollbar-thumb{background:#ddd;border-radius:2px;}
+.cascade-item{
+  padding:8px 12px;font-size:12px;color:#333;cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;
+  white-space:nowrap;user-select:none;transition:background .12s;
+}
+.cascade-item:hover{background:#f5f7fa;}
+.cascade-item.selected{color:#185FA5;background:#E6F1FB;font-weight:500;}
+.cascade-item .arrow{font-size:10px;color:#bbb;margin-left:8px;}
+.cascade-item.selected .arrow{color:#185FA5;}
+.cascade-col.empty{display:flex;align-items:center;justify-content:center;color:#aaa;font-size:12px;}
+
+/* Date input */
+.date-input{border:1px solid #ddd;border-radius:3px;padding:3px 4px;font-size:11px;font-family:inherit;width:100%;}
+
+/* Row operations */
+.op-btn{
+  display:inline-block;padding:3px 8px;border-radius:4px;border:none;
+  font-size:11px;font-weight:500;cursor:pointer;font-family:inherit;
+  margin:1px 2px;white-space:nowrap;
+}
+.op-btn.edit{background:#E6F1FB;color:#185FA5;}
+.op-btn.edit:hover{background:#d0e5f8;}
+.op-btn.del{background:#FCEBEB;color:#A32D2D;}
+.op-btn.del:hover{background:#f8d7d7;}
+.op-btn.add{background:#EAF3DE;color:#3B6D11;font-size:12px;padding:4px 10px;margin-top:4px;}
+.op-btn.add:hover{background:#d7ead4;}
+.op-btn.save{background:#E6F1FB;color:#185FA5;}
+.op-btn.cancel{background:#f0f0f0;color:#666;}
+
+/* Row states */
+.row-new td{background:#fafff2!important;}
+.row-editing td{background:#fafdff!important;}
+
+/* Empty state */
+.empty-tip{text-align:center;color:#aaa;font-size:13px;padding:40px 0;}
+
+/* Confirm bar */
+.confirm-bar{
+  position:fixed;bottom:0;left:0;right:0;background:#fff;
+  border-top:1px solid #eee;padding:10px 14px;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.confirm-bar .info{font-size:11px;color:#888;}
+.confirm-bar .btn-group{display:flex;gap:8px;}
+.confirm-bar button{
+  padding:10px 20px;border-radius:8px;border:none;font-size:14px;font-weight:600;
+  cursor:pointer;font-family:inherit;transition:background .15s;
+}
+.btn-save-draft{background:#185FA5;color:#fff;}
+.btn-save-draft:hover{background:#134a85;}
+.btn-submit{background:#3B6D11;color:#fff;}
+.btn-submit:hover{background:#34630f;}
+
+/* ===== Toast ===== */
+.toast{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  background:rgba(0,0,0,.72);color:#fff;padding:11px 22px;border-radius:8px;
+  font-size:14px;z-index:999;opacity:0;pointer-events:none;transition:opacity .2s;
+  white-space:nowrap;
+}
+.toast.show{opacity:1;}
+
+/* ===== Confirm modal ===== */
+.modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:300;
+  align-items:center;justify-content:center;
+}
+.modal-overlay.show{display:flex;}
+.modal-box{
+  background:#fff;border-radius:14px;padding:22px 22px 14px;width:280px;text-align:center;
+}
+.modal-box h3{font-size:15px;font-weight:600;margin-bottom:8px;}
+.modal-box p{font-size:13px;color:#666;margin-bottom:18px;line-height:1.5;}
+.modal-btns{display:flex;gap:10px;}
+.modal-btns button{
+  flex:1;padding:11px 0;border-radius:9px;border:none;
+  font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;
+}
+.modal-btns .btn-cancel{background:#f0f0f0;color:#555;}
+.modal-btns .btn-danger{background:#A32D2D;color:#fff;}
+.modal-btns .btn-primary{background:#3B6D11;color:#fff;}
+
+/* Scroll hint */
+.scroll-hint{text-align:center;font-size:10px;color:#bbb;padding:4px 0;}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="page-header-left"><h1>审核表格 · 海外市场营销信息</h1></div>
+  <div class="page-header-right">
+    <button class="hdr-btn" onclick="window.open('review_dashboard.html','_self')">卡片查看</button>
+  </div>
+</div>
+
+<div class="tab-bar" id="tabBar">
+  <div class="tab-item active" data-tab="dev">营销管理</div>
+  <div class="tab-item" data-tab="cus">客户管理</div>
+  <div class="tab-item" data-tab="bidThis">本周投标</div>
+  <div class="tab-item" data-tab="bidNext">下周投标</div>
+  <div class="tab-item" data-tab="sign">本周签约</div>
+</div>
+
+<div class="table-wrap" id="tableWrap"></div>
+
+<div class="confirm-bar" id="confirmBar">
+  <span class="info" id="confirmInfo">编辑过的单元格将以黄色高亮显示</span>
+  <div class="btn-group">
+    <button class="btn-submit" onclick="confirmSubmit()">确认提交（审批通过）</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <h3 id="modalTitle"></h3>
+    <p id="modalMsg"></p>
+    <div class="modal-btns" id="modalBtns"></div>
+  </div>
+</div>
+
+<script>
+/* ==================== DATA DICTIONARIES (与填报端一致) ==================== */
+const COUNTRIES = [
+  "沙特阿拉伯","阿联酋","卡塔尔","科威特","阿曼","巴林","伊拉克","伊朗",
+  "印度","巴基斯坦","孟加拉国","越南","泰国","印度尼西亚","马来西亚",
+  "菲律宾","缅甸","日本","韩国","新加坡","中国台湾","土耳其","巴西",
+  "墨西哥","阿根廷","智利","秘鲁、哥伦比亚","俄罗斯","乌克兰",
+  "哈萨克斯坦、乌兹别克斯坦","德国","法国、意大利、西班牙、英国",
+  "波兰、捷克、罗马尼亚、匈牙利","南非","埃及、尼日利亚、阿尔及利亚","摩洛哥","澳大利亚"
+];
+
+const CUSTOMERS = [
+  "ACME Corp","GlobalTech Ltd","Pacific Steel Co.",
+  "ArcelorMittal","Tata Steel","POSCO","Nippon Steel",
+  "Tenaris","Voestalpine","ThyssenKrupp","Nucor Corporation",
+  "SSAB","Outokumpu","Salzgitter AG","Aperam"
+];
+
+const PROJECTS = [
+  "Omega Steel Plant Phase II","Phoenix Greenfield Project",
+  "Atlas Rolling Mill Upgrade","Delta Coking Plant",
+  "Horizon Blast Furnace Relining","Nova Continuous Caster",
+  "Summit EAF Modernization","Titan Wire Rod Mill",
+  "Apex Pelletizing Plant","Eclipse Cold Rolling Mill"
+];
+
+const DEVELOP_PROGRESS_L1 = [
+  "项目前期跟踪","技术交流","商务报价","项目中标",
+  "合同签订","项目丢标","项目延期","项目取消","其他"
+];
+
+const DEVELOP_PROGRESS_L2 = {
+  "项目前期跟踪":[
+    "1）收到业主询价信息，进行沟通澄清",
+    "2）出于内部人力、竞争力、项目可靠性等原因判断，我方不参与本项目跟踪",
+    "3）业主计划来访交流和参观样板厂，内部安排准备",
+    "4）收集项目的商务背景信息，计划拜访业主",
+    "5）提供预算性报价和方案",
+    "6）内部立项，成立报价团队"
+  ],
+  "技术交流":[
+    "1）交流技术方案，准备初步技术附件",
+    "2）业主计划来访交流和参观样板厂，内部安排准备",
+    "3）提交初步技术附件，等待业主反馈审核意见",
+    "4）收到业主审核意见并澄清，内部确认和修改技术附件",
+    "5）业主提出方案的变化，内部确认和修改",
+    "6）提交最终修改的技术附件",
+    "7）双方签署技术附件"
+  ],
+  "商务报价":[
+    "1）业主要求提供商务报价，内部确认",
+    "2）内部准备、审核价格",
+    "3）提交报价，等待业主反馈",
+    "4）和业主澄清价格对应的范围、主要商务条款等",
+    "5）业主推迟决策",
+    "6）业主提出降价要求",
+    "7）应业主要求，我方提供修改报价",
+    "8）和业主进行商务谈判",
+    "9）提供最终价格",
+    "10）业主确认我方价格"
+  ],
+  "项目中标":[
+    "1）业主口头/书面确认接受我方价格",
+    "2）业主发布中标通知书",
+    "3）我方确认业主发送的中标通知书",
+    "4）完成业主系统的供应商注册"
+  ],
+  "合同签订":[
+    "1）谈判合同条款",
+    "2）内部走合同评审流程",
+    "3）完成合同签订"
+  ],
+  "项目丢标":[
+    "1）我方未中标，了解中标方",
+    "2）内部分析丢标原因"
+  ],
+  "项目延期":[
+    "1）业主通知项目延期",
+    "2）了解业主重启时间"
+  ],
+  "项目取消":["业主通知项目取消"],
+  "其他":null
+};
+
+const CUSTOMER_CHANGE_TYPES = [
+  "重大经营状况变化","宣布重大投资计划","客户管理层/关键人员变化",
+  "涉及重大诉讼或处罚","其他影响履约能力的事项","无"
+];
+
+const IMPACT_TYPES = ["影响较小","有影响，将专题分析汇报","影响较大，将专题分析汇报"];
+const REPORT_OPTS = ["报送","不报送"];
+const CONTRACT_TYPES = ["设计","咨询","EP","EPC"];
+const SIGNED_STATUS = ["已签待录入","中标待签"];
+
+// 审核者（虚拟姓名）
+const REVIEWER_NAME = "审核员";
+
+/* ==================== SAMPLE DATA ==================== */
+const NAMES = ["张磊","李雯","王浩","陈思远","刘晓","赵明","杨帆","吴悦","周强","孙艺"];
+const CTRY = ["沙特阿拉伯","德国","日本","韩国","印度","巴西","阿联酋","越南","土耳其","南非"];
+
+function randItem(a){return a[Math.floor(Math.random()*a.length)]}
+function randInt(a,b){return Math.floor(Math.random()*(b-a+1))+a}
+
+function genDevProjects(n){
+  const items=[];
+  for(let i=0;i<n;i++){
+    const l1=randItem(DEVELOP_PROGRESS_L1);
+    const l2List=DEVELOP_PROGRESS_L2[l1];
+    items.push({
+      customer:randItem(CUSTOMERS.slice(0,8)),
+      projectName:randItem(PROJECTS),
+      progressL1:l1,
+      progressL2:l2List?randItem(l2List):'',
+      progressRemark:'',
+      competitor:i%2===0?randItem(['西门子','SMS Group','Primetals','Danieli']):'',
+      reportLeader:Math.random()>0.4?'报送':'不报送',
+    });
+  }
+  return items;
+}
+
+function genCustomers(n){
+  const items=[];
+  for(let i=0;i<n;i++){
+    const ct=randItem(CUSTOMER_CHANGE_TYPES);
+    items.push({
+      customer:randItem(CUSTOMERS.slice(0,8)),
+      changeType:ct,
+      changeDetail:ct==='无'?'':'当地市场政策收紧，客户宣布暂停新增投资计划',
+      impact:randItem(IMPACT_TYPES),
+      reportLeader:Math.random()>0.5?'报送':'不报送',
+    });
+  }
+  return items;
+}
+
+function genBids(n,weekOffset){
+  const items=[];
+  for(let i=0;i<n;i++){
+    const d=new Date();
+    const dayOfWeek=d.getDay()||7;
+    const monday=new Date(d.getFullYear(),d.getMonth(),d.getDate()-dayOfWeek+1+weekOffset*7);
+    const bidDate=new Date(monday.getTime()+randInt(0,6)*86400000);
+    items.push({
+      projectName:randItem(PROJECTS),
+      amount:(randInt(50,800)*10)+'万美元',
+      bidTime:bidDate.toISOString().split('T')[0],
+      competitor:Math.random()>0.3?randItem(['西门子','SMS Group','Primetals','Danieli','ABB']):'',
+      result:Math.random()>0.5?'中标':'未中标',
+    });
+  }
+  return items;
+}
+
+function genSignings(n){
+  const items=[];
+  for(let i=0;i<n;i++){
+    items.push({
+      projectName:randItem(PROJECTS),
+      contractType:randItem(CONTRACT_TYPES),
+      contractAmount:(randInt(100,2000)*10)+'万美元',
+      contractRevenue:(randInt(50,1500)*10)+'万美元',
+      status:randItem(SIGNED_STATUS),
+      progress:randItem(['已完成合同条款谈判','内部评审中','等待业主反馈','已完成签约','已收到预付款']),
+    });
+  }
+  return items;
+}
+
+function genRecords(){
+  const records=[];
+  for(let i=0;i<10;i++){
+    records.push({
+      id:i+1,
+      name:NAMES[i],
+      country:CTRY[i],
+      developProjects:genDevProjects(randInt(1,3)),
+      customers:genCustomers(randInt(0,2)),
+      bidsThisWeek:genBids(randInt(0,2),0),
+      bidsNextWeek:genBids(randInt(0,2),1),
+      signingsThisWeek:genSignings(randInt(0,2)),
+    });
+  }
+  // 审核者记录（用于新增行，放在最后）
+  records.push({
+    id:999,
+    name:REVIEWER_NAME,
+    country:'审核员',
+    developProjects:[],
+    customers:[],
+    bidsThisWeek:[],
+    bidsNextWeek:[],
+    signingsThisWeek:[],
+    _isReviewer:true
+  });
+  return records;
+}
+
+let records = genRecords();
+let currentTab = 'dev';
+let leaderFilterOnly = false;  // 只看报送过滤
+// Track edited cells: Set of "tabKey|recordId|rowIdx|colKey"
+let editedCells = new Set();
+// Track editing state: {recordId, rowIdx, colKey, el, originalVal}
+let editState = null;
+
+/* ==================== TAB SWITCHING ==================== */
+document.getElementById('tabBar').addEventListener('click',e=>{
+  const tab=e.target.closest('.tab-item');
+  if(!tab)return;
+  document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
+  tab.classList.add('active');
+  currentTab=tab.dataset.tab;
+  leaderFilterOnly=false;  // 切tab时重置过滤
+  editState=null;
+  renderTable();
+});
+
+/* ==================== 只看报送过滤 ==================== */
+function toggleLeaderFilter(checked){
+  leaderFilterOnly = checked;
+  editState=null;
+  renderTable();
+}
+
+function showLeaderFilter(){
+  return currentTab==='dev'||currentTab==='cus';
+}
+
+/* ==================== RENDER ==================== */
+function renderTable(){
+  const wrap=document.getElementById('tableWrap');
+  editState=null;
+
+  switch(currentTab){
+    case 'dev': renderDevTable(wrap); break;
+    case 'cus': renderCusTable(wrap); break;
+    case 'bidThis': renderBidTable(wrap,'bidsThisWeek',0); break;
+    case 'bidNext': renderBidTable(wrap,'bidsNextWeek',1); break;
+    case 'sign': renderSignTable(wrap); break;
+  }
+  updateEditedCount();
+}
+
+function markEdited(tabKey,recordId,rowIdx,colKey){
+  editedCells.add(tabKey+'|'+recordId+'|'+rowIdx+'|'+colKey);
+  updateEditedCount();
+}
+function isEdited(tabKey,recordId,rowIdx,colKey){
+  return editedCells.has(tabKey+'|'+recordId+'|'+rowIdx+'|'+colKey);
+}
+
+function updateEditedCount(){
+  const n=editedCells.size;
+  document.getElementById('confirmInfo').textContent=n>0?`已编辑 ${n} 个单元格（黄色高亮）`:'编辑过的单元格将以黄色高亮显示';
+}
+
+/* ==================== EDIT STATE — 仅实际变更时标记 ==================== */
+function enterEdit(el,tabKey,recordId,rowIdx,colKey,originalVal){
+  if(el.classList.contains('editing'))return;
+  saveEdit(); // 保存上一个编辑
+  el.classList.add('editing');
+  el.textContent='';
+  el.title='';
+  editState={tabKey,recordId,rowIdx,colKey,el,originalVal:originalVal||''};
+}
+
+function saveEdit(){
+  if(!editState)return;
+  const {tabKey,recordId,rowIdx,colKey,el,originalVal}=editState;
+
+  let newVal='';
+  const inp=el.querySelector('input:not([type=hidden])');
+  const sel=el.querySelector('select');
+  const ta=el.querySelector('textarea');
+  const css=el.querySelector('.cascade-stack');
+
+  if(css){
+    const trigger=css.querySelector('.cascade-trigger');
+    if(trigger){
+      newVal=trigger.textContent||'';
+      if(newVal==='请选择')newVal='';
+    }else{
+      const sels=css.querySelectorAll('select');
+      if(sels.length>=2)newVal=sels[0].value+'-'+sels[1].value;
+      else if(sels.length===1)newVal=sels[0].value;
+    }
+  }else if(sel){
+    newVal=sel.value;
+  }else if(ta){
+    newVal=ta.value;
+  }else if(inp){
+    newVal=inp.value;
+  }else{
+    newVal=el.textContent||'';
+  }
+
+  el.classList.remove('editing');
+  el.textContent=newVal||'';
+  el.style.cursor='pointer';
+  el.title='点击编辑';
+
+  /* 仅当内容实际变更时标记黄色 */
+  if(tabKey&&colKey&&(newVal||'')!==(originalVal||'')){
+    markEdited(tabKey,recordId,rowIdx,colKey);
+    el.classList.add('edited');
+  }else if(!isEdited(tabKey,recordId,rowIdx,colKey)){
+    el.classList.remove('edited');
+  }
+
+  persistEdit(tabKey,recordId,rowIdx,colKey,newVal);
+  editState=null;
+}
+
+function persistEdit(tabKey,recordId,rowIdx,colKey,val){
+  const r=records.find(x=>x.id===parseInt(recordId));
+  if(!r)return;
+  const ri=parseInt(rowIdx);
+  switch(tabKey){
+    case 'dev':
+      if(!r.developProjects[ri])return;
+      const dp=r.developProjects[ri];
+      if(colKey==='customer')dp.customer=val;
+      else if(colKey==='projectName')dp.projectName=val;
+      else if(colKey==='progress'){const parts=val.split('-');dp.progressL1=parts[0]||'';dp.progressL2=parts[1]||'';}
+      else if(colKey==='progressRemark')dp.progressRemark=val;
+      else if(colKey==='competitor')dp.competitor=val;
+      else if(colKey==='report')dp.reportLeader=val;
+      break;
+    case 'cus':
+      if(!r.customers[ri])return;
+      const c=r.customers[ri];
+      if(colKey==='customer')c.customer=val;
+      else if(colKey==='changeType')c.changeType=val;
+      else if(colKey==='changeDetail')c.changeDetail=val;
+      else if(colKey==='impact')c.impact=val;
+      else if(colKey==='report')c.reportLeader=val;
+      break;
+    case 'bid1':
+      if(!r.bidsThisWeek[ri])return;
+      const b1=r.bidsThisWeek[ri];
+      if(colKey==='projectName')b1.projectName=val;
+      else if(colKey==='amount')b1.amount=val;
+      else if(colKey==='bidTime')b1.bidTime=val;
+      else if(colKey==='competitor')b1.competitor=val;
+      else if(colKey==='result')b1.result=val;
+      break;
+    case 'bid2':
+      if(!r.bidsNextWeek[ri])return;
+      const b2=r.bidsNextWeek[ri];
+      if(colKey==='projectName')b2.projectName=val;
+      else if(colKey==='amount')b2.amount=val;
+      else if(colKey==='bidTime')b2.bidTime=val;
+      else if(colKey==='competitor')b2.competitor=val;
+      else if(colKey==='result')b2.result=val;
+      break;
+    case 'sign':
+      if(!r.signingsThisWeek[ri])return;
+      const s=r.signingsThisWeek[ri];
+      if(colKey==='projectName')s.projectName=val;
+      else if(colKey==='contractType')s.contractType=val;
+      else if(colKey==='contractAmount')s.contractAmount=val;
+      else if(colKey==='contractRevenue')s.contractRevenue=val;
+      else if(colKey==='status')s.status=val;
+      else if(colKey==='progress')s.progress=val;
+      break;
+  }
+}
+
+/* Click outside to save */
+document.addEventListener('click',function(e){
+  if(!editState)return;
+  const el=editState.el;
+  if(el&&!el.contains(e.target)){
+    saveEdit();
+  }
+});
+
+/* Helper: make a select element */
+function mkSelect(options,val,onchange,cls){
+  const s=document.createElement('select');
+  if(cls)s.className=cls;
+  s.style.cssText='width:100%;border:none;background:transparent;font-size:12px;font-family:inherit;outline:none;';
+  options.forEach(o=>{
+    const opt=document.createElement('option');
+    opt.value=o;opt.textContent=o;
+    if(o===val)opt.selected=true;
+    s.appendChild(opt);
+  });
+  if(onchange)s.addEventListener('change',onchange);
+  return s;
+}
+
+/* Helper: make searchable select */
+function mkSearchSelect(options,val,onchange,placeholder){
+  const wrap=document.createElement('div');
+  wrap.style.cssText='position:relative;';
+  const inp=document.createElement('input');
+  inp.style.cssText='width:100%;border:none;background:transparent;font-size:12px;font-family:inherit;outline:none;padding:2px 0;';
+  inp.value=val||'';
+  inp.placeholder=placeholder||'搜索...';
+  const dd=document.createElement('div');
+  dd.style.cssText='display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #ddd;border-radius:4px;max-height:150px;overflow-y:auto;z-index:10;box-shadow:0 2px 8px rgba(0,0,0,.1);';
+  dd.className='search-dd';
+
+  function filterDD(q){
+    dd.innerHTML='';
+    const filtered=options.filter(o=>o.toLowerCase().includes(q.toLowerCase()));
+    if(!filtered.length){dd.style.display='none';return;}
+    filtered.forEach(o=>{
+      const div=document.createElement('div');
+      div.style.cssText='padding:5px 8px;font-size:12px;cursor:pointer;';
+      div.textContent=o;
+      div.addEventListener('mousedown',e=>{e.preventDefault();inp.value=o;dd.style.display='none';if(onchange)onchange(o);});
+      div.addEventListener('mouseenter',()=>{div.style.background='#E6F1FB';});
+      div.addEventListener('mouseleave',()=>{div.style.background='';});
+      dd.appendChild(div);
+    });
+    dd.style.display=filtered.length?'block':'none';
+  }
+  inp.addEventListener('focus',()=>{filterDD(inp.value);});
+  inp.addEventListener('input',()=>{filterDD(inp.value);});
+  inp.addEventListener('blur',()=>{setTimeout(()=>{dd.style.display='none';},200);});
+  wrap.appendChild(inp);
+  wrap.appendChild(dd);
+  return {wrap,val:inp};
+}
+
+/* Helper: 双栏级联选择器 — 模仿 Ant Design Cascader */
+function mkCascadeProgress(l1Val,l2Val,onchange){
+  const stack=document.createElement('div');
+  stack.className='cascade-stack';
+
+  // 显示当前选择的触发器
+  const trigger=document.createElement('div');
+  trigger.className='cascade-trigger';
+  trigger.tabIndex=0;
+  let currentL1=l1Val||'';
+  let currentL2=l2Val||'';
+  let displayText=currentL1?(currentL1+(currentL2?' - '+currentL2:'')):'请选择';
+  trigger.textContent=displayText;
+
+  let canAcceptMouse=true;
+  const updateTrigger=()=>{
+    displayText=currentL1?(currentL1+(currentL2?' - '+currentL2:'')):'请选择';
+    trigger.textContent=displayText;
+    if(currentL1&&onchange)onchange(currentL1,currentL2||'');
+  };
+
+  // 下拉面板
+  const dropdown=document.createElement('div');
+  dropdown.className='cascade-dropdown';
+  dropdown.innerHTML='<div class="cascade-col" id="cascadeCol1"></div><div class="cascade-col" id="cascadeCol2"></div>';
+  const col1=dropdown.querySelector('#cascadeCol1');
+  const col2=dropdown.querySelector('#cascadeCol2');
+
+  const renderCol1=()=>{
+    col1.innerHTML='';
+    DEVELOP_PROGRESS_L1.forEach(item=>{
+      const div=document.createElement('div');
+      div.className='cascade-item'+(item===currentL1?' selected':'');
+      div.textContent=item;
+      if(DEVELOP_PROGRESS_L2[item]&&DEVELOP_PROGRESS_L2[item].length>0){
+        const arrow=document.createElement('span');
+        arrow.className='arrow';arrow.textContent='>';
+        div.appendChild(arrow);
+      }
+      div.addEventListener('mousedown',e=>{e.preventDefault();});
+      div.addEventListener('click',()=>{
+        currentL1=item;currentL2='';
+        renderCol1();
+        renderCol2(item);
+        if(item!=='其他'){
+          updateTrigger();
+        }
+        if(item==='其他'){
+          // 关掉下拉，用文本输入
+          dropdown.classList.remove('active');
+          showOtherInput();
+        }
+      });
+      col1.appendChild(div);
+    });
+  };
+
+  const renderCol2=(l1Key)=>{
+    col2.innerHTML='';
+    const items=DEVELOP_PROGRESS_L2[l1Key];
+    if(!items||items.length===0){
+      col2.classList.add('empty');
+      col2.innerHTML='<span>请从左侧选择分类</span>';
+      return;
+    }
+    col2.classList.remove('empty');
+    items.forEach(item=>{
+      const div=document.createElement('div');
+      div.className='cascade-item'+(item===currentL2?' selected':'');
+      div.textContent=item;
+      div.addEventListener('mousedown',e=>{e.preventDefault();});
+      div.addEventListener('click',()=>{
+        currentL2=item;
+        renderCol2(l1Key);
+        updateTrigger();
+        dropdown.classList.remove('active');
+      });
+      col2.appendChild(div);
+    });
+  };
+
+  const showOtherInput=()=>{
+    // 清除之前的其他输入框
+    const old=stack.querySelector('.l2-input');
+    if(old)old.remove();
+    const txtInp=document.createElement('input');
+    txtInp.className='l2-input';
+    txtInp.value=currentL2||'';
+    txtInp.style.cssText='width:100%;border:1px solid #ddd;border-radius:3px;padding:3px 4px;font-size:11px;font-family:inherit;margin-top:4px;';
+    txtInp.placeholder='请输入具体状态';
+    txtInp.addEventListener('input',function(){
+      currentL2=this.value;
+      if(onchange)onchange(currentL1,currentL2);
+    });
+    stack.appendChild(txtInp);
+    setTimeout(()=>txtInp.focus(),50);
+  };
+
+  // 打开/关闭下拉
+  const openDropdown=()=>{
+    canAcceptMouse=true;
+    dropdown.classList.add('active');
+    const rect=trigger.getBoundingClientRect();
+    const spaceBelow=window.innerHeight-rect.bottom;
+    const spaceAbove=rect.top;
+    // 默认向下，空间不够向上
+    if(spaceBelow<260&&spaceAbove>260){
+      dropdown.style.top=(rect.top-260)+'px';
+      dropdown.style.bottom='auto';
+    }else{
+      dropdown.style.top=rect.bottom+'px';
+      dropdown.style.bottom='auto';
+    }
+    // 水平居中偏左
+    let left=rect.left;
+    if(left+340>window.innerWidth)left=window.innerWidth-350;
+    if(left<8)left=8;
+    dropdown.style.left=left+'px';
+    renderCol1();
+    if(currentL1&&currentL1!=='其他'){
+      renderCol2(currentL1);
+    }else{
+      col2.classList.add('empty');
+      col2.innerHTML='<span>请从左侧选择分类</span>';
+    }
+    // 聚焦后短时间内忽略mousedown
+    canAcceptMouse=true;
+  };
+  const closeDropdown=(force)=>{
+    // 延迟关闭以避免与 mousedown 冲突
+    if(force){
+      dropdown.classList.remove('active');
+      return;
+    }
+    setTimeout(()=>{
+      if(!dropdown.contains(document.activeElement)&&document.activeElement!==trigger){
+        dropdown.classList.remove('active');
+      }
+    },120);
+  };
+
+  trigger.addEventListener('click',e=>{
+    e.stopPropagation();
+    if(dropdown.classList.contains('active')){
+      dropdown.classList.remove('active');
+    }else{
+      openDropdown();
+    }
+  });
+  trigger.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();openDropdown();}});
+
+  // 点击外部关闭
+  document.addEventListener('mousedown',function(e){
+    if(!dropdown.classList.contains('active'))return;
+    if(!dropdown.contains(e.target)&&e.target!==trigger&&!trigger.contains(e.target)){
+      dropdown.classList.remove('active');
+    }
+  });
+
+  // 关闭 dropdown 时更新值
+  const observer=new MutationObserver(()=>{
+    if(!dropdown.classList.contains('active')&&currentL1){
+      updateTrigger();
+    }
+  });
+  observer.observe(dropdown,{attributes:true,attributeFilter:['class']});
+
+  stack.appendChild(trigger);
+  stack.appendChild(dropdown);
+
+  // 如果初始值是"其他"，显示输入框
+  if(currentL1==='其他'){
+    const txtInp=document.createElement('input');
+    txtInp.className='l2-input';
+    txtInp.value=currentL2||'';
+    txtInp.style.cssText='width:100%;border:1px solid #ddd;border-radius:3px;padding:3px 4px;font-size:11px;font-family:inherit;margin-top:4px;';
+    txtInp.placeholder='请输入具体状态';
+    txtInp.addEventListener('input',function(){
+      currentL2=this.value;
+      if(onchange)onchange(currentL1,currentL2);
+    });
+    stack.appendChild(txtInp);
+  }
+
+  return stack;
+}
+
+/* Helper: cell with value display */
+function cellDiv(tabKey,recordId,rowIdx,colKey,val,editable,editRender){
+  const div=document.createElement('div');
+  div.className='cell-val';
+  if(isEdited(tabKey,recordId,rowIdx,colKey))div.classList.add('edited');
+  div.textContent=val||'';
+  div.dataset.tabKey=tabKey;
+  div.dataset.recordId=recordId;
+  div.dataset.rowIdx=rowIdx;
+  div.dataset.colKey=colKey;
+  div.dataset.editable=editable?'1':'0';
+
+  if(editable){
+    div.style.cursor='pointer';
+    div.title='点击编辑';
+    div.addEventListener('click',function(e){
+      if(div.classList.contains('editing'))return;
+      enterEdit(div,tabKey,recordId,rowIdx,colKey,val);
+      if(editRender)editRender(div,val);
+    });
+  }
+  return div;
+}
+
+/* ==================== 营销管理 TABLE ==================== */
+function renderDevTable(wrap){
+  const rows=[];
+  records.forEach(r=>{
+    r.developProjects.forEach((p,i)=>{
+      if(leaderFilterOnly && p.reportLeader!=='报送') return;
+      rows.push({recordId:r.id,name:r.name,country:r.country,data:p,rowIdx:i,isReviewer:!!r._isReviewer});
+    });
+  });
+
+  let h='';
+  /* 只看报送过滤栏 */
+  h+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 8px;background:#f9fafb;border-bottom:1px solid #eee;">
+    <span style="font-size:11px;color:#888;">${rows.length} 条记录</span>
+    <label style="font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;color:#555;">
+      <input type="checkbox" id="leaderFilter" onchange="toggleLeaderFilter(this.checked)" ${leaderFilterOnly?'checked':''}>
+      只看报送
+    </label>
+  </div>`;
+
+  if(!rows.length){h+='<div class="empty-tip">暂无营销管理数据</div>';wrap.innerHTML=h;return;}
+
+  h+=`<div class="scroll-hint">← 左右滑动查看完整表格 →</div><table><thead><tr>
+    <th rowspan="2" style="width:100px;">填报人</th>
+    <th rowspan="2">客户名称</th>
+    <th rowspan="2">项目名称</th>
+    <th colspan="2">当前项目进展</th>
+    <th rowspan="2">竞争对手</th>
+    <th rowspan="2">是否上报</th>
+    <th rowspan="2" style="width:120px;">操作</th>
+  </tr><tr>
+    <th class="sub-header">进展状态</th>
+    <th class="sub-header">补充说明</th>
+  </tr></thead><tbody>`;
+
+  rows.forEach(r=>{
+    const p=r.data;
+    const rk=r.recordId,ri=r.rowIdx;
+    const extraClass=r.isReviewer?' class="row-new"':'';
+    h+=`<tr data-rk="${rk}" data-ri="${ri}"${extraClass}>
+      <td class="name-col">${r.name}${r.country!=='审核员'?'（'+r.country+'）':''}</td>
+      <td id="cell_dev_${rk}_${ri}_customer"></td>
+      <td id="cell_dev_${rk}_${ri}_projectName"></td>
+      <td id="cell_dev_${rk}_${ri}_progress"></td>
+      <td id="cell_dev_${rk}_${ri}_progressRemark"></td>
+      <td id="cell_dev_${rk}_${ri}_competitor"></td>
+      <td id="cell_dev_${rk}_${ri}_report"></td>
+      <td id="ops_dev_${rk}_${ri}"></td>
+    </tr>`;
+  });
+
+  h+=`</tbody></table>`;
+  h+=`<div style="text-align:center;padding:8px;"><button class="op-btn add" onclick="addDevRow()">+ 新增行</button></div>`;
+  wrap.innerHTML=h;
+
+  rows.forEach(r=>{
+    const rk=r.recordId,ri=r.rowIdx,p=r.data;
+    const progressText=(p.progressL1||'')+(p.progressL2?'-'+p.progressL2:'');
+    fillCell('dev',rk,ri,'customer',p.customer,true,(el,val)=>{
+      const s=mkSearchSelect(CUSTOMERS,val,v=>{el.innerHTML='';el.appendChild(document.createTextNode(v));saveEdit();},'搜索客户');
+      el.appendChild(s.wrap);
+      setTimeout(()=>s.wrap.querySelector('input').focus(),50);
+    });
+    fillCell('dev',rk,ri,'projectName',p.projectName,true,(el,val)=>{
+      const s=mkSearchSelect(PROJECTS,val,v=>{el.innerHTML='';el.appendChild(document.createTextNode(v));saveEdit();},'搜索项目');
+      el.appendChild(s.wrap);
+      setTimeout(()=>s.wrap.querySelector('input').focus(),50);
+    });
+    // 进展状态：级联选择组件
+    fillCell('dev',rk,ri,'progress',progressText,true,(el,val)=>{
+      const css=mkCascadeProgress(p.progressL1,p.progressL2,(l1,l2)=>{
+        // 级联变化时同步更新数据
+        p.progressL1=l1;p.progressL2=l2;
+      });
+      el.appendChild(css);
+    });
+    fillCell('dev',rk,ri,'progressRemark',p.progressRemark||'',true,(el,val)=>{
+      const ta=document.createElement('textarea');
+      ta.value=val||'';ta.placeholder='补充说明';
+      el.appendChild(ta);
+      setTimeout(()=>ta.focus(),50);
+    });
+    fillCell('dev',rk,ri,'competitor',p.competitor||'',true,(el,val)=>{
+      const inp=document.createElement('input');
+      inp.value=val||'';inp.placeholder='竞争对手';
+      el.appendChild(inp);
+      setTimeout(()=>inp.focus(),50);
+    });
+    fillCell('dev',rk,ri,'report',p.reportLeader,true,(el,val)=>{
+      const s=mkSelect(REPORT_OPTS,val);
+      el.appendChild(s);
+      setTimeout(()=>s.focus(),50);
+    });
+    fillOps('dev',rk,ri);
+  });
+}
+
+/* ==================== 客户管理 TABLE ==================== */
+function renderCusTable(wrap){
+  const rows=[];
+  records.forEach(r=>{
+    r.customers.forEach((c,i)=>{
+      if(leaderFilterOnly && c.reportLeader!=='报送') return;
+      rows.push({recordId:r.id,name:r.name,country:r.country,data:c,rowIdx:i,isReviewer:!!r._isReviewer});
+    });
+  });
+
+  let h='';
+  /* 只看报送过滤栏 */
+  h+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 8px;background:#f9fafb;border-bottom:1px solid #eee;">
+    <span style="font-size:11px;color:#888;">${rows.length} 条记录</span>
+    <label style="font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;color:#555;">
+      <input type="checkbox" id="leaderFilter" onchange="toggleLeaderFilter(this.checked)" ${leaderFilterOnly?'checked':''}>
+      只看报送
+    </label>
+  </div>`;
+
+  if(!rows.length){h+='<div class="empty-tip">暂无客户管理数据</div>';wrap.innerHTML=h;return;}
+
+  h+=`<div class="scroll-hint">← 左右滑动查看完整表格 →</div><table><thead><tr>
+    <th rowspan="2" style="width:100px;">填报人</th>
+    <th rowspan="2">客户名称</th>
+    <th colspan="2">客户重大变化</th>
+    <th rowspan="2">对我公司影响判断</th>
+    <th rowspan="2">是否上报</th>
+    <th rowspan="2" style="width:120px;">操作</th>
+  </tr><tr>
+    <th class="sub-header">变化类型</th>
+    <th class="sub-header">补充说明</th>
+  </tr></thead><tbody>`;
+
+  rows.forEach(r=>{
+    const rk=r.recordId,ri=r.rowIdx;
+    const extraClass=r.isReviewer?' class="row-new"':'';
+    h+=`<tr data-rk="${rk}" data-ri="${ri}"${extraClass}>
+      <td class="name-col">${r.name}${r.country!=='审核员'?'（'+r.country+'）':''}</td>
+      <td id="cell_cus_${rk}_${ri}_customer"></td>
+      <td id="cell_cus_${rk}_${ri}_changeType"></td>
+      <td id="cell_cus_${rk}_${ri}_changeDetail"></td>
+      <td id="cell_cus_${rk}_${ri}_impact"></td>
+      <td id="cell_cus_${rk}_${ri}_report"></td>
+      <td id="ops_cus_${rk}_${ri}"></td>
+    </tr>`;
+  });
+
+  h+=`</tbody></table>`;
+  h+=`<div style="text-align:center;padding:8px;"><button class="op-btn add" onclick="addCusRow()">+ 新增行</button></div>`;
+  wrap.innerHTML=h;
+
+  rows.forEach(r=>{
+    const rk=r.recordId,ri=r.rowIdx,c=r.data;
+    fillCell('cus',rk,ri,'customer',c.customer,true,(el,val)=>{
+      const s=mkSearchSelect(CUSTOMERS,val,v=>{el.innerHTML='';el.appendChild(document.createTextNode(v));saveEdit();},'搜索客户');
+      el.appendChild(s.wrap);
+      setTimeout(()=>s.wrap.querySelector('input').focus(),50);
+    });
+    fillCell('cus',rk,ri,'changeType',c.changeType,true,(el,val)=>{
+      const s=mkSelect(CUSTOMER_CHANGE_TYPES,val);
+      el.appendChild(s);
+      setTimeout(()=>s.focus(),50);
+    });
+    fillCell('cus',rk,ri,'changeDetail',c.changeDetail||'',true,(el,val)=>{
+      const ta=document.createElement('textarea');
+      ta.value=val||'';ta.placeholder='补充说明';
+      el.appendChild(ta);
+      setTimeout(()=>ta.focus(),50);
+    });
+    fillCell('cus',rk,ri,'impact',c.impact,true,(el,val)=>{
+      const s=mkSelect(IMPACT_TYPES,val);
+      el.appendChild(s);
+      setTimeout(()=>s.focus(),50);
+    });
+    fillCell('cus',rk,ri,'report',c.reportLeader,true,(el,val)=>{
+      const s=mkSelect(REPORT_OPTS,val);
+      el.appendChild(s);
+      setTimeout(()=>s.focus(),50);
+    });
+    fillOps('cus',rk,ri);
+  });
+}
+
+/* ==================== 投标表格 (本周/下周) ==================== */
+function renderBidTable(wrap,fieldKey,weekOffset){
+  const rows=[];
+  records.forEach(r=>{
+    (r[fieldKey]||[]).forEach((b,i)=>{
+      rows.push({recordId:r.id,name:r.name,country:r.country,data:b,rowIdx:i,isReviewer:!!r._isReviewer});
+    });
+  });
+
+  const tabKey=fieldKey==='bidsThisWeek'?'bid1':'bid2';
+  const label=weekOffset===0?'本周投标':'下周投标';
+
+  if(!rows.length){wrap.innerHTML=`<div class="empty-tip">暂无${label}数据</div>`;return;}
+
+  let h=`<div class="scroll-hint">← 左右滑动查看完整表格 →</div><table><thead><tr>
+    <th style="width:100px;">填报人</th>
+    <th>项目名称</th>
+    <th>投标金额</th>
+    <th>投标时间</th>
+    <th>竞争对手</th>
+    <th>投标结果</th>
+    <th style="width:120px;">操作</th>
+  </tr></thead><tbody>`;
+
+  rows.forEach(r=>{
+    const rk=r.recordId,ri=r.rowIdx;
+    const extraClass=r.isReviewer?' class="row-new"':'';
+    h+=`<tr data-rk="${rk}" data-ri="${ri}"${extraClass}>
+      <td class="name-col">${r.name}${r.country!=='审核员'?'（'+r.country+'）':''}</td>
+      <td id="cell_${tabKey}_${rk}_${ri}_projectName"></td>
+      <td id="cell_${tabKey}_${rk}_${ri}_amount"></td>
+      <td id="cell_${tabKey}_${rk}_${ri}_bidTime"></td>
+      <td id="cell_${tabKey}_${rk}_${ri}_competitor"></td>
+      <td id="cell_${tabKey}_${rk}_${ri}_result"></td>
+      <td id="ops_${tabKey}_${rk}_${ri}"></td>
+    </tr>`;
+  });
+
+  h+=`</tbody></table>`;
+  h+=`<div style="text-align:center;padding:8px;"><button class="op-btn add" onclick="addBidRow('${fieldKey}')">+ 新增行</button></div>`;
+  wrap.innerHTML=h;
+
+  const now=new Date();
+  const dow=now.getDay()||7;
+  const monday=new Date(now.getFullYear(),now.getMonth(),now.getDate()-dow+1+weekOffset*7);
+  const sunday=new Date(monday.getTime()+6*86400000);
+  const minDate=monday.toISOString().split('T')[0];
+  const maxDate=sunday.toISOString().split('T')[0];
+
+  rows.forEach(r=>{
+    const rk=r.recordId,ri=r.rowIdx,b=r.data;
+    fillCell(tabKey,rk,ri,'projectName',b.projectName,true,(el,val)=>{
+      const s=mkSearchSelect(PROJECTS,val,v=>{el.innerHTML='';el.appendChild(document.createTextNode(v));saveEdit();},'搜索项目');
+      el.appendChild(s.wrap);
+      setTimeout(()=>s.wrap.querySelector('input').focus(),50);
+    });
+    fillCell(tabKey,rk,ri,'amount',b.amount,true,(el,val)=>{
+      const inp=document.createElement('input');
+      inp.value=val||'';inp.placeholder='金额';
+      el.appendChild(inp);
+      setTimeout(()=>inp.focus(),50);
+    });
+    fillCell(tabKey,rk,ri,'bidTime',b.bidTime,true,(el,val)=>{
+      const inp=document.createElement('input');
+      inp.type='date';inp.className='date-input';inp.value=val||'';
+      inp.min=minDate;inp.max=maxDate;
+      el.appendChild(inp);
+      setTimeout(()=>inp.focus(),50);
+    });
+    fillCell(tabKey,rk,ri,'competitor',b.competitor||'',true,(el,val)=>{
+      const inp=document.createElement('input');
+      inp.value=val||'';inp.placeholder='竞争对手';
+      el.appendChild(inp);
+      setTimeout(()=>inp.focus(),50);
+    });
+    fillCell(tabKey,rk,ri,'result',b.result,true,(el,val)=>{
+      const inp=document.createElement('input');
+      inp.value=val||'';inp.placeholder='投标结果';
+      el.appendChild(inp);
+      setTimeout(()=>inp.focus(),50);
+    });
+    fillOps(tabKey,rk,ri);
+  });
+}
+
+/* ==================== 签约表格 ==================== */
+function renderSignTable(wrap){
+  const rows=[];
+  records.forEach(r=>{
+    (r.signingsThisWeek||[]).forEach((s,i)=>{
+      rows.push({recordId:r.id,name:r.name,country:r.country,data:s,rowIdx:i,isReviewer:!!r._isReviewer});
+    });
+  });
+
+  if(!rows.length){wrap.innerHTML='<div class="empty-tip">暂无本周签约数据</div>';return;}
+
+  let h=`<div class="scroll-hint">← 左右滑动查看完整表格 →</div><table><thead><tr>
+    <th style="width:100px;">填报人</th>
+    <th>项目名称</th>
+    <th>合同类型</th>
+    <th>合同金额</th>
+    <th>合同收入</th>
+    <th>当前状态</th>
+    <th>本周主要进展</th>
+    <th style="width:120px;">操作</th>
+  </tr></thead><tbody>`;
+
+  rows.forEach(r=>{
+    const rk=r.recordId,ri=r.rowIdx;
+    const extraClass=r.isReviewer?' class="row-new"':'';
+    h+=`<tr data-rk="${rk}" data-ri="${ri}"${extraClass}>
+      <td class="name-col">${r.name}${r.country!=='审核员'?'（'+r.country+'）':''}</td>
+      <td id="cell_sign_${rk}_${ri}_projectName"></td>
+      <td id="cell_sign_${rk}_${ri}_contractType"></td>
+      <td id="cell_sign_${rk}_${ri}_contractAmount"></td>
+      <td id="cell_sign_${rk}_${ri}_contractRevenue"></td>
+      <td id="cell_sign_${rk}_${ri}_status"></td>
+      <td id="cell_sign_${rk}_${ri}_progress"></td>
+      <td id="ops_sign_${rk}_${ri}"></td>
+    </tr>`;
+  });
+
+  h+=`</tbody></table>`;
+  h+=`<div style="text-align:center;padding:8px;"><button class="op-btn add" onclick="addSignRow()">+ 新增行</button></div>`;
+  wrap.innerHTML=h;
+
+  rows.forEach(r=>{
+    const rk=r.recordId,ri=r.rowIdx,s=r.data;
+    fillCell('sign',rk,ri,'projectName',s.projectName,true,(el,val)=>{
+      const ss=mkSearchSelect(PROJECTS,val,v=>{el.innerHTML='';el.appendChild(document.createTextNode(v));saveEdit();},'搜索项目');
+      el.appendChild(ss.wrap);
+      setTimeout(()=>ss.wrap.querySelector('input').focus(),50);
+    });
+    fillCell('sign',rk,ri,'contractType',s.contractType,true,(el,val)=>{
+      const sel=mkSelect(CONTRACT_TYPES,val);
+      el.appendChild(sel);
+      setTimeout(()=>sel.focus(),50);
+    });
+    fillCell('sign',rk,ri,'contractAmount',s.contractAmount,true,(el,val)=>{
+      const inp=document.createElement('input');
+      inp.value=val||'';inp.placeholder='合同金额';
+      el.appendChild(inp);
+      setTimeout(()=>inp.focus(),50);
+    });
+    fillCell('sign',rk,ri,'contractRevenue',s.contractRevenue,true,(el,val)=>{
+      const inp=document.createElement('input');
+      inp.value=val||'';inp.placeholder='合同收入';
+      el.appendChild(inp);
+      setTimeout(()=>inp.focus(),50);
+    });
+    fillCell('sign',rk,ri,'status',s.status,true,(el,val)=>{
+      const sel=mkSelect(SIGNED_STATUS,val);
+      el.appendChild(sel);
+      setTimeout(()=>sel.focus(),50);
+    });
+    fillCell('sign',rk,ri,'progress',s.progress,true,(el,val)=>{
+      const ta=document.createElement('textarea');
+      ta.value=val||'';ta.placeholder='本周主要进展';
+      el.appendChild(ta);
+      setTimeout(()=>ta.focus(),50);
+    });
+    fillOps('sign',rk,ri);
+  });
+}
+
+/* ==================== CELL FILL HELPERS ==================== */
+function fillCell(tabKey,recordId,rowIdx,colKey,val,editable,editRender){
+  const id='cell_'+tabKey+'_'+recordId+'_'+rowIdx+'_'+colKey;
+  const td=document.getElementById(id);
+  if(!td)return;
+  td.innerHTML='';
+  const div=cellDiv(tabKey,recordId,rowIdx,colKey,val,editable,editRender);
+  td.appendChild(div);
+  td.dataset.colKey=colKey;
+}
+
+function fillOps(tabKey,recordId,rowIdx){
+  const id='ops_'+tabKey+'_'+recordId+'_'+rowIdx;
+  const td=document.getElementById(id);
+  if(!td)return;
+  td.innerHTML=`
+    <button class="op-btn del" onclick="deleteRow('${tabKey}',${recordId},${rowIdx})">删除</button>
+  `;
+}
+
+/* ==================== ROW OPERATIONS ==================== */
+function editRow(tabKey,recordId,rowIdx){
+  const cells=document.querySelectorAll(`tr[data-rk="${recordId}"][data-ri="${rowIdx}"] .cell-val[data-editable="1"]`);
+  if(cells.length>0){cells[0].click();}
+}
+
+function deleteRow(tabKey,recordId,rowIdx){
+  const r=records.find(x=>x.id===recordId);
+  if(!r)return;
+  let itemName='';
+  switch(tabKey){
+    case 'dev':itemName=r.developProjects[rowIdx]?.projectName||'';break;
+    case 'cus':itemName=r.customers[rowIdx]?.customer||'';break;
+    case 'bid1':itemName=r.bidsThisWeek[rowIdx]?.projectName||'';break;
+    case 'bid2':itemName=r.bidsNextWeek[rowIdx]?.projectName||'';break;
+    case 'sign':itemName=r.signingsThisWeek[rowIdx]?.projectName||'';break;
+  }
+  showModal('确认删除',`确认删除「${itemName||'此项'}」？此操作不可撤销。`,
+    [{text:'取消',cls:'btn-cancel',cb:closeModal},{text:'确认删除',cls:'btn-danger',cb:()=>{
+      switch(tabKey){
+        case 'dev':r.developProjects.splice(rowIdx,1);break;
+        case 'cus':r.customers.splice(rowIdx,1);break;
+        case 'bid1':r.bidsThisWeek.splice(rowIdx,1);break;
+        case 'bid2':r.bidsNextWeek.splice(rowIdx,1);break;
+        case 'sign':r.signingsThisWeek.splice(rowIdx,1);break;
+      }
+      closeModal();renderTable();showToast('已删除');
+    }}]
+  );
+}
+
+/* ==================== ADD ROW — 新增行追加到审核者记录（最下方） ==================== */
+function getReviewerRecord(){
+  let rr=records.find(x=>x._isReviewer);
+  if(!rr){
+    rr={id:999,name:REVIEWER_NAME,country:'审核员',developProjects:[],customers:[],bidsThisWeek:[],bidsNextWeek:[],signingsThisWeek:[],_isReviewer:true};
+    records.push(rr);
+  }
+  return rr;
+}
+
+function addDevRow(){
+  const r=getReviewerRecord();
+  r.developProjects.push({customer:'',projectName:'',progressL1:'',progressL2:'',progressRemark:'',competitor:'',reportLeader:'不报送'});
+  renderTable();
+  showToast('已新增行，请编辑');
+}
+
+function addCusRow(){
+  const r=getReviewerRecord();
+  r.customers.push({customer:'',changeType:'无',changeDetail:'',impact:'影响较小',reportLeader:'不报送'});
+  renderTable();
+  showToast('已新增行，请编辑');
+}
+
+function addBidRow(fieldKey){
+  const r=getReviewerRecord();
+  if(!r[fieldKey])r[fieldKey]=[];
+  r[fieldKey].push({projectName:'',amount:'',bidTime:'',competitor:'',result:''});
+  renderTable();
+  showToast('已新增行，请编辑');
+}
+
+function addSignRow(){
+  const r=getReviewerRecord();
+  r.signingsThisWeek.push({projectName:'',contractType:'',contractAmount:'',contractRevenue:'',status:'',progress:''});
+  renderTable();
+  showToast('已新增行，请编辑');
+}
+
+/* ==================== SAVE DRAFT（保存按钮） ==================== */
+function saveDraft(){
+  saveEdit(); // 先保存当前编辑中的单元格
+  showToast('已保存草稿');
+}
+
+/* ==================== CONFIRM SUBMIT ==================== */
+function confirmSubmit(){
+  saveEdit();
+  showModal('确认提交','确认提交当前表格内容？提交后视为审批通过，所有编辑将被保存。',
+    [{text:'取消',cls:'btn-cancel',cb:closeModal},{text:'确认提交',cls:'btn-primary',cb:()=>{
+      closeModal();
+      editedCells.clear();
+      updateEditedCount();
+      renderTable();
+      showToast('已提交（审批通过）');
+    }}]
+  );
+}
+
+/* ==================== MODAL ==================== */
+function showModal(title,msg,buttons){
+  document.getElementById('modalTitle').textContent=title;
+  document.getElementById('modalMsg').textContent=msg;
+  const btns=document.getElementById('modalBtns');
+  btns.innerHTML='';
+  buttons.forEach(b=>{
+    const btn=document.createElement('button');
+    btn.className=b.cls;btn.textContent=b.text;btn.onclick=b.cb;
+    btns.appendChild(btn);
+  });
+  document.getElementById('modalOverlay').classList.add('show');
+}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('show');}
+
+/* ==================== TOAST ==================== */
+let toastTimer;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2000);
+}
+
+/* ==================== INIT ==================== */
+renderTable();
+</script>
+</body>
+</html>
