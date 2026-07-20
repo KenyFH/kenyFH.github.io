@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0">
+<title>敬业集团交流参考资料</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif; font-size: 14px; line-height: 1.65; color: #1A1A2E; background: #F5F6F8; padding: 0; }
+  .wrap { max-width: 480px; margin: 0 auto; padding: 12px 14px 40px; }
+  header { text-align: center; padding: 20px 0 14px; }
+  header h1 { font-size: 20px; font-weight: 600; color: #042C53; margin-bottom: 4px; }
+  header p { font-size: 12px; color: #888; }
+  section { margin-bottom: 18px; }
+  h2 { font-size: 16px; font-weight: 600; color: #042C53; padding: 8px 0 10px; margin-bottom: 10px; border-bottom: 2px solid #185FA5; display: flex; align-items: center; gap: 6px; }
+  h2 .num { display: inline-flex; width: 22px; height: 22px; background: #185FA5; color: white; border-radius: 50%; font-size: 12px; font-weight: 500; align-items: center; justify-content: center; }
+  h3 { font-size: 14px; font-weight: 600; color: #0C447C; margin: 12px 0 6px; }
+  .card { background: white; border-radius: 10px; padding: 14px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(24,95,165,0.04); }
+  .summary-card { background: linear-gradient(135deg, #E6F1FB 0%, #F0F7FD 100%); border-left: 3px solid #185FA5; }
+  .summary-card .item { display: flex; gap: 8px; padding: 7px 0; border-bottom: 0.5px solid rgba(24,95,165,0.1); }
+  .summary-card .item:last-child { border-bottom: none; }
+  .summary-card .tag { flex-shrink: 0; font-size: 11px; font-weight: 500; color: #185FA5; background: white; padding: 2px 7px; border-radius: 10px; height: 20px; line-height: 16px; min-width: 30px; text-align: center; }
+  .summary-card .txt { font-size: 13px; color: #042C53; flex: 1; line-height: 1.5; }
+  .metric-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .metric { background: #F8F9FC; border-radius: 8px; padding: 10px; text-align: center; }
+  .metric .v { font-size: 16px; font-weight: 600; color: #185FA5; }
+  .metric .l { font-size: 11px; color: #888; margin-top: 2px; }
+  .info-tbl { width: 100%; font-size: 12px; }
+  .info-tbl td { padding: 4px 0; vertical-align: top; }
+  .info-tbl td.k { color: #888; width: 90px; white-space: nowrap; }
+  .info-tbl td.v { color: #333; }
+  .timeline { position: relative; padding-left: 16px; }
+  .timeline::before { content: ""; position: absolute; left: 5px; top: 6px; bottom: 6px; width: 2px; background: #B5D4F4; }
+  .timeline .t { position: relative; padding-bottom: 10px; }
+  .timeline .t::before { content: ""; position: absolute; left: -14px; top: 5px; width: 9px; height: 9px; background: white; border: 2px solid #185FA5; border-radius: 50%; }
+  .timeline .yr { font-size: 12px; font-weight: 600; color: #185FA5; }
+  .timeline .ev { font-size: 13px; color: #444; margin-top: 2px; line-height: 1.5; }
+  .biz-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .biz { background: white; border: 1px solid #E8EAF0; border-radius: 8px; padding: 10px; }
+  .biz .n { font-size: 13px; font-weight: 600; color: #0C447C; }
+  .biz .d { font-size: 11px; color: #666; margin-top: 3px; line-height: 1.45; }
+  .feature-box { background: #F8FBFE; border-left: 3px solid #378ADD; padding: 10px 12px; border-radius: 0 6px 6px 0; margin-top: 8px; }
+  .feature-box .ft { font-size: 12px; font-weight: 600; color: #0C447C; margin-bottom: 4px; }
+  .feature-box ul { list-style: none; padding-left: 0; }
+  .feature-box li { font-size: 12px; color: #444; padding: 2px 0; line-height: 1.5; padding-left: 12px; position: relative; }
+  .feature-box li::before { content: "·"; position: absolute; left: 4px; color: #378ADD; font-weight: 700; }
+  .person { display: flex; gap: 10px; padding: 10px 0; border-bottom: 0.5px solid #EEE; }
+  .person:last-child { border-bottom: none; }
+  .avatar { flex-shrink: 0; width: 42px; height: 42px; border-radius: 50%; background: #E6F1FB; color: #185FA5; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; }
+  .person .info { flex: 1; }
+  .person .nm { font-size: 14px; font-weight: 600; color: #042C53; }
+  .person .role { font-size: 11px; color: #185FA5; margin-top: 1px; }
+  .person .bio { font-size: 12px; color: #555; margin-top: 4px; line-height: 1.5; }
+  .person .judg { font-size: 11px; color: #378ADD; margin-top: 4px; line-height: 1.5; padding: 4px 8px; background: #F0F7FD; border-radius: 4px; }
+  .map-placeholder { background: #F0F7FD; border: 2px dashed #B5D4F4; border-radius: 10px; padding: 40px 20px; text-align: center; margin-bottom: 10px; }
+  .map-placeholder .ph-icon { font-size: 32px; color: #85B7EB; margin-bottom: 8px; }
+  .map-placeholder .ph-txt { font-size: 13px; color: #185FA5; font-weight: 500; }
+  .map-placeholder .ph-sub { font-size: 11px; color: #888; margin-top: 4px; }
+  img {   width: 100%;  height: 100%;object-fit: contain;}
+  details.base { background: white; border-radius: 8px; margin-bottom: 8px; overflow: hidden; box-shadow: 0 1px 2px rgba(24,95,165,0.03); }
+  details.base summary { padding: 11px 14px; font-size: 14px; font-weight: 600; color: #042C53; cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; background: #F8F9FC; }
+  details.base summary::-webkit-details-marker { display: none; }
+  details.base summary::after { content: "+"; font-size: 18px; color: #185FA5; font-weight: 400; transition: transform 0.2s; }
+  details.base[open] summary::after { content: "−"; }
+  details.base summary .nm-wrap { display: flex; flex-direction: column; gap: 2px; }
+  details.base summary .feat { font-size: 11px; color: #378ADD; font-weight: 400; }
+  .tbl-wrap { padding: 0 8px 8px; overflow-x: auto; }
+  table.eq { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 340px; }
+  table.eq th { background: #F0F1F6; color: #0C447C; font-weight: 500; padding: 7px 5px; text-align: left; font-size: 11px; border-bottom: 1px solid #E0E2EC; }
+  table.eq td { padding: 6px 5px; border-bottom: 0.5px solid #EEE; color: #333; vertical-align: top; }
+  table.eq tr:last-child td { border-bottom: none; }
+  table.eq .proc { color: #185FA5; font-weight: 500; }
+  table.eq .cap { color: #378ADD; font-weight: 500; text-align: right; }
+  table.eq .spec { color: #666; font-size: 11px; }
+  table.eq .note { color: #A32D2D; font-size: 11px; }
+  .cap-overview { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 10px; }
+  .cap-overview th { background: #185FA5; color: white; padding: 6px 4px; font-weight: 500; font-size: 11px; text-align: center; }
+  .cap-overview td { padding: 6px 4px; border-bottom: 0.5px solid #E0E2EC; text-align: center; vertical-align: top; }
+  .cap-overview td:first-child { text-align: left; font-weight: 500; color: #042C53; }
+  .cap-overview tr:last-child td { border-bottom: none; }
+  .cap-overview tfoot td { font-weight: 600; color: #185FA5; background: #F0F7FD; border-top: 1px solid #B5D4F4; }
+  .news-item { padding: 10px 0; border-bottom: 0.5px solid #EEE; }
+  .news-item:last-child { border-bottom: none; }
+  .news-item .date { display: inline-block; font-size: 11px; font-weight: 600; color: white; background: #185FA5; padding: 2px 8px; border-radius: 10px; margin-bottom: 5px; }
+  .news-item.hot .date { background: #A32D2D; }
+  .news-item .title { font-size: 13px; font-weight: 500; color: #042C53; line-height: 1.5; }
+  .news-item .desc { font-size: 12px; color: #666; margin-top: 3px; line-height: 1.5; }
+  .intl-banner { background: linear-gradient(135deg, #FCEBEB 0%, #FDF5F5 100%); border-left: 3px solid #A32D2D; padding: 12px 14px; border-radius: 0 8px 8px 0; margin: 10px 0; }
+  .intl-banner .tag { display: inline-block; font-size: 10px; font-weight: 600; color: white; background: #A32D2D; padding: 2px 7px; border-radius: 8px; margin-bottom: 6px; }
+  .intl-banner .tt { font-size: 14px; font-weight: 600; color: #501313; margin-bottom: 4px; }
+  .intl-banner .dd { font-size: 12px; color: #791F1F; line-height: 1.55; }
+  .intl-banner .tl { font-size: 11px; color: #791F1F; margin-top: 6px; line-height: 1.6; }
+  .intl-banner .warn { font-size: 11px; color: #A32D2D; margin-top: 6px; padding: 6px 8px; background: white; border-radius: 4px; line-height: 1.5; }
+  .risk-box { background: #FFF8F0; border-left: 3px solid #BA7517; padding: 10px 12px; border-radius: 0 6px 6px 0; margin-top: 8px; }
+  .risk-box .rt { font-size: 12px; font-weight: 600; color: #633806; margin-bottom: 4px; }
+  .risk-box ul { list-style: none; padding-left: 0; }
+  .risk-box li { font-size: 12px; color: #444; padding: 2px 0; line-height: 1.5; padding-left: 12px; position: relative; }
+  .risk-box li::before { content: "·"; position: absolute; left: 4px; color: #BA7517; font-weight: 700; }
+  footer { text-align: center; padding: 20px 0 10px; font-size: 11px; color: #999; }
+  @media (max-width: 360px) { .wrap { padding: 10px 10px 30px; } body { font-size: 13px; } .metric .v { font-size: 14px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>敬业集团交流参考资料</h1>
+  <p>2026年7月20日</p>
+</header>
+
+<section>
+  <h2><span class="num">1</span>摘要</h2>
+  <div class="card summary-card">
+    <div class="item"><span class="num"></span><span class="txt"><b>创始人主导、家族传承</b>的大型民营钢铁集团。李赶坡仍处核心决策位置，其子李慧明任集团总经理，2025年兼任敬业钢铁董事长。</span></div>
+    <div class="item"><span class="num"></span><span class="txt"><b>规模大但利润率偏薄</b>。2025年销售收入3691亿元，财富世界500强第292位；《财富》口径营收512.25亿美元、利润3.20亿美元，<b>净利率约0.6%</b>。</span></div>
+    <div class="item"><span class="num"></span><span class="txt"><b>国内七大钢铁生产基地</b>：河北平山、辽宁营口、内蒙古乌兰浩特、广东揭阳、广东英德、河北唐山、江苏连云港，覆盖华北/东北/华南/华东。</span></div>
+    <div class="item"><span class="num"></span><span class="txt"><b>产品结构已由建筑钢材扩展为"长材+板材+冷轧涂镀+深加工"</b>。含螺纹钢、棒线材、中宽厚板、船板、海工钢、桥梁钢、管线钢、热卷、冷轧板、镀锌板和彩涂板。</span></div>
+    <div class="item"><span class="num"></span><span class="txt"><b>扩张模式以并购整合为主</b>。通过接管兴鑫钢铁、全资收购营口中板、整合华西特钢等方式，快速获得区域市场、产能和高端板材能力。</span></div>
+    <div class="item"><span class="num"></span><span class="txt"><b>中厚板是最有辨识度的优势业务</b>。收购营口中板后补强船板、海工钢、能源用钢和高端线材能力。</span></div>
+    <div class="item"><span class="num"></span><span class="txt"><b>强销售、强执行、强客户服务</b>。对客户提出交货数量、时间、质量、开票和退款"五个100%"，承诺质量不满意可退款、个性化定轧和产品全生命周期服务。</span></div>
+    <div class="item"><span class="num"></span><span class="txt"><b>正从"大规模钢厂"向"高端钢材和制造服务商"转型</b>。重点方向：高端板材、冷轧汽车家电用钢、管线钢、钢结构与制管、金属回收、智能制造、增材制造和储能。</span></div>
+    <div class="item"><span class="num"></span><span class="txt"><b>智能化和绿色化</b>。敬业本部1450热轧线已上线自研PES系统；入选国家级卓越级智能工厂；应用高炉专家系统、无人天车、机器人替代。</span></div>
+    <div class="item"><span class="num"></span><span class="txt"><b>英国钢铁事件</b>。英钢已于2026年7月16日被英国政府宣布正式国有化，敬业集团正告英国政府：将悉数追偿，分毫不让。</span></div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="num">2</span>企业基本情况</h2>
+  <div class="card">
+    <table class="info-tbl">
+      <tr><td class="k">企业名称</td><td class="v">敬业集团有限公司</td></tr>
+      <tr><td class="k">企业性质</td><td class="v">大型民营企业，创始人控制的集团化企业</td></tr>
+      <tr><td class="k">总部/本部</td><td class="v">总部石家庄市，工业本部平山县南甸镇</td></tr>
+      <tr><td class="k">创始人/董事长</td><td class="v">李赶坡</td></tr>
+      <tr><td class="k">集团总经理</td><td class="v">李慧明（2025年兼任敬业钢铁董事长）</td></tr>
+      <tr><td class="k">员工人数</td><td class="v">约4万人</td></tr>
+      <tr><td class="k">2025年销售</td><td class="v">3691亿元</td></tr>
+      <tr><td class="k">财富500强</td><td class="v">第292位（较上年314位上升22位）</td></tr>
+      <!-- <tr><td class="k">财富口径</td><td class="v">营收512.25亿美元、利润3.20亿美元、净利率约0.6%</td></tr> -->
+      <tr><td class="k">市场范围</td><td class="v">出口130多国；32国设分支/办事机构</td></tr>
+      <!-- <tr><td class="k">主要荣誉</td><td class="v">钢铁企业竞争力A+级、AAA信用、环保绩效A级、国家级卓越级智能工厂</td></tr> -->
+      <tr><td class="k">资质荣誉</td><td class="v">多国船级社、欧盟CE、冶金产品MC和绿色产品认证；钢铁企业竞争力A+级、环保绩效A级、国家级卓越级智能工厂等</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>发展历程</h3>
+    <div class="timeline">
+      <div class="t"><div class="yr">1988前后</div><div class="ev">以平山县化工企业为起点，生产水杨酸等化工产品</div></div>
+      <div class="t"><div class="yr">1990年代</div><div class="ev">完成早期资本积累并进入钢铁行业</div></div>
+      <div class="t"><div class="yr">2000年代</div><div class="ev">平山钢铁本部快速扩大，形成全流程钢铁生产能力</div></div>
+      <div class="t"><div class="yr">2014年</div><div class="ev">乌兰浩特钢铁加入敬业集团</div></div>
+      <div class="t"><div class="yr">2020年</div><div class="ev">收购英国钢铁公司；收购广东泰都钢铁→广东敬业钢铁</div></div>
+      <div class="t"><div class="yr">2022年</div><div class="ev">收购广东粤北联合钢铁</div></div>
+      <div class="t"><div class="yr">2024.06</div><div class="ev">接管连云港兴鑫钢铁→江苏敬业钢铁</div></div>
+      <div class="t"><div class="yr">2024.09</div><div class="ev">完成对日钢营口中板100%股权收购</div></div>
+      <div class="t"><div class="yr">2025前后</div><div class="ev">将河北华西特钢纳入七大生产基地体系</div></div>
+      <div class="t"><div class="yr">2026.07</div><div class="ev"><b>英国钢铁公司被英国政府国有化</b>，敬业退出该项资产控制</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>主要业务板块</h3>
+    <div class="biz-grid">
+      <div class="biz"><div class="n">钢铁主业</div><div class="d">长材+板材（中厚板/宽厚板/船板/海工/桥梁/管线/风电/容器）+卷板（热轧/冷轧）+涂镀（镀锌/彩涂）+出口+高端品种（9Ni/X70M/DC06）</div></div>
+      <div class="biz"><div class="n">钢材深加工</div><div class="d">钢结构、钢筋加工配送、精密制管、埋弧直缝焊管、专用汽车及改装、冶金设备制造维修、钢板预处理。规划300亿元产值园区</div></div>
+      <div class="biz"><div class="n">金属回收加工</div><div class="d">废钢采购/分拣/加工、基地运营、工程拆除、汽车拆解、国际废钢贸易。未来提高废钢比、发展电炉短流程的基础</div></div>
+      <div class="biz"><div class="n">增材制造与机器人</div><div class="d">金属粉末制备、3D打印、金属注射成形。服务航空航天、医疗、模具、消费电子。"新质生产力"重点板块</div></div>
+      <div class="biz"><div class="n">新能源</div><div class="d">2023年成立，工商业储能柜、大型储能系统、智能电网和用户侧储能。尚处拓展期</div></div>
+      <div class="biz"><div class="n">非钢产业</div><div class="d">医药科技、国际贸易、物流、酒店、景区、康养旅游、医院、教育。利润和资产仍高度依赖钢铁主业</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>典型经营特征</h3>
+    <div class="feature-box"><div class="ft">"并购+改造+统一经营"扩张</div><ul><li>近年主要增长方式不是新建独立钢厂，而是收购接管存量企业→快速恢复生产→纳入集团统一体系→技术改造→区域基地降低物流半径</li><li>扩张速度快，但带来设备差异、人员文化、债务、环保和系统整合压力</li></ul></div>
+    <div class="feature-box"><div class="ft">从建筑钢材走向板材和高端品种</div><ul><li>平山+华西+营口组成板材主轴；广东+粤北+江苏+乌钢强化建筑钢材和区域市场</li><li>产品升级方向：船舶海工、油气管线、风电新能源装备、桥梁、汽车家电冷轧板、高强耐低温耐腐蚀钢</li></ul></div>
+    <div class="feature-box"><div class="ft">出口导向明显</div><ul><li>出口130多国，利用广东/营口/唐山等港口区位</li><li>风险：贸易壁垒、反倾销、碳关税和地缘政治不确定性</li></ul></div>
+    <div class="feature-box"><div class="ft">强客户承诺和营销网络</div><ul><li>"五个100%"：交货数量/时间/质量/开票/退款</li><li>质量不满意可退款、个性化定制、产品全生命周期服务</li></ul></div>
+    <!-- <div class="feature-box"><div class="ft">管理文化偏强执行</div><ul><li>"务实求精，永远争第一""打出去、冲上去""企业管理无止境，技术进步无止境"</li><li>交流时宜准备具体数据、项目和落地方案，泛泛而谈不易取得效果</li></ul></div> -->
+  </div>
+
+</section>
+
+<section>
+  <h2><span class="num">3</span>核心人员及背景</h2>
+  <div class="card">
+    <div class="person">
+      <!-- <div class="avatar">李</div> -->
+      <div class="info">
+        <div class="nm">李赶坡</div>
+        <div class="role">创始人 · 集团董事长</div>
+        <div class="bio">1949年生，河北平山人。早年有教师和基层行政管理经历，后辞职创业。1980年代末创办平山县化工企业，随后组建敬业集团。清华经管学院EMBA08级校友，曾任第十一届全国人大代表。集团战略方向、重大投资、并购和企业文化的核心塑造者。管理风格突出"务实求精、争第一、强执行、重人才、重现场管理"。</div>
+        <!-- <div class="judg"><b>交流判断：</b>若出席，会谈应适当提高战略高度，适合谈产业报国、钢铁行业长期趋势、民营企业传承、高端制造、绿色转型和区域产业贡献。过度聚焦单项采购价格，层级可能偏低。</div> -->
+      </div>
+    </div>
+    <div class="person">
+      <!-- <div class="avatar">李</div> -->
+      <div class="info">
+        <div class="nm">李慧明</div>
+        <div class="role">集团总经理 · 敬业钢铁董事长</div>
+        <div class="bio">1979年生，河北平山人，硕士学历。为李赶坡之子，集团明确的二代核心管理者。2003年前后进入敬业，从炼铁、采购等岗位做起，曾任采购部部长、常务副总经理。2010年起担任集团总经理，主要负责集团经营体系和日常运营。曾深度参与英国钢铁收购和经营。2025年4月底出任敬业钢铁有限公司董事长。</div>
+        <!-- <div class="judg"><b>交流判断：</b>更偏经营管理和产业整合，适合深入谈七大基地协同、产品结构升级、并购后整合、市场开拓、数字化管理和供应链合作。</div> -->
+      </div>
+    </div>
+    <div class="person">
+      <!-- <div class="avatar">刘</div> -->
+      <div class="info">
+        <div class="nm">刘虎德</div>
+        <div class="role">集团副总经理 · 敬业钢铁经理</div>
+        <div class="bio">2025年4月出任敬业钢铁有限公司法定代表人、董事、经理及财务负责人。曾代表集团与北京科技大学等机构开展冶金技术交流。详细教育和职业履历公开程度较低，不宜对背景作过度延伸。</div>
+        <!-- <div class="judg"><b>交流判断：</b>可能更侧重本部钢铁生产经营、技术改造、成本控制和项目执行。</div> -->
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>治理特征</h3>
+    <p style="font-size:13px;color:#444;line-height:1.6">敬业属于典型的<b>"创始人掌舵、二代经营接班、职业经理人分工执行"</b>的大型民营集团：</p>
+    <div class="feature-box" style="margin-top:6px"><ul>
+      <li>李赶坡负责战略、文化和重大事项</li>
+      <li>李慧明负责集团经营和产业整合</li>
+      <li>各副总经理、基地总经理负责生产、技术、采购、销售及区域基地</li>
+      <li>决策链条较短，执行力度较强，但关键战略仍具有明显的创始人中心特征</li>
+    </ul></div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="num">4</span>生产基地分布</h2>
+    <img src="./baseSteelMap.png" alt="七大基地产能分布图"> 
+
+  <!-- <div class="map-placeholder">
+    <div class="ph-icon">[ 地图 ]</div>
+    <div class="ph-txt">七大钢铁基地分布图</div>
+    <div class="ph-sub"> 
+      <img src="./敬业集团七大基地产能分布图.png" alt="七大基地产能分布图"> 
+    </div>
+  </div> -->
+
+  <div class="card">
+    <h3>七大基地产能概览</h3>
+    <table class="cap-overview">
+      <thead>
+        <tr><th>基地</th><th>所在地</th><th>生铁(万t)</th><th>粗钢(万t)</th><th>钢材(万t)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>敬业钢铁（本部）</td><td>河北石家庄</td><td>1500</td><td>1654</td><td>654</td></tr>
+        <tr><td>敬业营口中板</td><td>辽宁营口</td><td>700</td><td>786</td><td>740</td></tr>
+        <tr><td>敬业华西特钢</td><td>河北唐山</td><td>200</td><td>215</td><td>200</td></tr>
+        <tr><td>江苏敬业钢铁</td><td>江苏连云港</td><td>255</td><td>287</td><td>280</td></tr>
+        <tr><td>广东敬业钢铁</td><td>广东揭阳</td><td>75</td><td>82</td><td>80</td></tr>
+        <tr><td>粤北联合钢铁</td><td>广东清远</td><td>76</td><td>149</td><td>145</td></tr>
+        <tr><td>敬业乌钢</td><td>内蒙古乌兰浩特</td><td>194</td><td>226</td><td>220</td></tr>
+      </tbody>
+      <tfoot>
+        <tr><td>合计</td><td>7大基地</td><td>3000</td><td>3399</td><td>2319</td></tr>
+      </tfoot>
+    </table>
+    <!-- <p style="font-size:11px;color:#888;margin-top:6px;line-height:1.5">
+      <b>产品特征：</b>本部（宽厚板/热卷/冷轧涂镀/棒线材）·营口（2800/3800/5000mm中厚板，船板/海工/能源钢）·华西（3800mm宽厚板，船舶/海工/能源/重型机械）·江苏（钢筋）·广东敬业（英标港标钢筋/出口钢坯，配套自有码头）·粤北（工业线材/冷镦钢/中高碳硬线/盘螺/螺纹钢）·乌钢（钢筋/线棒材）
+    </p>
+    <p style="font-size:11px;color:#A32D2D;margin-top:4px">
+      ⚠️ 口径提示：敬业为非上市民营集团，无统一公开完整的七基地核准产能表。上表将公开确认的生产线能力与明确披露的产能结合列示，未披露部分不作推算。
+    </p> -->
+  </div>
+
+  <h3 style="margin-top:14px;padding-left:2px">产线设备明细（点击展开）</h3>
+
+  <details class="base">
+    <summary><div class="nm-wrap"><span>敬业钢铁（本部）· 河北石家庄</span><span class="feat">生铁1500万吨 / 粗钢1654万吨 / 钢材654万吨</span></div></summary>
+    <div class="tbl-wrap"><table class="eq">
+      <thead><tr><th>工序</th><th>设备</th><th>规格</th><th>设计产能(万t)</th></tr></thead>
+      <tbody>
+        <tr><td class="proc">焦化</td><td>捣固焦炉</td><td class="spec">4.3m×2×50孔</td><td class="cap">80</td></tr>
+        <tr><td class="proc">球团</td><td>回转窑</td><td class="spec">2×80+1×200万吨</td><td class="cap">402</td></tr>
+        <tr><td class="proc">烧结</td><td>烧结机</td><td class="spec">3×230+4×260 m²</td><td class="cap">1982</td></tr>
+        <tr><td class="proc">炼铁</td><td>高炉</td><td class="spec">3×1500+6×1260 m³</td><td class="cap">1500</td></tr>
+        <tr><td class="proc">炼钢</td><td>转炉</td><td class="spec">5×150t+1×100t+2×80t</td><td class="cap">1697</td></tr>
+        <tr><td class="proc">连铸</td><td>板坯</td><td class="spec">4台</td><td class="cap">993</td></tr>
+        <tr><td class="proc">连铸</td><td>方坯</td><td class="spec">2台</td><td class="cap">662</td></tr>
+        <tr><td class="proc">热轧</td><td>热连轧</td><td class="spec">1780mm+1450mm</td><td class="cap">488</td></tr>
+        <tr><td class="proc">热轧</td><td>中厚板</td><td class="spec">3000mm</td><td class="cap">194</td></tr>
+        <tr><td class="proc">热轧</td><td>中厚板</td><td class="spec">3800mm</td><td class="cap">301</td></tr>
+        <tr><td class="proc">热轧</td><td>长材</td><td class="spec">棒材6条+线材1条</td><td class="cap">645</td></tr>
+        <tr><td class="proc">冷轧</td><td>酸轧联机</td><td class="spec">2×1450mm</td><td class="cap">190</td></tr>
+      </tbody>
+    </table></div>
+  </details>
+
+  <details class="base">
+    <summary><div class="nm-wrap"><span>敬业营口中板 · 辽宁营口</span><span class="feat">生铁700万吨 / 粗钢786万吨 / 钢材740万吨</span></div></summary>
+    <div class="tbl-wrap"><table class="eq">
+      <thead><tr><th>工序</th><th>设备</th><th>规格</th><th>产能(万吨)</th></tr></thead>
+      <tbody>
+        <tr><td class="proc">烧结</td><td>烧结机</td><td class="spec">132+2×180+600 m²</td><td class="cap">200</td></tr>
+        <tr><td class="proc">炼铁</td><td>高炉</td><td class="spec">1×2400+2×2300 m³</td><td class="cap">700</td></tr>
+        <tr><td class="proc">炼铁</td><td>竖炉</td><td class="spec">2×10 m²</td><td class="cap">127</td></tr>
+        <tr><td class="proc">炼钢</td><td>转炉</td><td class="spec">4×120 t</td><td class="cap">806</td></tr>
+        <tr><td class="proc">连铸</td><td>板坯</td><td class="spec">4台单流</td><td class="cap">581</td></tr>
+        <tr><td class="proc">连铸</td><td>方坯</td><td class="spec">1台8流</td><td class="cap">205</td></tr>
+        <tr><td class="proc">热轧</td><td>中厚板</td><td class="spec">2800mm</td><td class="cap">160</td></tr>
+        <tr><td class="proc">热轧</td><td>中厚板</td><td class="spec">3800mm</td><td class="cap">150</td></tr>
+        <tr><td class="proc">热轧</td><td>中厚板</td><td class="spec">5000mm</td><td class="cap">230</td></tr>
+        <tr><td class="proc">热轧</td><td>长材</td><td class="spec">高线3条</td><td class="cap">200</td></tr>
+      </tbody>
+    </table></div>
+  </details>
+
+  <details class="base">
+    <summary><div class="nm-wrap"><span>敬业华西特钢 · 河北唐山</span><span class="feat">生铁200万吨 / 粗钢215万吨 / 钢材200万吨</span></div></summary>
+    <div class="tbl-wrap"><table class="eq">
+      <thead><tr><th>工序</th><th>设备</th><th>规格</th><th>产能(万吨)</th></tr></thead>
+      <tbody>
+        <tr><td class="proc">烧结</td><td>烧结机</td><td class="spec">1×320 m²</td><td class="cap">305</td></tr>
+        <tr><td class="proc">炼铁</td><td>高炉</td><td class="spec">1×2300 m³</td><td class="cap">200</td></tr>
+        <tr><td class="proc">炼钢</td><td>转炉</td><td class="spec">1×170 t</td><td class="cap">221</td></tr>
+        <tr><td class="proc">连铸</td><td>板坯</td><td class="spec">1台双流</td><td class="cap">215</td></tr>
+        <tr><td class="proc">热轧</td><td>中厚板</td><td class="spec">3800mm</td><td class="cap">200</td></tr>
+        <tr><td colspan="4" class="note">注：中厚板2024年底投产，2025年实际产量120万吨</td></tr>
+      </tbody>
+    </table></div>
+  </details>
+
+  <details class="base">
+    <summary><div class="nm-wrap"><span>江苏敬业钢铁 · 江苏连云港</span><span class="feat">生铁255万吨 / 粗钢287万吨 / 钢材280万吨</span></div></summary>
+    <div class="tbl-wrap"><table class="eq">
+      <thead><tr><th>工序</th><th>设备</th><th>规格</th><th>产能(万吨)</th></tr></thead>
+      <tbody>
+        <tr><td class="proc">烧结</td><td>平烧</td><td class="spec">1×330 m²</td><td class="cap">337</td></tr>
+        <tr><td class="proc">炼铁</td><td>高炉</td><td class="spec">3×500 m³</td><td class="cap">255</td></tr>
+        <tr><td class="proc">炼铁</td><td>竖炉</td><td class="spec">4座</td><td class="cap">114</td></tr>
+        <tr><td class="proc">炼钢</td><td>转炉</td><td class="spec">2×120 t</td><td class="cap">295</td></tr>
+        <tr><td class="proc">连铸</td><td>方坯</td><td class="spec">2台7流</td><td class="cap">287</td></tr>
+        <tr><td class="proc">热轧</td><td>长材</td><td class="spec">2条棒材</td><td class="cap">280</td></tr>
+      </tbody>
+    </table></div>
+  </details>
+
+  <details class="base">
+    <summary><div class="nm-wrap"><span>广东敬业钢铁 · 广东揭阳</span><span class="feat">生铁75万吨 / 粗钢82万吨 / 钢材80万吨</span></div></summary>
+    <div class="tbl-wrap"><table class="eq">
+      <thead><tr><th>工序</th><th>设备</th><th>规格</th><th>产能(万吨)</th></tr></thead>
+      <tbody>
+        <tr><td class="proc">烧结</td><td>烧结机</td><td class="spec">1×180 m²</td><td class="cap">122</td></tr>
+        <tr><td class="proc">炼铁</td><td>高炉</td><td class="spec">1×600 m³</td><td class="cap">75</td></tr>
+        <tr><td class="proc">炼钢</td><td>转炉</td><td class="spec">1×50 t</td><td class="cap">84</td></tr>
+        <tr><td class="proc">连铸</td><td>方坯</td><td class="spec">1台5流</td><td class="cap">82</td></tr>
+        <tr><td class="proc">热轧</td><td>长材</td><td class="spec">棒材1条</td><td class="cap">80</td></tr>
+      </tbody>
+    </table></div>
+  </details>
+
+  <details class="base">
+    <summary><div class="nm-wrap"><span>粤北联合钢铁 · 广东清远</span><span class="feat">生铁76万吨 / 粗钢149万吨 / 钢材145万吨</span></div></summary>
+    <div class="tbl-wrap"><table class="eq">
+      <thead><tr><th>工序</th><th>设备</th><th>规格</th><th>产能(万吨)</th></tr></thead>
+      <tbody>
+        <tr><td class="proc">烧结</td><td>平烧</td><td class="spec">1×90 m²</td><td class="cap">100</td></tr>
+        <tr><td class="proc">炼铁</td><td>高炉</td><td class="spec">1×630 m³</td><td class="cap">76</td></tr>
+        <tr><td class="proc">炼钢</td><td>转炉</td><td class="spec">1×75 t</td><td class="cap">80</td></tr>
+        <tr><td class="proc">炼钢</td><td>电炉</td><td class="spec">3×50 t</td><td class="cap">73</td></tr>
+        <tr><td class="proc">连铸</td><td>方坯</td><td class="spec">1台5流+2台6流</td><td class="cap">149</td></tr>
+        <tr><td class="proc">热轧</td><td>长材</td><td class="spec">棒材1条+盘螺1条</td><td class="cap">145</td></tr>
+      </tbody>
+    </table></div>
+  </details>
+
+  <details class="base">
+    <summary><div class="nm-wrap"><span>敬业乌钢 · 内蒙古乌兰浩特</span><span class="feat">生铁194万吨 / 粗钢226万吨 / 钢材220万吨</span></div></summary>
+    <div class="tbl-wrap"><table class="eq">
+      <thead><tr><th>工序</th><th>设备</th><th>规格</th><th>产能(万吨)</th></tr></thead>
+      <tbody>
+        <tr><td class="proc">烧结</td><td>烧结机</td><td class="spec">1×240 m²</td><td class="cap">268</td></tr>
+        <tr><td class="proc">炼铁</td><td>高炉</td><td class="spec">1×1200 m³</td><td class="cap">194</td></tr>
+        <tr><td class="proc">炼铁</td><td>竖炉</td><td class="spec">1座</td><td class="cap">52</td></tr>
+        <tr><td class="proc">炼钢</td><td>转炉</td><td class="spec">1×120 t</td><td class="cap">231</td></tr>
+        <tr><td class="proc">连铸</td><td>方坯</td><td class="spec">1台8流</td><td class="cap">221</td></tr>
+        <tr><td class="proc">热轧</td><td>长材</td><td class="spec">老式棒材+双高棒</td><td class="cap">220</td></tr>
+      </tbody>
+    </table></div>
+  </details>
+</section>
+
+<section>
+  <h2><span class="num">5</span>最新动态</h2>
+
+  <div class="card">
+    <div class="intl-banner">
+      <span class="tag">国际化焦点</span>
+      <div class="tt">英国钢铁公司被英国政府正式国有化</div>
+      <div class="dd">2026年7月16日，英国钢铁正式转为英国政府所有，敬业成为前所有者。英国政府公告称双方未能就兼顾钢厂未来和纳税人利益的方案达成一致。</div>
+      <div class="tl">
+        <b>时间线：</b><br>
+        · 2020年3月 敬业完成收购英国钢铁<br>
+        · 2025年4月 英国政府通过《钢铁行业特别措施法》，取得介入权<br>
+        · 2025年4月后 英国政府实际控制生产经营<br>
+        · 2026年7月15日 国有化法案获得御准<br>
+        · 2026年7月16日 英钢正式转为英国政府所有<br>
+        · 后续 英国将聘请独立估值人评估是否应向敬业支付补偿
+      </div>
+    </div>
+
+    <div class="news-item">
+      <span class="date">2026.06</span>
+      <div class="title">高端管线钢X70M/PSL2取得突破</div>
+      <div class="desc">敬业完成X70M/PSL2高端管线钢工业化生产，面向高压、大口径油气长输管道，使用转炉脱磷、LF精炼、RH真空处理、电磁搅拌和控轧控冷等技术。板材升级已从普通工程板延伸到高洁净度、高韧性能源用钢。</div>
+    </div>
+
+    <div class="news-item">
+      <span class="date">2026.06</span>
+      <div class="title">DC06超深冲钢实现批量生产</div>
+      <div class="desc">高品钢事业部实现DC06超深冲钢量产，目标市场为汽车复杂冲压件和高端家电面板。汽车和家电冷轧板认证周期长、质量稳定性要求高，有助于提升产品附加值。</div>
+    </div>
+
+    <div class="news-item">
+      <span class="date">2026年</span>
+      <div class="title">1450热轧线智能化改造，上线自研PES系统</div>
+      <div class="desc">本部1450热轧产线上线集团自研PES生产执行系统，实现订单、物料、库存、生产和质量数据贯通。</div>
+    </div>
+
+    <div class="news-item">
+      <span class="date">2025-2026</span>
+      <div class="title">智能工厂和机器人应用</div>
+      <div class="desc">敬业钢铁入选国家级卓越级智能工厂；集团在炼铁、炼钢、轧钢和库区等工序推进70余个高风险、高强度岗位机器替代，应用无人天车、高炉专家系统、转炉合金模型等。</div>
+    </div>
+
+    <div class="news-item">
+      <span class="date">2026.06</span>
+      <div class="title">品牌评估价值提升至1251.36亿元</div>
+      <div class="desc">世界品牌实验室将"敬业"品牌价值评估为1251.36亿元，列《中国500最具价值品牌》第99位、钢铁企业第4位。该数据为品牌评估机构口径，并非企业资产或可直接变现价值。</div>
+    </div>
+  </div>
+</section>
+
+<!-- <footer>
+  本材料主要依据敬业集团官方网站、政府部门、行业协会及公开披露资料整理 · 2026年7月20日<br>
+  敬业集团为非上市民营企业，部分产能、财务和人员信息未完整公开
+</footer> -->
+
+</div>
+</body>
+</html>
