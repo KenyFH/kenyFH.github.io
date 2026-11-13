@@ -40,3 +40,9 @@
 - NPTEL，Material Balance：https://archive.nptel.ac.in/content/storage2/courses/113104059/lecture11/11_5.html
 - NPTEL，Dephosphorization：https://archive.nptel.ac.in/content/storage2/courses/113104059/lecture8/8_5.htm
 - Konecranes，Metals industry material handling：https://www.konecranes.com/sites/default/files/2022-10/Metals_smallbook_EN_web_2022.pdf
+
+## 自动镜头与炉内反应增强
+
+默认自动聚焦到当前工序区域，平滑追踪运输物料、炉内吹炼、出钢及连铸。拖动、缩放或选择固定观察视角会临时接管镜头，下一工序恢复；关闭“自动聚焦”可一直自由观察。尊重系统减少动态效果设置。
+
+吹炼时展示变形熔池、氧流冲击凹坑、熔池气泡、泡沫渣起伏、金属液滴与向烟罩逸出的烟气。反应随降枪、吹炼、提枪启停，暂停及进度定位会固定在对应反应状态。效果为教学增强，不是 CFD 计算或反应强度测量。
